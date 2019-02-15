@@ -65,9 +65,16 @@ public class DyescapeBot extends AbstractVerticle {
         }
 
         CompositeFuture.all(deploymentFutures).setHandler(deploymentHandler -> {
-            this.getVertx().eventBus().publish(Events.STARTUP_EVENT, null);
-            future.complete();
-            this.logger.info("Finished application startup");
+            if (deploymentHandler.succeeded()) {
+
+                this.getVertx().eventBus().publish(Events.STARTUP_EVENT, null);
+                future.complete();
+                this.logger.info("Finished application startup");
+            } else {
+
+                future.fail(deploymentHandler.cause());
+                this.logger.error("Failed application startup!");
+            }
         });
     }
 }
