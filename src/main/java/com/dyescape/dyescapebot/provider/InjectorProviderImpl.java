@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 import com.dyescape.dyescapebot.binder.ApplicationVerticlesBinder;
+import com.dyescape.dyescapebot.binder.BotConnectionBinder;
 import com.dyescape.dyescapebot.binder.InjectorProviderBinder;
 
 /**
@@ -24,7 +25,8 @@ public class InjectorProviderImpl implements InjectorProvider {
 
     private final static Injector injector = Guice.createInjector(
             new ApplicationVerticlesBinder(),
-            new InjectorProviderBinder()
+            new InjectorProviderBinder(),
+            new BotConnectionBinder()
     );
 
     // -------------------------------------------- //

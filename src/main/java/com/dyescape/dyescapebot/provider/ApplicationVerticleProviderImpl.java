@@ -7,6 +7,8 @@ import javax.inject.Singleton;
 
 import io.vertx.core.Verticle;
 
+import com.dyescape.dyescapebot.verticle.BotGatewayConnectorVerticle;
+
 /**
  * Base implementation of the {@link ApplicationVerticleProvider}
  * interface. In here, the actual production scenario application
@@ -25,7 +27,7 @@ public class ApplicationVerticleProviderImpl implements ApplicationVerticleProvi
     public List<Class<? extends Verticle>> getApplicationVerticles() {
         List<Class<? extends Verticle>> verticles = new ArrayList<>();
 
-        // Add Verticles here
+        verticles.add(BotGatewayConnectorVerticle.class);
 
         return verticles;
     }
