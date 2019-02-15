@@ -21,7 +21,7 @@ import com.dyescape.dyescapebot.provider.InjectorProvider;
  * the startup process of the application, such as deploying all
  * other application Verticles and making sure all are working as
  * they should.
- * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+ * @author Dennis van der Veeke
  * @since 0.1.0
  */
 public class DyescapeBot extends AbstractVerticle {

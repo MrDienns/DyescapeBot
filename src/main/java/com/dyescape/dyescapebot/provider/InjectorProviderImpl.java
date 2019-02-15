@@ -13,7 +13,7 @@ import com.dyescape.dyescapebot.binder.InjectorProviderBinder;
  * interface. This is the base implementation of a deployed scenario
  * as all known application specific binders are registered in this
  * {@link Injector}.
- * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+ * @author Dennis van der Veeke
  * @since 0.1.0
  */
 @Singleton

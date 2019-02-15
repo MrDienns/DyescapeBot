@@ -23,7 +23,7 @@ import com.dyescape.dyescapebot.provider.InjectorProvider;
  * responsibility principle as the main Verticle should only be
  * responsible for launcher the other application Verticles and
  * start the further process.
- * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+ * @author Dennis van der Veeke
  * @since 0.1.0
  */
 public class DyescapeBotLauncher extends Launcher {

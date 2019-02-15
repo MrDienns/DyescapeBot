@@ -10,7 +10,7 @@ import com.dyescape.dyescapebot.provider.ApplicationVerticleProviderImpl;
  * is used to bind the {@link ApplicationVerticleProvider} interface to the
  * implementation of {@link ApplicationVerticleProviderImpl} when injecting the
  * {@link ApplicationVerticleProvider} interface.
- * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+ * @author Dennis van der Veeke
  * @since 0.1.0
  */
 public class ApplicationVerticlesBinder extends AbstractModule {

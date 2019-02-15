@@ -10,7 +10,7 @@ import com.dyescape.dyescapebot.provider.InjectorProviderImpl;
  * is used to bind the {@link InjectorProvider} interface to the
  * implementation of {@link InjectorProviderImpl} when injecting the
  * {@link InjectorProvider} interface.
- * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+ * @author Dennis van der Veeke
  * @since 0.1.0
  */
 public class InjectorProviderBinder extends AbstractModule {

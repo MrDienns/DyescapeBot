@@ -9,7 +9,7 @@ import com.google.inject.Injector;
  * proper dependency injection.
  *
  * This interface may be mocked during testing.
- * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+ * @author Dennis van der Veeke
  * @since 0.1.0
  */
 public interface InjectorProvider {
@@ -18,7 +18,7 @@ public interface InjectorProvider {
      * Returns the Guice {@link Injector} which is used to get an instance
      * of classes through dependency injection.
      * @return {@link Injector}
-     * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+     * @author Dennis van der Veeke
      * @since 0.1.0
      */
     Injector getInjector();

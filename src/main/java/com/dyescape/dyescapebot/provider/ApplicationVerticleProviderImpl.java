@@ -13,7 +13,7 @@ import com.dyescape.dyescapebot.verticle.BotGatewayConnectorVerticle;
  * Base implementation of the {@link ApplicationVerticleProvider}
  * interface. In here, the actual production scenario application
  * Verticles are specified to the application can operate.
- * @author Dennis van der Veeke - Owner & Lead Developer of Dyescape
+ * @author Dennis van der Veeke
  * @since 0.1.0
  */
 @Singleton
