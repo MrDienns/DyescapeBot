@@ -3,10 +3,9 @@ package com.dyescape.dyescapebot;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Verticle;
+import io.vertx.config.ConfigRetriever;
+import io.vertx.core.*;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -56,25 +55,43 @@ public class DyescapeBot extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> future) {
+
+        // We prepare a list of deployment futures
         List<Future> deploymentFutures = new ArrayList<>();
 
-        for (Class<? extends Verticle> clazz : this.applicationVerticleProvider.getApplicationVerticles()) {
-            Future deploymentFuture = Future.future();
-            deploymentFutures.add(deploymentFuture);
-            this.getVertx().deployVerticle(this.injectorProvider.getInjector().getInstance(clazz), deploymentFuture);
-        }
+        // Let's load the configuration
+        ConfigRetriever configRetriever = ConfigRetriever.create(this.getVertx());
+        configRetriever.getConfig(configHandler -> {
 
-        CompositeFuture.all(deploymentFutures).setHandler(deploymentHandler -> {
-            if (deploymentHandler.succeeded()) {
-
-                this.getVertx().eventBus().publish(Events.STARTUP_EVENT, null);
-                future.complete();
-                this.logger.info("Finished application startup");
-            } else {
-
-                future.fail(deploymentHandler.cause());
-                this.logger.error("Failed application startup!");
+            // Check if the configuration could be retrieved at all
+            if (!configHandler.succeeded()) {
+                future.fail(configHandler.cause());
+                return;
             }
+
+            // Get the actual configuration now
+            JsonObject config = configHandler.result();
+
+            // We loop over all Verticles that this application needs to run
+            for (Class<? extends Verticle> clazz : this.applicationVerticleProvider.getApplicationVerticles()) {
+                Future deploymentFuture = Future.future();
+                deploymentFutures.add(deploymentFuture);
+                this.getVertx().deployVerticle(this.injectorProvider.getInjector().getInstance(clazz),
+                        new DeploymentOptions().setConfig(config), deploymentFuture);
+            }
+
+            CompositeFuture.all(deploymentFutures).setHandler(deploymentHandler -> {
+                if (deploymentHandler.succeeded()) {
+
+                    this.getVertx().eventBus().publish(Events.STARTUP_EVENT, null);
+                    future.complete();
+                    this.logger.info("Finished application startup");
+                } else {
+
+                    future.fail(deploymentHandler.cause());
+                    this.logger.error("Failed application startup!");
+                }
+            });
         });
     }
 }

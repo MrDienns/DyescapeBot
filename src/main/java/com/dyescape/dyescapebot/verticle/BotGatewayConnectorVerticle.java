@@ -3,7 +3,6 @@ package com.dyescape.dyescapebot.verticle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -50,39 +49,27 @@ public class BotGatewayConnectorVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> future) {
 
-        // Let's load the configuration
-        this.logger.debug("Loading configuration to retrieve token...");
-        ConfigRetriever configRetriever = ConfigRetriever.create(this.getVertx());
-        configRetriever.getConfig(configHandler -> {
+        // Let's validate the configuration for this Verticle
+        JsonObject config = this.config();
+        String apiToken = config.getString(Config.API_TOKEN);
+        if (apiToken == null || apiToken.isEmpty()) {
+            future.fail(new DyescapeBotConfigurationException("No API token is configured."));
+            return;
+        }
 
-            // Check if the configuration could be retrieved at all
-            if (!configHandler.succeeded()) {
-                future.fail(configHandler.cause());
-                return;
+        // Initiate the connection
+        this.logger.debug("Token loaded, connecting to the gateway...");
+        this.botConnection.connect(apiToken, handler -> {
+
+            // Let's check the result
+            if (handler.succeeded()) {
+
+                this.logger.info("Successfully connected to the gateway.");
+                future.complete();
+            } else {
+
+                future.fail(handler.cause());
             }
-
-            // Parse the configuration and validate the token
-            JsonObject config = configHandler.result();
-            String apiToken = config.getString(Config.API_TOKEN);
-            if (apiToken == null || apiToken.isEmpty()) {
-                future.fail(new DyescapeBotConfigurationException("No API token is configured."));
-                return;
-            }
-
-            // Initiate the connection
-            this.logger.debug("Token loaded, connecting to the gateway...");
-            this.botConnection.connect(apiToken, handler -> {
-
-                // Let's check the result
-                if (handler.succeeded()) {
-
-                    this.logger.info("Successfully connected to the gateway.");
-                    future.complete();
-                } else {
-
-                    future.fail(handler.cause());
-                }
-            });
         });
     }
 }
