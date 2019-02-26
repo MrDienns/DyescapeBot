@@ -8,6 +8,7 @@ import io.vertx.core.Handler;
 
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -42,6 +43,8 @@ public class DiscordBotConnection implements BotConnection {
                         }
                     })
                     .build();
+
+            this.jda.getPresence().setGame(Game.of(Game.GameType.DEFAULT, "Dyescape"));
         } catch (Exception e) {
             handler.handle(Future.failedFuture(new DyescapeBotConnectionException(e)));
         }
