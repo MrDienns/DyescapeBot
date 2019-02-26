@@ -11,6 +11,8 @@ package com.dyescape.dyescapebot.constant;
  */
 public final class Config {
 
+    private Config() {  }
+
     // -------------------------------------------- //
     // CONSTANTS
     // -------------------------------------------- //

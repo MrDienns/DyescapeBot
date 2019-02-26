@@ -8,6 +8,8 @@ package com.dyescape.dyescapebot.constant;
  */
 public final class Events {
 
+    private Events() {  }
+
     // -------------------------------------------- //
     // CONSTANTS
     // -------------------------------------------- //
