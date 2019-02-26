@@ -2,7 +2,7 @@ package com.dyescape.dyescapebot.unit.verticle.helper;
 
 import io.vertx.core.AbstractVerticle;
 
-public class TestVerticle extends AbstractVerticle {
+public class SucceedingBlankVerticle extends AbstractVerticle {
 
     public static final String DEPLOYED_VERTICLE_ADDRESS = "test_verticle_deployed";
 

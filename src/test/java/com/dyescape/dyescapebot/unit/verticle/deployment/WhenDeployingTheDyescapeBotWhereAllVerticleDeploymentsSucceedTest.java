@@ -22,19 +22,19 @@ import com.dyescape.dyescapebot.binder.InjectorProviderBinder;
 import com.dyescape.dyescapebot.constant.Events;
 import com.dyescape.dyescapebot.provider.ApplicationVerticleProvider;
 import com.dyescape.dyescapebot.provider.InjectorProvider;
-import com.dyescape.dyescapebot.unit.verticle.helper.TestVerticle;
+import com.dyescape.dyescapebot.unit.verticle.helper.SucceedingBlankVerticle;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(VertxExtension.class)
 @DisplayName("When deploying the Dyescape Bot")
-public class WhenDeployingTheDyescapeBotTest {
+public class WhenDeployingTheDyescapeBotWhereAllVerticleDeploymentsSucceedTest {
 
     private static Injector injector;
 
     @BeforeAll
     public static void setup() {
-        Verticle testVerticle = new TestVerticle();
+        Verticle testVerticle = new SucceedingBlankVerticle();
 
         List<Class<? extends Verticle>> verticles = new ArrayList<>();
         verticles.add(testVerticle.getClass());
@@ -63,7 +63,7 @@ public class WhenDeployingTheDyescapeBotTest {
     @DisplayName("It should deploy the provided list of Verticles")
     public void itShouldDeployTheProvidedListOfVerticles(Vertx vertx, VertxTestContext testContext) {
         List<Class<? extends Verticle>> verticles = new ArrayList<>();
-        verticles.add(TestVerticle.class);
+        verticles.add(SucceedingBlankVerticle.class);
 
         ApplicationVerticleProvider applicationVerticleProvider = Mockito.mock(ApplicationVerticleProvider.class);
         Mockito.when(applicationVerticleProvider.getApplicationVerticles()).thenReturn(verticles);
