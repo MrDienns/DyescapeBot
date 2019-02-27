@@ -5,14 +5,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.stubbing.Answer;
 
-import com.dyescape.dyescapebot.constant.Config;
 import com.dyescape.dyescapebot.core.connectivity.BotConnection;
 import com.dyescape.dyescapebot.exception.DyescapeBotConfigurationException;
 import com.dyescape.dyescapebot.verticle.BotGatewayConnectorVerticle;
@@ -52,11 +50,6 @@ public class WhenDeployingTheBotGatewayConnectorVerticleWithNoTokenConfiguredTes
             cause = handler.cause();
             context.completeNow();
         });
-    }
-
-    @AfterAll
-    public static void teardown() {
-        System.clearProperty(Config.API_TOKEN);
     }
 
     @Test

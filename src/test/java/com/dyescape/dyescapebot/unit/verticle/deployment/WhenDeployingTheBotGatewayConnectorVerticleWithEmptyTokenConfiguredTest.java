@@ -10,7 +10,6 @@ import com.dyescape.dyescapebot.core.connectivity.BotConnection;
 import com.dyescape.dyescapebot.exception.DyescapeBotConfigurationException;
 import com.dyescape.dyescapebot.verticle.BotGatewayConnectorVerticle;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,11 +52,6 @@ public class WhenDeployingTheBotGatewayConnectorVerticleWithEmptyTokenConfigured
             cause = handler.cause();
             context.completeNow();
         });
-    }
-
-    @AfterAll
-    public static void teardown() {
-        System.clearProperty(Config.API_TOKEN);
     }
 
     @Test
