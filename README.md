@@ -12,4 +12,16 @@
 </div>
 
 # DyescapeBot
-Official Dyescape chat bot.
+The DyescapeBot is a chat bot for services like Discord, which is integrated into Dyescape, the largest upcoming
+Minecraft MMORPG server. This bot will contain several integrations to our game. The bot is open source and public to
+all. If you wish to contribute, please see our [contribution guidelines](CONTRIBUTING.md).
+
+## Introduction
+The vision of this project is to allow users on different chat platforms, such as Discord, to be able to interact with
+our game through these chat services. For example, game related alerts (events for example), item inspection, monster
+inspection, update notifications, etc. You'll be able to invite this bot into your own servers and configure the
+behaviour of the bot that suits your desires.
+
+## Contributing
+Contributions are welcome, so long they respect the [contribution guidelines](CONTRIBUTING.md). Please be sure to read
+these guidelines before contributing. Contributors are rewarded with a small medal on our services.
