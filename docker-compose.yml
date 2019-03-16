@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+
+  dyescape-bot:
+    image: dyescape/dyescape-bot:latest
+    build:
+      context: ./
+    restart: on-failure
+    volumes:
+      - ./conf:/opt/dyescape/dyescape-bot/conf
