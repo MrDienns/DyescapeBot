@@ -138,7 +138,7 @@ public class DiscordModeration implements Moderation {
 
         long banTime = endTime.toInstant(ZoneOffset.UTC).toEpochMilli() - System.currentTimeMillis();
 
-        builder.append(String.format("You have been temporarily muted on %s for %s.\n",
+        builder.append(String.format("You have been muted on %s for %s.\n",
                 servername, TimeUtil.parsePunishmentTime(banTime)));
         if (!Strings.isNullOrEmpty(reason)) {
             builder.append(String.format("**Reason: **%s\n", reason));
@@ -153,7 +153,7 @@ public class DiscordModeration implements Moderation {
     private String getBanMessage(String username, String servername, String reason) {
         StringBuilder builder = this.getStringBuilder(username);
 
-        builder.append(String.format("You have been permanently banned from %s.\n", servername));
+        builder.append(String.format("You have been banned from %s.\n", servername));
         if (!Strings.isNullOrEmpty(reason)) {
             builder.append(String.format("**Reason: **%s\n", reason));
         }
