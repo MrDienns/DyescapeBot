@@ -11,8 +11,25 @@ import co.aikar.commands.annotation.Syntax;
 import com.google.common.base.Strings;
 import net.dv8tion.jda.core.entities.Member;
 
+import com.dyescape.dyescapebot.moderation.Moderation;
+import com.dyescape.dyescapebot.util.TimeUtil;
+
 @CommandAlias("!")
 public class ModerationCommand extends BaseCommand {
+
+    // -------------------------------------------- //
+    // DEPENDENCIES
+    // -------------------------------------------- //
+
+    private final Moderation moderation;
+
+    // -------------------------------------------- //
+    // CONSTRUCT
+    // -------------------------------------------- //
+
+    public ModerationCommand(Moderation moderation) {
+        this.moderation = moderation;
+    }
 
     // -------------------------------------------- //
     // PUNISHMENT COMMANDS
@@ -23,8 +40,7 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Kick a user from the server")
     public void onKickCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        e.sendMessage(String.format("I am going to kick %s from %s, reason: %s",
-                member.getEffectiveName(), member.getGuild().getName(), reason));
+        this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
     }
 
     @Subcommand("ban")
@@ -32,8 +48,7 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Permanently ban a user from the server")
     public void onBanCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        e.sendMessage(String.format("I am going to ban %s from %s, reason: %s",
-                member.getEffectiveName(), member.getGuild().getName(), reason));
+        this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
     }
 
     @Subcommand("tempban")
@@ -41,8 +56,8 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> <Time> [Reason]")
     @Description("Temporarily ban a user from the server")
     public void onTempBanCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
-        e.sendMessage(String.format("I am going to temporarily ban %s for %s from %s, reason: %s",
-                member.getEffectiveName(), member.getGuild().getName(), time, reason));
+        this.moderation.tempban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
+                TimeUtil.parseFromRelativeString(time));
     }
 
     @Subcommand("mute")
@@ -50,17 +65,16 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Permanently mute a user on the server")
     public void onMuteCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        e.sendMessage(String.format("I am going to mute %s on %s, reason: %s",
-                member.getEffectiveName(), member.getGuild().getName(), reason));
+        this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
     }
 
     @Subcommand("tempmute")
     @CommandPermission("moderator")
     @Syntax("<User> <Time> [Reason]")
     @Description("Temporarily mute a user on the server")
-    public void onMuteCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
-        e.sendMessage(String.format("I am going to mute %s on %s for %s, reason: %s",
-                member.getEffectiveName(), member.getGuild().getName(), time, reason));
+    public void onTempMuteCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
+        this.moderation.tempmute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
+                TimeUtil.parseFromRelativeString(time));
     }
 
     @Subcommand("warn")
@@ -68,8 +82,7 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Warn a user on the server")
     public void onWarnCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        e.sendMessage(String.format("I am going to warn %s on %s, reason: %s",
-                member.getEffectiveName(), member.getGuild().getName(), reason));
+        this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
     }
 
     // -------------------------------------------- //

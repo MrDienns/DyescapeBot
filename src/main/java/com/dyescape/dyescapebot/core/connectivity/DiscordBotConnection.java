@@ -22,6 +22,7 @@ import com.dyescape.dyescapebot.command.discord.ModerationCommand;
 import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.permission.PermissionResolver;
 import com.dyescape.dyescapebot.exception.DyescapeBotConnectionException;
+import com.dyescape.dyescapebot.moderation.discord.DiscordModeration;
 import com.dyescape.dyescapebot.provider.InjectorProvider;
 
 /**
@@ -70,8 +71,6 @@ public class DiscordBotConnection implements BotConnection {
 
             this.jda.getPresence().setGame(Game.of(Game.GameType.DEFAULT, "Dyescape"));
 
-            Injector injector = this.injectorProvider.getInjector();
-
             JDACommandManager commandManager = new JDACommandManager(this.jda);
 
             JDACommandContexts contexts = (JDACommandContexts) commandManager.getCommandContexts();
@@ -80,8 +79,9 @@ public class DiscordBotConnection implements BotConnection {
             commandManager.enableUnstableAPI("help");
             commandManager.setPermissionResolver(new PermissionResolver());
 
-            commandManager.registerCommand(injector.getInstance(ModerationCommand.class));
-            commandManager.registerCommand(injector.getInstance(GeneralHelpCommand.class));
+            // TODO: Find a way to inject JDA with Guice, so we can use DI through Guice here
+            commandManager.registerCommand(new ModerationCommand(new DiscordModeration(this.jda)));
+            commandManager.registerCommand(new GeneralHelpCommand());
         } catch (Exception e) {
             handler.handle(Future.failedFuture(new DyescapeBotConnectionException(e)));
         }
