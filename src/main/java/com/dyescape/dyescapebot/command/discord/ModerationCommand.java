@@ -9,7 +9,12 @@ import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import com.google.common.base.Strings;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+
+import java.awt.Color;
+import java.time.ZoneOffset;
 
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.util.TimeUtil;
@@ -41,6 +46,8 @@ public class ModerationCommand extends BaseCommand {
     @Description("Kick a user from the server")
     public void onKickCommand(JDACommandEvent e, Member member, @Optional String reason) {
         this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+
+        e.sendMessage(this.embed(String.format("User %s was kicked.", member.getEffectiveName())));
     }
 
     @Subcommand("ban")
@@ -49,6 +56,8 @@ public class ModerationCommand extends BaseCommand {
     @Description("Permanently ban a user from the server")
     public void onBanCommand(JDACommandEvent e, Member member, @Optional String reason) {
         this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+
+        e.sendMessage(this.embed(String.format("User %s was banned.", member.getEffectiveName())));
     }
 
     @Subcommand("tempban")
@@ -58,6 +67,12 @@ public class ModerationCommand extends BaseCommand {
     public void onTempBanCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
         this.moderation.tempban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                 TimeUtil.parseFromRelativeString(time));
+
+        long punishmentTime = TimeUtil.parseFromRelativeString(time)
+                .toInstant(ZoneOffset.UTC).toEpochMilli() - System.currentTimeMillis();
+
+        e.sendMessage(this.embed(String.format("User %s was banned for %s.",
+                member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
     }
 
     @Subcommand("mute")
@@ -66,6 +81,8 @@ public class ModerationCommand extends BaseCommand {
     @Description("Permanently mute a user on the server")
     public void onMuteCommand(JDACommandEvent e, Member member, @Optional String reason) {
         this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+
+        e.sendMessage(this.embed(String.format("User %s was muted.", member.getEffectiveName())));
     }
 
     @Subcommand("tempmute")
@@ -75,6 +92,12 @@ public class ModerationCommand extends BaseCommand {
     public void onTempMuteCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
         this.moderation.tempmute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                 TimeUtil.parseFromRelativeString(time));
+
+        long punishmentTime = TimeUtil.parseFromRelativeString(time)
+                .toInstant(ZoneOffset.UTC).toEpochMilli() - System.currentTimeMillis();
+
+        e.sendMessage(this.embed(String.format("User %s was muted for %s.",
+                member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
     }
 
     @Subcommand("warn")
@@ -102,5 +125,16 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(String.format("I am going to delete the action of %s warning points.",
                     warningPoints));
         }
+    }
+
+    // -------------------------------------------- //
+    // PRIVATE
+    // -------------------------------------------- //
+
+    private MessageEmbed embed(String message) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setDescription(message);
+        eb.setColor(Color.RED);
+        return eb.build();
     }
 }
