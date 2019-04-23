@@ -2,10 +2,13 @@ package com.dyescape.dyescapebot.moderation.discord;
 
 import com.google.common.base.Strings;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.managers.GuildController;
 
 import javax.inject.Inject;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 import com.dyescape.dyescapebot.moderation.Moderation;
@@ -40,8 +43,25 @@ public class DiscordModeration implements Moderation {
 
     @Override
     public void kick(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler) {
-        this.sendPrivateMessage(userId, this.getKickMessage(
-                this.getUsername(userId), this.getServername(serverId), reason));
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        GuildController guildController = new GuildController(guild);
+
+        // Kick the user, await async response
+        guildController.kick(guild.getMemberById(userId), reason).queue(successConsumer -> {
+
+            // Succeeded, let's send a message to the user
+            this.sendPrivateMessage(userId, this.getKickMessage(
+                    this.getUsername(userId), this.getServername(serverId), reason));
+
+            // And complete our Future
+            handler.handle(Future.succeededFuture());
+        }, failureConsumer -> {
+
+            // Something went wrong, fail our Future
+            handler.handle(Future.failedFuture(failureConsumer.getCause()));
+        });
     }
 
     @Override
