@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.User;
 
 import java.awt.Color;
 
@@ -115,6 +116,23 @@ public class ModerationCommand extends BaseCommand {
                 long punishmentTime = TimeUtil.parseFromRelativeString(time);
                 e.sendMessage(this.embed(String.format("User %s was muted for %s.",
                         member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
+    }
+
+    @Subcommand("unmute")
+    @CommandPermission("moderator")
+    @Syntax("<User>")
+    @Description("Unmute a user on the server")
+    public void onUnmuteCommand(JDACommandEvent e, User user) {
+        this.moderation.unmute(e.getIssuer().getGuild().getIdLong(), user.getIdLong(), handler -> {
+
+            if (handler.succeeded()) {
+
+                e.sendMessage(this.embed(String.format("User %s#%s was unmuted.",
+                        user.getName(), user.getDiscriminator())));
             } else {
                 e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
             }

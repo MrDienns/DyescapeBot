@@ -7,6 +7,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.PermissionOverride;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.managers.GuildController;
 import net.dv8tion.jda.core.managers.PermOverrideManager;
 
@@ -149,8 +150,50 @@ public class DiscordModeration implements Moderation {
 
     @Override
     public void unmute(long serverId, long userId, Handler<AsyncResult<Void>> handler) {
-        this.sendPrivateMessage(userId, this.getUnmuteMessage(
-                this.getUsername(userId), this.getServername(serverId)));
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        User user = this.jda.getUserById(userId);
+
+        if (guild.isMember(user)) {
+            Member member = guild.getMemberById(userId);
+
+            this.ensureGuildHasMutedRole(guild, ensureHandler -> {
+
+                if (ensureHandler.succeeded()) {
+
+                    if (!member.getRoles().contains(ensureHandler.result())) {
+
+                        handler.handle(Future.failedFuture(
+                                new DyescapeBotModerationException(String.format("User %s#%s is not muted.",
+                                        user.getName(), user.getDiscriminator()))
+                        ));
+                        return;
+                    }
+
+                    GuildController guildController = new GuildController(guild);
+
+                    guildController.removeRolesFromMember(member, ensureHandler.result()).queue(successHandler -> {
+
+                        // TODO: Remove mute from database
+
+                        this.sendPrivateMessage(userId, this.getUnmuteMessage(
+                                this.getUsername(userId), this.getServername(serverId)));
+                        handler.handle(Future.succeededFuture());
+                    }, failureHandler -> {
+
+                        handler.handle(Future.failedFuture(failureHandler.getCause()));
+                    });
+                } else {
+
+                    handler.handle(Future.failedFuture(ensureHandler.cause()));
+                }
+            });
+        } else {
+
+            // TODO: Remove mute from database
+            return;
+        }
     }
 
     @Override
