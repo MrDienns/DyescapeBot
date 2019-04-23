@@ -44,9 +44,14 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Kick a user from the server")
     public void onKickCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+        this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason, handler -> {
 
-        e.sendMessage(this.embed(String.format("User %s was kicked.", member.getEffectiveName())));
+            if (handler.succeeded()) {
+                e.sendMessage(this.embed(String.format("User %s was kicked.", member.getEffectiveName())));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
     }
 
     @Subcommand("ban")
@@ -54,9 +59,14 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Permanently ban a user from the server")
     public void onBanCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+        this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason, handler -> {
 
-        e.sendMessage(this.embed(String.format("User %s was banned.", member.getEffectiveName())));
+            if (handler.succeeded()) {
+                e.sendMessage(this.embed(String.format("User %s was banned.", member.getEffectiveName())));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
     }
 
     @Subcommand("tempban")
@@ -65,12 +75,16 @@ public class ModerationCommand extends BaseCommand {
     @Description("Temporarily ban a user from the server")
     public void onTempBanCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
         this.moderation.tempban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
-                TimeUtil.parseFromRelativeString(time));
+                TimeUtil.parseFromRelativeString(time), handler -> {
 
-        long punishmentTime = TimeUtil.parseFromRelativeString(time);
-
-        e.sendMessage(this.embed(String.format("User %s was banned for %s.",
-                member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
+            if (handler.succeeded()) {
+                long punishmentTime = TimeUtil.parseFromRelativeString(time);
+                e.sendMessage(this.embed(String.format("User %s was banned for %s.",
+                        member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
     }
 
     @Subcommand("mute")
@@ -78,9 +92,14 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Permanently mute a user on the server")
     public void onMuteCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+        this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason, handler -> {
 
-        e.sendMessage(this.embed(String.format("User %s was muted.", member.getEffectiveName())));
+            if (handler.succeeded()) {
+                e.sendMessage(this.embed(String.format("User %s was muted.", member.getEffectiveName())));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
     }
 
     @Subcommand("tempmute")
@@ -89,12 +108,17 @@ public class ModerationCommand extends BaseCommand {
     @Description("Temporarily mute a user on the server")
     public void onTempMuteCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
         this.moderation.tempmute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
-                TimeUtil.parseFromRelativeString(time));
+                TimeUtil.parseFromRelativeString(time), handler -> {
 
-        long punishmentTime = TimeUtil.parseFromRelativeString(time);
+            if (handler.succeeded()) {
 
-        e.sendMessage(this.embed(String.format("User %s was muted for %s.",
-                member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
+                long punishmentTime = TimeUtil.parseFromRelativeString(time);
+                e.sendMessage(this.embed(String.format("User %s was muted for %s.",
+                        member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
     }
 
     @Subcommand("warn")
@@ -102,7 +126,14 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Warn a user on the server")
     public void onWarnCommand(JDACommandEvent e, Member member, @Optional String reason) {
-        this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+        this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason, handler -> {
+
+            if (handler.succeeded()) {
+                e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName())));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
     }
 
     // -------------------------------------------- //

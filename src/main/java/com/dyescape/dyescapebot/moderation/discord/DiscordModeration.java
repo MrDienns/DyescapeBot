@@ -5,6 +5,9 @@ import net.dv8tion.jda.core.JDA;
 
 import javax.inject.Inject;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.util.TimeUtil;
 
@@ -30,37 +33,37 @@ public class DiscordModeration implements Moderation {
     // -------------------------------------------- //
 
     @Override
-    public void warn(long serverId, long userId, String reason) {
+    public void warn(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getWarnMessage(
                 this.getUsername(userId), this.getServername(serverId), reason));
     }
 
     @Override
-    public void kick(long serverId, long userId, String reason) {
+    public void kick(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getKickMessage(
                 this.getUsername(userId), this.getServername(serverId), reason));
     }
 
     @Override
-    public void mute(long serverId, long userId, String reason) {
+    public void mute(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getMuteMessage(
                 this.getUsername(userId), this.getServername(serverId), reason));
     }
 
     @Override
-    public void tempmute(long serverId, long userId, String reason, long punishmentTime) {
+    public void tempmute(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getTempMuteMessage(
                 this.getUsername(userId), this.getServername(serverId), reason, punishmentTime));
     }
 
     @Override
-    public void ban(long serverId, long userId, String reason) {
+    public void ban(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getBanMessage(
                 this.getUsername(userId), this.getServername(serverId), reason));
     }
 
     @Override
-    public void tempban(long serverId, long userId, String reason, long punishmentTime) {
+    public void tempban(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getTempBanMessage(
                 this.getUsername(userId), this.getServername(serverId), reason, punishmentTime));
     }
