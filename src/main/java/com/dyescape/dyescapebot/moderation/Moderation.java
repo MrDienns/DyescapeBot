@@ -11,7 +11,9 @@ public interface Moderation {
 
     void mute(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler);
     void tempmute(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler);
+    void unmute(long serverId, long userId, Handler<AsyncResult<Void>> handler);
 
     void ban(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler);
     void tempban(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler);
+    void unban(long serverId, long userId, Handler<AsyncResult<Void>> handler);
 }

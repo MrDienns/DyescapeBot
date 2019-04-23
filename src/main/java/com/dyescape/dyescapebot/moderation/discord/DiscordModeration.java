@@ -148,6 +148,12 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
+    public void unmute(long serverId, long userId, Handler<AsyncResult<Void>> handler) {
+        this.sendPrivateMessage(userId, this.getUnmuteMessage(
+                this.getUsername(userId), this.getServername(serverId)));
+    }
+
+    @Override
     public void ban(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getBanMessage(
                 this.getUsername(userId), this.getServername(serverId), reason));
@@ -157,6 +163,12 @@ public class DiscordModeration implements Moderation {
     public void tempban(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler) {
         this.sendPrivateMessage(userId, this.getTempBanMessage(
                 this.getUsername(userId), this.getServername(serverId), reason, punishmentTime));
+    }
+
+    @Override
+    public void unban(long serverId, long userId, Handler<AsyncResult<Void>> handler) {
+        this.sendPrivateMessage(userId, this.getUnbanMessage(
+                this.getUsername(userId), this.getServername(serverId)));
     }
 
     // -------------------------------------------- //
@@ -239,6 +251,18 @@ public class DiscordModeration implements Moderation {
         return builder.toString();
     }
 
+    private String getUnmuteMessage(String username, String servername) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been unmuted on %s.\n",
+                servername));
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
     private String getBanMessage(String username, String servername, String reason) {
         StringBuilder builder = this.getStringBuilder(username);
 
@@ -261,6 +285,18 @@ public class DiscordModeration implements Moderation {
         if (!Strings.isNullOrEmpty(reason)) {
             builder.append(String.format("**Reason: **%s\n", reason));
         }
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
+    private String getUnbanMessage(String username, String servername) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been unbanned from %s.\n",
+                servername));
 
         builder.append("\n");
         builder.append("Please respect the rules and guidelines.");
