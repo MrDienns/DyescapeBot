@@ -14,7 +14,6 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 import java.awt.Color;
-import java.time.ZoneOffset;
 
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.util.TimeUtil;
@@ -68,8 +67,7 @@ public class ModerationCommand extends BaseCommand {
         this.moderation.tempban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                 TimeUtil.parseFromRelativeString(time));
 
-        long punishmentTime = TimeUtil.parseFromRelativeString(time)
-                .toInstant(ZoneOffset.UTC).toEpochMilli() - System.currentTimeMillis();
+        long punishmentTime = TimeUtil.parseFromRelativeString(time);
 
         e.sendMessage(this.embed(String.format("User %s was banned for %s.",
                 member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
@@ -93,8 +91,7 @@ public class ModerationCommand extends BaseCommand {
         this.moderation.tempmute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                 TimeUtil.parseFromRelativeString(time));
 
-        long punishmentTime = TimeUtil.parseFromRelativeString(time)
-                .toInstant(ZoneOffset.UTC).toEpochMilli() - System.currentTimeMillis();
+        long punishmentTime = TimeUtil.parseFromRelativeString(time);
 
         e.sendMessage(this.embed(String.format("User %s was muted for %s.",
                 member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));

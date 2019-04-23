@@ -3,6 +3,7 @@ package com.dyescape.dyescapebot.unit.util;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -18,7 +19,9 @@ public class WhenUsingTheTimeUtilToParseCommandArgumentsTest {
     public void itShouldCorrectlyParseTheArgumentIntoTheCorrectTime() {
         String argumentOne = "2d1h30m";
         LocalDateTime expectedOne = LocalDateTime.now(ZoneId.of("UTC")).plusDays(2).plusHours(1).plusMinutes(30);
-        LocalDateTime actualOne = TimeUtil.parseFromRelativeString(argumentOne);
+        long punishmentTime = TimeUtil.parseFromRelativeString(argumentOne);
+        LocalDateTime actualOne = Instant.ofEpochMilli(System.currentTimeMillis() + punishmentTime)
+                .atZone(ZoneId.of("UTC")).toLocalDateTime();
 
         // One big comparison check will fail due to misalignment of milliseconds
         assertEquals(expectedOne.getYear(), actualOne.getYear());

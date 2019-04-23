@@ -5,9 +5,6 @@ import net.dv8tion.jda.core.JDA;
 
 import javax.inject.Inject;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.util.TimeUtil;
 
@@ -51,9 +48,9 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
-    public void tempmute(long serverId, long userId, String reason, LocalDateTime tillDateTime) {
+    public void tempmute(long serverId, long userId, String reason, long punishmentTime) {
         this.sendPrivateMessage(userId, this.getTempMuteMessage(
-                this.getUsername(userId), this.getServername(serverId), reason, tillDateTime));
+                this.getUsername(userId), this.getServername(serverId), reason, punishmentTime));
     }
 
     @Override
@@ -63,9 +60,9 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
-    public void tempban(long serverId, long userId, String reason, LocalDateTime tillDateTime) {
+    public void tempban(long serverId, long userId, String reason, long punishmentTime) {
         this.sendPrivateMessage(userId, this.getTempBanMessage(
-                this.getUsername(userId), this.getServername(serverId), reason, tillDateTime));
+                this.getUsername(userId), this.getServername(serverId), reason, punishmentTime));
     }
 
     // -------------------------------------------- //
@@ -133,13 +130,11 @@ public class DiscordModeration implements Moderation {
         return builder.toString();
     }
 
-    private String getTempMuteMessage(String username, String servername, String reason, LocalDateTime endTime) {
+    private String getTempMuteMessage(String username, String servername, String reason, long punishmentTime) {
         StringBuilder builder = this.getStringBuilder(username);
 
-        long banTime = endTime.toInstant(ZoneOffset.UTC).toEpochMilli() - System.currentTimeMillis();
-
         builder.append(String.format("You have been muted on %s for %s.\n",
-                servername, TimeUtil.parsePunishmentTime(banTime)));
+                servername, TimeUtil.parsePunishmentTime(punishmentTime)));
         if (!Strings.isNullOrEmpty(reason)) {
             builder.append(String.format("**Reason: **%s\n", reason));
         }
@@ -164,13 +159,11 @@ public class DiscordModeration implements Moderation {
         return builder.toString();
     }
 
-    private String getTempBanMessage(String username, String servername, String reason, LocalDateTime endTime) {
+    private String getTempBanMessage(String username, String servername, String reason, long punishmentTime) {
         StringBuilder builder = this.getStringBuilder(username);
 
-        long banTime = endTime.toInstant(ZoneOffset.UTC).toEpochMilli() - System.currentTimeMillis();
-
         builder.append(String.format("You have been temporarily banned from %s for %s.\n",
-                servername, TimeUtil.parsePunishmentTime(banTime)));
+                servername, TimeUtil.parsePunishmentTime(punishmentTime)));
         if (!Strings.isNullOrEmpty(reason)) {
             builder.append(String.format("**Reason: **%s\n", reason));
         }

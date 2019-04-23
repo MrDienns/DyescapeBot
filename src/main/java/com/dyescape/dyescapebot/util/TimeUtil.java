@@ -5,7 +5,6 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * Simple utility to perform time related tasks quickly.
@@ -25,7 +24,7 @@ public final class TimeUtil {
      * @return {@link LocalDateTime}
      * @author Dennis van der Veeke
      */
-    public static LocalDateTime parseFromRelativeString(String relativeTime) {
+    public static long parseFromRelativeString(String relativeTime) {
         PeriodFormatter formatter = new PeriodFormatterBuilder()
                 .appendDays().appendSuffix("d")
                 .appendDays().appendSuffix("day")
@@ -39,8 +38,7 @@ public final class TimeUtil {
                 .toFormatter();
 
         Period period = formatter.parsePeriod(relativeTime);
-        long seconds = period.toStandardDuration().getStandardSeconds();
-        return LocalDateTime.now(ZoneId.of("UTC")).plusSeconds(seconds);
+        return period.toStandardDuration().getMillis();
     }
 
     /**
@@ -103,7 +101,11 @@ public final class TimeUtil {
 
         int replaceIndex = result.lastIndexOf(", ");
 
-        return result.substring(0, replaceIndex) + " and " +
-                result.substring(replaceIndex + ", ".length());
+        if (replaceIndex == -1) {
+            return result;
+        } else {
+            return result.substring(0, replaceIndex) + " and " +
+                    result.substring(replaceIndex + ", ".length());
+        }
     }
 }
