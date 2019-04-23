@@ -88,6 +88,23 @@ public class ModerationCommand extends BaseCommand {
         });
     }
 
+    @Subcommand("unban")
+    @CommandPermission("moderator")
+    @Syntax("<User>")
+    @Description("Unban a user from the server")
+    public void onUnbanCommand(JDACommandEvent e, User user) {
+        this.moderation.unban(e.getIssuer().getGuild().getIdLong(), user.getIdLong(), handler -> {
+
+            if (handler.succeeded()) {
+
+                e.sendMessage(this.embed(String.format("User %s was unbanned.",
+                        user.getName() + user.getDiscriminator())));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
+    }
+
     @Subcommand("mute")
     @CommandPermission("moderator")
     @Syntax("<User> [Reason]")
