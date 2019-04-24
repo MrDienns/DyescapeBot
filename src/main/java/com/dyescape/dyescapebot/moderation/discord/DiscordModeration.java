@@ -82,34 +82,8 @@ public class DiscordModeration implements Moderation {
         // Get the guild and controller
         Guild guild = this.jda.getGuildById(serverId);
         Member member = guild.getMemberById(userId);
-        this.ensureGuildHasMutedRole(guild, ensureHandler -> {
 
-            if (ensureHandler.succeeded()) {
-
-                if (member.getRoles().contains(ensureHandler.result())) {
-                    handler.handle(Future.failedFuture(
-                            new DyescapeBotModerationException(String.format("User %s is already muted.",
-                                    member.getEffectiveName()))
-                    ));
-                    return;
-                }
-
-                GuildController guildController = new GuildController(guild);
-
-                guildController.addRolesToMember(member, ensureHandler.result()).queue(successHandler -> {
-
-                    this.sendPrivateMessage(userId, this.getMuteMessage(
-                            this.getUsername(userId), this.getServername(serverId), reason));
-                    handler.handle(Future.succeededFuture());
-                }, failureHandler -> {
-
-                    handler.handle(Future.failedFuture(failureHandler.getCause()));
-                });
-            } else {
-
-                handler.handle(Future.failedFuture(ensureHandler.cause()));
-            }
-        });
+        this.applyMute(guild, member, reason, handler);
     }
 
     @Override
@@ -118,34 +92,8 @@ public class DiscordModeration implements Moderation {
         // Get the guild and controller
         Guild guild = this.jda.getGuildById(serverId);
         Member member = guild.getMemberById(userId);
-        this.ensureGuildHasMutedRole(guild, ensureHandler -> {
 
-            if (ensureHandler.succeeded()) {
-
-                if (member.getRoles().contains(ensureHandler.result())) {
-                    handler.handle(Future.failedFuture(
-                            new DyescapeBotModerationException(String.format("User %s is already muted.",
-                                    member.getEffectiveName()))
-                    ));
-                    return;
-                }
-
-                GuildController guildController = new GuildController(guild);
-
-                guildController.addRolesToMember(member, ensureHandler.result()).queue(successHandler -> {
-
-                    this.sendPrivateMessage(userId, this.getTempMuteMessage(
-                            this.getUsername(userId), this.getServername(serverId), reason, punishmentTime));
-                    handler.handle(Future.succeededFuture());
-                }, failureHandler -> {
-
-                    handler.handle(Future.failedFuture(failureHandler.getCause()));
-                });
-            } else {
-
-                handler.handle(Future.failedFuture(ensureHandler.cause()));
-            }
-        });
+        this.applyMute(guild, member, reason, handler);
     }
 
     @Override
@@ -542,6 +490,38 @@ public class DiscordModeration implements Moderation {
 
                 handler.handle(Future.failedFuture(banFailure.getCause()));
             });
+        });
+    }
+
+    private void applyMute(Guild guild, Member member, String reason, Handler<AsyncResult<Void>> handler) {
+
+        this.ensureGuildHasMutedRole(guild, ensureHandler -> {
+
+            if (ensureHandler.succeeded()) {
+
+                if (member.getRoles().contains(ensureHandler.result())) {
+                    handler.handle(Future.failedFuture(
+                            new DyescapeBotModerationException(String.format("User %s is already muted.",
+                                    member.getEffectiveName()))
+                    ));
+                    return;
+                }
+
+                GuildController guildController = new GuildController(guild);
+
+                guildController.addRolesToMember(member, ensureHandler.result()).queue(successHandler -> {
+
+                    this.sendPrivateMessage(member.getUser().getIdLong(), this.getMuteMessage(
+                            member.getUser().getName(), guild.getName(), reason));
+                    handler.handle(Future.succeededFuture());
+                }, failureHandler -> {
+
+                    handler.handle(Future.failedFuture(failureHandler.getCause()));
+                });
+            } else {
+
+                handler.handle(Future.failedFuture(ensureHandler.cause()));
+            }
         });
     }
 }
