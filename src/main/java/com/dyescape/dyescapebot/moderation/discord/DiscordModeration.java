@@ -198,20 +198,71 @@ public class DiscordModeration implements Moderation {
 
     @Override
     public void ban(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler) {
-        this.sendPrivateMessage(userId, this.getBanMessage(
-                this.getUsername(userId), this.getServername(serverId), reason));
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        User user = this.jda.getUserById(userId);
+
+        this.applyBan(guild, user, reason, banHandler -> {
+
+            if (banHandler.failed()) {
+                handler.handle(Future.failedFuture(banHandler.cause()));
+                return;
+            }
+
+            // TODO: Update database
+
+            handler.handle(Future.succeededFuture());
+        });
     }
 
     @Override
     public void tempban(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler) {
-        this.sendPrivateMessage(userId, this.getTempBanMessage(
-                this.getUsername(userId), this.getServername(serverId), reason, punishmentTime));
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        User user = this.jda.getUserById(userId);
+
+        this.applyBan(guild, user, reason, banHandler -> {
+
+            if (banHandler.failed()) {
+                handler.handle(Future.failedFuture(banHandler.cause()));
+                return;
+            }
+
+            // TODO: Update database
+
+            handler.handle(Future.succeededFuture());
+        });
     }
 
     @Override
     public void unban(long serverId, long userId, Handler<AsyncResult<Void>> handler) {
-        this.sendPrivateMessage(userId, this.getUnbanMessage(
-                this.getUsername(userId), this.getServername(serverId)));
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        User user = this.jda.getUserById(userId);
+
+        guild.getBan(user).queue(isBannedSuccess -> {
+
+            GuildController guildController = new GuildController(guild);
+            guildController.unban(user).queue(unbanSuccess -> {
+
+                this.sendPrivateMessage(userId, this.getUnbanMessage(
+                        user.getName(), guild.getName()));
+            }, unbanFailure -> {
+
+                handler.handle(Future.failedFuture(unbanFailure));
+            });
+        }, isBannedFailure -> {
+
+            if (isBannedFailure.getMessage().contains("Unknown Ban")) {
+                handler.handle(Future.failedFuture(new DyescapeBotModerationException(
+                        String.format("User %s#%s is not banned.",
+                                user.getName(), user.getDiscriminator()))));
+                return;
+            }
+        });
     }
 
     // -------------------------------------------- //
@@ -458,6 +509,39 @@ public class DiscordModeration implements Moderation {
             handler.handle(Future.failedFuture(new DyescapeBotModerationException(
                     String.format("Could not deny permissions for role. Error: %s",
                             denyFailureConsumer.getMessage()))));
+        });
+    }
+
+    private void applyBan(Guild guild, User user, String reason, Handler<AsyncResult<Void>> handler) {
+        guild.getBan(user).queue(isBannedSuccess -> {
+
+            if (isBannedSuccess != null) {
+
+                handler.handle(Future.failedFuture(
+                        new DyescapeBotModerationException(String.format("User %s#%s is already banned.",
+                                user.getName(), user.getDiscriminator()))
+                ));
+            }
+        }, isBannedFailure -> {
+
+            if (!isBannedFailure.getMessage().contains("Unknown Ban")) {
+                handler.handle(Future.failedFuture(isBannedFailure));
+                return;
+            }
+
+            GuildController guildController = new GuildController(guild);
+            guildController.ban(user, 0, reason).queue(banSuccess -> {
+
+                // TODO: Update database
+
+                this.sendPrivateMessage(user.getIdLong(), this.getBanMessage(
+                        user.getName(), guild.getName(), reason));
+
+                handler.handle(Future.succeededFuture());
+            }, banFailure -> {
+
+                handler.handle(Future.failedFuture(banFailure.getCause()));
+            });
         });
     }
 }
