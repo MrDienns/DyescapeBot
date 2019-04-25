@@ -58,43 +58,26 @@ public final class TimeUtil {
         StringBuilder builder = new StringBuilder();
 
         if (days > 0) {
-            if (days == 1) {
-                builder.append(String.format("%s day", days));
-            } else {
-                builder.append(String.format("%s days", days));
-            }
+            builder.append(days);
+            builder.append(days == 1 ? " day" : " days");
         }
 
         if (hours % 24 != 0) {
             if (!builder.toString().isEmpty()) {
-                if (hours % 24 == 1) {
-                    builder.append(String.format(", %s hour", hours % 24));
-                } else {
-                    builder.append(String.format(", %s hours", hours % 24));
-                }
-            } else {
-                if (hours % 24 == 1) {
-                    builder.append(String.format("%s hour", hours % 24));
-                } else {
-                    builder.append(String.format("%s hours", hours % 24));
-                }
+                builder.append(", ");
             }
+
+            builder.append(hours % 24);
+            builder.append(hours % 24 == 1 ? " hour" : " hours");
         }
 
         if (mins % 60 != 0) {
             if (!builder.toString().isEmpty()) {
-                if (mins % 60 == 1) {
-                    builder.append(String.format(", %s minute", mins % 60));
-                } else {
-                    builder.append(String.format(", %s minutes", mins % 60));
-                }
-            } else {
-                if (mins % 60 == 1) {
-                    builder.append(String.format("%s minute", mins % 60));
-                } else {
-                    builder.append(String.format("%s minutes", mins % 60));
-                }
+                builder.append(", ");
             }
+
+            builder.append(mins % 60);
+            builder.append(mins % 60 == 1 ? " minute" : " minutes");
         }
 
         String result = builder.toString();
