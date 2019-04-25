@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 
 public class MemberResolver implements ContextResolver<Member, JDACommandExecutionContext> {
 
+    private static final Pattern MEMBER_PATTERN = Pattern.compile("<@.*?(\\d+)>");
+
     @Override
     public Member getContext(JDACommandExecutionContext context) throws InvalidCommandArgument {
 
@@ -22,8 +24,7 @@ public class MemberResolver implements ContextResolver<Member, JDACommandExecuti
         }
 
         // Let's get the Discord ID from the tag string
-        Pattern idPattern = Pattern.compile("<@.*?(\\d+)>");
-        Matcher idMatcher = idPattern.matcher(argument);
+        Matcher idMatcher = MEMBER_PATTERN.matcher(argument);
         if (!idMatcher.find()) {
             throw new InvalidCommandArgument("Could not find user ID in your tag.");
         }

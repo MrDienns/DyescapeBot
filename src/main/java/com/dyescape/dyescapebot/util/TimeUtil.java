@@ -12,6 +12,18 @@ import java.time.LocalDateTime;
  */
 public final class TimeUtil {
 
+    private static final PeriodFormatter PERIOD_FORMATTER = new PeriodFormatterBuilder()
+            .appendDays().appendSuffix("d")
+            .appendDays().appendSuffix("day")
+            .appendDays().appendSuffix("days")
+            .appendHours().appendSuffix("h")
+            .appendHours().appendSuffix("hour")
+            .appendHours().appendSuffix("hours")
+            .appendMinutes().appendSuffix("m")
+            .appendMinutes().appendSuffix("minute")
+            .appendMinutes().appendSuffix("minutes")
+            .toFormatter();
+
     private TimeUtil() {
 
     }
@@ -25,19 +37,7 @@ public final class TimeUtil {
      * @author Dennis van der Veeke
      */
     public static long parseFromRelativeString(String relativeTime) {
-        PeriodFormatter formatter = new PeriodFormatterBuilder()
-                .appendDays().appendSuffix("d")
-                .appendDays().appendSuffix("day")
-                .appendDays().appendSuffix("days")
-                .appendHours().appendSuffix("h")
-                .appendHours().appendSuffix("hour")
-                .appendHours().appendSuffix("hours")
-                .appendMinutes().appendSuffix("m")
-                .appendMinutes().appendSuffix("minute")
-                .appendMinutes().appendSuffix("minutes")
-                .toFormatter();
-
-        Period period = formatter.parsePeriod(relativeTime);
+        Period period = PERIOD_FORMATTER.parsePeriod(relativeTime);
         return period.toStandardDuration().getMillis();
     }
 
