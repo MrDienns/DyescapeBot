@@ -209,6 +209,24 @@ public class ModerationCommand extends BaseCommand {
         e.sendMessage(this.embed(String.format("Removing %s from the list of Moderator roles.", role.getName())));
     }
 
+    @Subcommand("addadmin|addadministrator")
+    @CommandPermission("administrator")
+    @Syntax("<Role>")
+    @Description("Mark a role as Moderator role for this bot")
+    public void onAddAdministratorCommand(JDACommandEvent e, Role role) {
+
+        e.sendMessage(this.embed(String.format("Adding %s to the list of Administrator roles.", role.getName())));
+    }
+
+    @Subcommand("removeadmin|removeadministrator")
+    @CommandPermission("administrator")
+    @Syntax("<Role>")
+    @Description("Unmark a role as Moderator role for this bot")
+    public void onRemoveAdministratorCommand(JDACommandEvent e, Role role) {
+
+        e.sendMessage(this.embed(String.format("Removing %s from the list of Administrator roles.", role.getName())));
+    }
+
     // -------------------------------------------- //
     // PRIVATE
     // -------------------------------------------- //
