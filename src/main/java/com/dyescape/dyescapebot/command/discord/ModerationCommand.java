@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.Color;
@@ -188,6 +189,24 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(String.format("I am going to delete the action of %s warning points.",
                     warningPoints));
         }
+    }
+
+    @Subcommand("addmod|addmoderator")
+    @CommandPermission("administrator")
+    @Syntax("<Role>")
+    @Description("Mark a role as Moderator role for this bot")
+    public void onAddModeratorCommand(JDACommandEvent e, Role role) {
+
+        e.sendMessage(this.embed(String.format("Adding %s to the list of Moderator roles.", role.getName())));
+    }
+
+    @Subcommand("removemod|removemoderator")
+    @CommandPermission("administrator")
+    @Syntax("<Role>")
+    @Description("Unmark a role as Moderator role for this bot")
+    public void onRemoveModeratorCommand(JDACommandEvent e, Role role) {
+
+        e.sendMessage(this.embed(String.format("Removing %s from the list of Moderator roles.", role.getName())));
     }
 
     // -------------------------------------------- //
