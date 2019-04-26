@@ -18,15 +18,10 @@ public class MemberResolver implements ContextResolver<Member, JDACommandExecuti
         // popFirstArgument will always give us the correct argument string
         String argument = context.popFirstArg();
 
-        // TODO: Improve this
-        if (!argument.startsWith("<@")) {
-            throw new InvalidCommandArgument("Please tag the user.");
-        }
-
         // Let's get the Discord ID from the tag string
         Matcher idMatcher = MEMBER_PATTERN.matcher(argument);
         if (!idMatcher.find()) {
-            throw new InvalidCommandArgument("Could not find user ID in your tag.");
+            throw new InvalidCommandArgument("Please tag the user.");
         }
 
         // Let's load the member
