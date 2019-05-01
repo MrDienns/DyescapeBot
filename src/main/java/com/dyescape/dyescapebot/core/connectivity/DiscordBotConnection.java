@@ -12,14 +12,17 @@ import co.aikar.commands.JDACommandManager;
 import com.google.inject.Injector;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 
 import com.dyescape.dyescapebot.command.discord.GeneralHelpCommand;
 import com.dyescape.dyescapebot.command.discord.ModerationCommand;
+import com.dyescape.dyescapebot.command.discord.resolver.ChannelResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.RoleResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.permission.PermissionResolver;
@@ -78,6 +81,7 @@ public class DiscordBotConnection implements BotConnection {
             JDACommandContexts contexts = (JDACommandContexts) commandManager.getCommandContexts();
             contexts.registerContext(Member.class, new MemberResolver());
             contexts.registerContext(Role.class, new RoleResolver());
+            contexts.registerContext(TextChannel.class, new ChannelResolver());
 
             commandManager.enableUnstableAPI("help");
             commandManager.setPermissionResolver(new PermissionResolver());
