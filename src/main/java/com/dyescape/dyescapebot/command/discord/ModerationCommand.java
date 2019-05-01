@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.Color;
@@ -151,6 +152,81 @@ public class ModerationCommand extends BaseCommand {
 
                 e.sendMessage(this.embed(String.format("User %s#%s was unmuted.",
                         user.getName(), user.getDiscriminator())));
+            } else {
+                e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+            }
+        });
+    }
+
+    @Subcommand("channelban|banchannel")
+    @CommandPermission("moderator")
+    @Syntax("<User> <Channel> [reason]")
+    @Description("Ban a user from a channel (revokes read & write access)")
+    public void onChannelBanCommand(JDACommandEvent e, Member member, TextChannel channel,
+                                    @Optional String reason) {
+
+        this.moderation.channelBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
+                channel.getIdLong(), reason, handler -> {
+                    if (handler.succeeded()) {
+                        e.sendMessage(this.embed(String.format("User %s was banned from channel #%s.",
+                                member.getEffectiveName(), channel.getName())));
+                    } else {
+                        e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+                    }
+                });
+    }
+
+    @Subcommand("channeltempban|tempbanchannel|tempchannelban")
+    @CommandPermission("moderator")
+    @Syntax("<User> <Channel> <Time> [Reason]")
+    @Description("Temporarily ban a user from a channel (revokes read & write access)")
+    public void onChannelTempBanCommand(JDACommandEvent e, Member member, TextChannel channel,
+                                        String time, @Optional String reason) {
+
+        this.moderation.channelTempBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
+                channel.getIdLong(), reason, TimeUtil.parseFromRelativeString(time), handler -> {
+                    if (handler.succeeded()) {
+                        long punishmentTime = TimeUtil.parseFromRelativeString(time);
+                        e.sendMessage(this.embed(String.format("User %s was banned from channel #%s for %s.",
+                                member.getEffectiveName(), channel.getName(),
+                                TimeUtil.parsePunishmentTime(punishmentTime))));
+                    } else {
+                        e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+                    }
+                });
+    }
+
+    @Subcommand("channelmute|mutechannel")
+    @CommandPermission("moderator")
+    @Syntax("<User> <Channel> [Reason]")
+    @Description("Mute a user in a channel (revokes write access)")
+    public void onChannelMuteCommand(JDACommandEvent e, Member member, TextChannel channel, @Optional String reason) {
+        this.moderation.channelMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
+                channel.getIdLong(), reason, handler -> {
+
+                    if (handler.succeeded()) {
+                        e.sendMessage(this.embed(String.format("User %s was muted in channel #%s.",
+                                member.getEffectiveName(), channel.getName())));
+                    } else {
+                        e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
+                    }
+        });
+    }
+
+    @Subcommand("channeltempmute|tempmutechannel|tempchannelmute")
+    @CommandPermission("moderator")
+    @Syntax("<User> <Channel> <Time> [Reason]")
+    @Description("Temporarily mute a user in a channel (revokes  write access)")
+    public void onChannelTempMuteCommand(JDACommandEvent e, Member member, TextChannel channel,
+                                         String time, @Optional String reason) {
+        this.moderation.channelTempMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
+                channel.getIdLong(), reason, TimeUtil.parseFromRelativeString(time), handler -> {
+
+            if (handler.succeeded()) {
+                long punishmentTime = TimeUtil.parseFromRelativeString(time);
+                e.sendMessage(this.embed(String.format("User %s was muted in channel #%s for %s.",
+                        member.getEffectiveName(), channel.getName(),
+                        TimeUtil.parsePunishmentTime(punishmentTime))));
             } else {
                 e.sendMessage(this.embed(String.format("Error: %s", handler.cause().getMessage())));
             }

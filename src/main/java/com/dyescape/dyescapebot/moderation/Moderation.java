@@ -13,6 +13,11 @@ public interface Moderation {
     void tempmute(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler);
     void unmute(long serverId, long userId, Handler<AsyncResult<Void>> handler);
 
+    void channelMute(long serverId, long userId, long channelId, String reason, Handler<AsyncResult<Void>> handler);
+    void channelTempMute(long serverId, long userId, long channelId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler);
+    void channelBan(long serverId, long userId, long channelId, String reason, Handler<AsyncResult<Void>> handler);
+    void channelTempBan(long serverId, long userId, long channelId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler);
+
     void ban(long serverId, long userId, String reason, Handler<AsyncResult<Void>> handler);
     void tempban(long serverId, long userId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler);
     void unban(long serverId, long userId, Handler<AsyncResult<Void>> handler);

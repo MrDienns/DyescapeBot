@@ -3,10 +3,12 @@ package com.dyescape.dyescapebot.moderation.discord;
 import com.google.common.base.Strings;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.PermissionOverride;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.managers.GuildController;
 import net.dv8tion.jda.core.managers.PermOverrideManager;
@@ -15,7 +17,11 @@ import javax.inject.Inject;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -142,6 +148,98 @@ public class DiscordModeration implements Moderation {
             // TODO: Remove mute from database
             return;
         }
+    }
+
+    @Override
+    public void channelMute(long serverId, long userId, long channelId, String reason, Handler<AsyncResult<Void>> handler) {
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        Member member = guild.getMemberById(userId);
+        Channel channel = this.jda.getTextChannelById(channelId);
+
+        this.applyChannelMute(guild, member, channel, banHandler -> {
+
+            if (banHandler.failed()) {
+                handler.handle(Future.failedFuture(banHandler.cause()));
+                return;
+            }
+
+            this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelMutedMessage(
+                    member.getUser().getName(), guild.getName(), reason, channel.getName()
+            ));
+            handler.handle(Future.succeededFuture());
+        });
+    }
+
+    @Override
+    public void channelTempMute(long serverId, long userId, long channelId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler) {
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        Member member = guild.getMemberById(userId);
+        Channel channel = this.jda.getTextChannelById(channelId);
+
+        this.applyChannelMute(guild, member, channel, banHandler -> {
+
+            if (banHandler.failed()) {
+                handler.handle(Future.failedFuture(banHandler.cause()));
+                return;
+            }
+
+            // TODO: Update database
+
+            this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelTempMutedMessage(
+                    member.getUser().getName(), guild.getName(), channel.getName(), reason, punishmentTime
+            ));
+            handler.handle(Future.succeededFuture());
+        });
+    }
+
+    @Override
+    public void channelBan(long serverId, long userId, long channelId, String reason, Handler<AsyncResult<Void>> handler) {
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        Member member = guild.getMemberById(userId);
+        Channel channel = this.jda.getTextChannelById(channelId);
+
+        this.applyChannelBan(guild, member, channel, banHandler -> {
+
+            if (banHandler.failed()) {
+                handler.handle(Future.failedFuture(banHandler.cause()));
+                return;
+            }
+
+            this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelBannedMessage(
+                    member.getUser().getName(), guild.getName(), channel.getName(), reason
+            ));
+            handler.handle(Future.succeededFuture());
+        });
+    }
+
+    @Override
+    public void channelTempBan(long serverId, long userId, long channelId, String reason, long punishmentTime, Handler<AsyncResult<Void>> handler) {
+
+        // Get the guild and controller
+        Guild guild = this.jda.getGuildById(serverId);
+        Member member = guild.getMemberById(userId);
+        Channel channel = this.jda.getTextChannelById(channelId);
+
+        this.applyChannelBan(guild, member, channel, banHandler -> {
+
+            if (banHandler.failed()) {
+                handler.handle(Future.failedFuture(banHandler.cause()));
+                return;
+            }
+
+            // TODO: Update database
+
+            this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelTempBannedMessage(
+                    member.getUser().getName(), guild.getName(), channel.getName(), reason, punishmentTime
+            ));
+            handler.handle(Future.succeededFuture());
+        });
     }
 
     @Override
@@ -346,8 +444,137 @@ public class DiscordModeration implements Moderation {
         return builder.toString();
     }
 
+    private String getChannelMutedMessage(String username, String servername, String channel, String reason) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been muted in #%s on %s.\n",
+                channel, servername));
+        builder.append(String.format("This means that you can no longer talk in the #%s channel.\n", channel));
+
+        if (!Strings.isNullOrEmpty(reason)) {
+            builder.append(String.format("**Reason: **%s\n", reason));
+        }
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
+    private String getChannelTempMutedMessage(String username, String servername, String channel,
+                                             String reason, long punishment) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been muted in #%s on %s for %s.\n",
+                channel, servername, TimeUtil.parsePunishmentTime(punishment)));
+        builder.append(String.format("This means that you can no longer talk in the #%s channel.\n", channel));
+
+        if (!Strings.isNullOrEmpty(reason)) {
+            builder.append(String.format("**Reason: **%s\n", reason));
+        }
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
+    private String getChannelBannedMessage(String username, String servername, String channel, String reason) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been banned from #%s on %s.\n",
+                channel, servername));
+        builder.append(String.format("This means that you can no longer access the #%s channel.\n", channel));
+
+        if (!Strings.isNullOrEmpty(reason)) {
+            builder.append(String.format("**Reason: **%s\n", reason));
+        }
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
+    private String getChannelTempBannedMessage(String username, String servername, String channel,
+                                               String reason, long punishment) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been temporarily banned from #%s on %s for %s.\n",
+                channel, servername, TimeUtil.parsePunishmentTime(punishment)));
+        builder.append(String.format("This means that you can no longer access the #%s channel.\n", channel));
+
+        if (!Strings.isNullOrEmpty(reason)) {
+            builder.append(String.format("**Reason: **%s\n", reason));
+        }
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
     private StringBuilder getStringBuilder(String username) {
         return new StringBuilder(String.format("Dear %s,\n\n", username));
+    }
+
+    private void ensureGuildHasChannelMutedRoles(Guild guild, Handler<AsyncResult<Map<Channel, Role>>> ensureHandler) {
+
+        // Define our controller
+        GuildController guildController = new GuildController(guild);
+
+        // Prepare the to-do list
+        List<Future> futures = new ArrayList<>();
+
+        // Prepare the result
+        Map<Channel, Role> channelMutedRoles = new HashMap<>();
+
+        // Loop over all channels
+        for (TextChannel channel : guild.getTextChannels()) {
+
+            Future future = Future.future();
+            futures.add(future);
+
+            String roleName = this.getChannelMutedRoleName(channel);
+            List<Role> roles = guild.getRolesByName(roleName, true);
+            if (!roles.isEmpty()) {
+
+                if (roles.size() > 1) {
+                    ensureHandler.handle(Future.failedFuture(new IllegalStateException(
+                            "Too many roles matching name of channel-specific punishment role: " + roleName
+                    )));
+                }
+
+                channelMutedRoles.put(channel, roles.get(0));
+                future.complete();
+            } else {
+                guildController.createRole()
+                        .setMentionable(false)
+                        .setName(roleName)
+                        .queue(successConsumer -> {
+
+                            this.ensureChannelDenyPermissionOverrides(channel, successConsumer, overrideHandler -> {
+
+                                if (overrideHandler.succeeded()) {
+                                    channelMutedRoles.put(channel, overrideHandler.result());
+                                    future.complete();
+                                } else {
+                                    future.fail(overrideHandler.cause());
+                                }
+                            }, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_WRITE);
+
+                        }, future::fail);
+            }
+        }
+
+        CompositeFuture.all(futures).setHandler(compositeHandler -> {
+
+            if (compositeHandler.succeeded()) {
+                ensureHandler.handle(Future.succeededFuture(channelMutedRoles));
+            } else {
+                ensureHandler.handle(Future.failedFuture(compositeHandler.cause()));
+            }
+        });
     }
 
     private void ensureGuildHasMutedRole(Guild guild, Handler<AsyncResult<Role>> ensureHandler) {
@@ -382,6 +609,65 @@ public class DiscordModeration implements Moderation {
         }
     }
 
+    private void ensureGuildHasChannelBannedRoles(Guild guild, Handler<AsyncResult<Map<Channel, Role>>> ensureHandler) {
+
+        // Define our controller
+        GuildController guildController = new GuildController(guild);
+
+        // Prepare the to-do list
+        List<Future> futures = new ArrayList<>();
+
+        // Prepare the result
+        Map<Channel, Role> channelMutedRoles = new HashMap<>();
+
+        // Loop over all channels
+        for (TextChannel channel : guild.getTextChannels()) {
+
+            Future future = Future.future();
+            futures.add(future);
+
+            String roleName = this.getChannelBannedRoleName(channel);
+            List<Role> roles = guild.getRolesByName(roleName, true);
+            if (!roles.isEmpty()) {
+
+                if (roles.size() > 1) {
+                    ensureHandler.handle(Future.failedFuture(new IllegalStateException(
+                            "Too many roles matching name of channel-specific punishment role: " + roleName
+                    )));
+                }
+
+                channelMutedRoles.put(channel, roles.get(0));
+                future.complete();
+            } else {
+                guildController.createRole()
+                        .setMentionable(false)
+                        .setName(roleName)
+                        .queue(successConsumer -> {
+
+                            this.ensureChannelDenyPermissionOverrides(channel, successConsumer, overrideHandler -> {
+
+                                if (overrideHandler.succeeded()) {
+                                    channelMutedRoles.put(channel, overrideHandler.result());
+                                    future.complete();
+                                } else {
+                                    future.fail(overrideHandler.cause());
+                                }
+                            }, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ);
+
+                        }, future::fail);
+            }
+        }
+
+        CompositeFuture.all(futures).setHandler(compositeHandler -> {
+
+            if (compositeHandler.succeeded()) {
+                ensureHandler.handle(Future.succeededFuture(channelMutedRoles));
+            } else {
+                ensureHandler.handle(Future.failedFuture(compositeHandler.cause()));
+            }
+        });
+    }
+
     private void ensureMutedRolePermissions(Guild guild, Role role, Handler<AsyncResult<Role>> ensureHandler) {
 
         List<Future> futures = new ArrayList<>();
@@ -391,36 +677,14 @@ public class DiscordModeration implements Moderation {
             Future future = Future.future();
             futures.add(future);
 
-            PermissionOverride override = channel.getPermissionOverride(role);
-            if (override != null) {
+            this.ensureChannelDenyPermissionOverrides(channel, role, ensurePermissionHandler -> {
 
-                this.ensurePermissionOverrideForChannel(override, ensurePermissionHandler -> {
-
-                    if (ensurePermissionHandler.succeeded()) {
-                        future.complete();
-                    } else {
-                        future.fail(ensurePermissionHandler.cause());
-                    }
-                }, Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION, Permission.VOICE_SPEAK);
-            } else {
-
-                channel.createPermissionOverride(role).queue(createSuccessConsumer -> {
-
-                    this.ensurePermissionOverrideForChannel(createSuccessConsumer, ensurePermissionHandler -> {
-
-                        if (ensurePermissionHandler.succeeded()) {
-                            future.complete();
-                        } else {
-                            future.fail(ensurePermissionHandler.cause());
-                        }
-                    }, Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION, Permission.VOICE_SPEAK);
-                }, creatureFailureConsumer -> {
-
-                    ensureHandler.handle(Future.failedFuture(new DyescapeBotModerationException(
-                            String.format("Could not create permission override. Error: %s",
-                                    creatureFailureConsumer.getMessage()))));
-                });
-            }
+                if (ensurePermissionHandler.succeeded()) {
+                    future.complete();
+                } else {
+                    future.fail(ensurePermissionHandler.cause());
+                }
+            }, Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION, Permission.VOICE_SPEAK);
         });
 
         CompositeFuture.all(futures).setHandler(compositeHandler -> {
@@ -435,23 +699,31 @@ public class DiscordModeration implements Moderation {
         });
     }
 
-    private void ensurePermissionOverrideForChannel(PermissionOverride override, Handler<AsyncResult<Role>> handler,
-                                                    Permission... permissions) {
-        PermOverrideManager overrideManager = new PermOverrideManager(override);
+    private void ensureChannelDenyPermissionOverrides(Channel channel, Role role,
+                                                      Handler<AsyncResult<Role>> handler, Permission... permissions) {
 
-        if (override.getDenied().contains(Permission.MESSAGE_WRITE) &&
-                override.getDenied().contains(Permission.MESSAGE_ADD_REACTION) &&
-                override.getDenied().contains(Permission.VOICE_SPEAK)) {
+        PermissionOverride override = channel.getPermissionOverride(role);
+        if (override != null) {
 
-            // This channel has the correct role permissions, so let's continue (return due to lambda)
-            handler.handle(Future.succeededFuture(override.getRole()));
-            return;
+            if (!override.getDenied().containsAll(Arrays.asList(permissions))) {
+
+                this.createPermissionDenyOverride(channel, role, handler, permissions);
+            } else {
+                handler.handle(Future.succeededFuture());
+            }
+        } else {
+
+            this.createPermissionDenyOverride(channel, role, handler, permissions);
         }
+    }
 
-        overrideManager.deny(permissions).queue(denySuccessConsumer -> {
+    private void createPermissionDenyOverride(Channel channel, Role role, Handler<AsyncResult<Role>> handler,
+                                          Permission... permissions) {
+
+        channel.createPermissionOverride(role).setDeny(permissions).queue(denySuccessConsumer -> {
 
             // Permissions were set correctly, so let's continue (return due to lambda)
-            handler.handle(Future.succeededFuture(override.getRole()));
+            handler.handle(Future.succeededFuture(role));
         }, denyFailureConsumer -> {
 
             handler.handle(Future.failedFuture(new DyescapeBotModerationException(
@@ -523,5 +795,71 @@ public class DiscordModeration implements Moderation {
                 handler.handle(Future.failedFuture(ensureHandler.cause()));
             }
         });
+    }
+
+    private void applyChannelMute(Guild guild, Member member, Channel channel, Handler<AsyncResult<Void>> handler) {
+        this.ensureGuildHasChannelMutedRoles(guild, ensureHandler -> {
+
+            if (ensureHandler.failed()) {
+                handler.handle(Future.failedFuture(ensureHandler.cause()));
+                return;
+            }
+
+            List<Role> roles = member.getRoles().stream()
+                    .filter(role -> role.getName().equalsIgnoreCase(this.getChannelMutedRoleName(channel)))
+                    .collect(Collectors.toList());
+            if (!roles.isEmpty()) {
+                handler.handle(Future.failedFuture(
+                        new DyescapeBotModerationException("User is already muted in that channel.")));
+                return;
+            }
+
+            Role channelMuteRole = ensureHandler.result().get(channel);
+
+            GuildController guildController = new GuildController(guild);
+            guildController.addRolesToMember(member, channelMuteRole).queue(successConsumer -> {
+
+                handler.handle(Future.succeededFuture());
+            }, failure -> {
+                handler.handle(Future.failedFuture(failure));
+            });
+        });
+    }
+
+    private void applyChannelBan(Guild guild, Member member, Channel channel, Handler<AsyncResult<Void>> handler) {
+        this.ensureGuildHasChannelBannedRoles(guild, ensureHandler -> {
+
+            if (ensureHandler.failed()) {
+                handler.handle(Future.failedFuture(ensureHandler.cause()));
+                return;
+            }
+
+            List<Role> roles = member.getRoles().stream()
+                    .filter(role -> role.getName().equalsIgnoreCase(this.getChannelBannedRoleName(channel)))
+                    .collect(Collectors.toList());
+            if (!roles.isEmpty()) {
+                handler.handle(Future.failedFuture(
+                        new DyescapeBotModerationException("User is already banned from that channel.")));
+                return;
+            }
+
+            Role channelMuteRole = ensureHandler.result().get(channel);
+
+            GuildController guildController = new GuildController(guild);
+            guildController.addRolesToMember(member, channelMuteRole).queue(successConsumer -> {
+
+                handler.handle(Future.succeededFuture());
+            }, failure -> {
+                handler.handle(Future.failedFuture(failure));
+            });
+        });
+    }
+
+    private String getChannelMutedRoleName(Channel channel) {
+        return String.format("TCM: %s", channel.getIdLong());
+    }
+
+    private String getChannelBannedRoleName(Channel channel) {
+        return String.format("TCB: %s", channel.getIdLong());
     }
 }
