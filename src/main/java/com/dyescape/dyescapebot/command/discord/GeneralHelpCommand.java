@@ -7,17 +7,22 @@ import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.HelpCommand;
 import com.google.common.base.Strings;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+
+import java.awt.*;
 
 @CommandAlias("!")
 public class GeneralHelpCommand extends BaseCommand {
 
+    // -------------------------------------------- //
+    // COMMANDS
+    // -------------------------------------------- //
+
     @HelpCommand
     public void help(JDACommandEvent e, CommandHelp help) {
 
-        String header = String.format("**——————[** Showing commands for %s **]——————**\n\n",
-                "!" + help.getCommandPrefix());
-
-        StringBuilder totalHelpResponse = new StringBuilder(header);
+        StringBuilder totalHelpResponse = new StringBuilder();
 
         for (HelpEntry entry : help.getHelpEntries()) {
             if (!entry.shouldShow()) continue;
@@ -25,26 +30,41 @@ public class GeneralHelpCommand extends BaseCommand {
             totalHelpResponse.append(this.formatHelpEntry(entry));
         }
 
-        e.sendMessageInternal(totalHelpResponse.toString());
+        e.sendMessage(this.embed("List of commands", totalHelpResponse.toString()));
     }
+
+    // -------------------------------------------- //
+    // PRIVATE
+    // -------------------------------------------- //
 
     private String formatHelpEntry(HelpEntry entry) {
 
         // We start by simply adding the command string
-        StringBuilder builder = new StringBuilder(entry.getCommand());
+        StringBuilder builder = new StringBuilder(String.format("`!%s", entry.getCommand()));
 
         // If it has any arguments, we add those
         if (!Strings.isNullOrEmpty(entry.getParameterSyntax())) {
             builder.append(" ").append(entry.getParameterSyntax());
         }
+        builder.append("`");
 
         // If it has a description, we add it
         if (!Strings.isNullOrEmpty(entry.getDescription())) {
-            builder.append(" - ").append(entry.getDescription());
+            builder.append("\n").append(entry.getDescription());
         }
 
-        builder.append("\n");
+        builder.append("\n\n");
 
         return builder.toString();
+    }
+
+    private MessageEmbed embed(String title, String description) {
+        EmbedBuilder eb = new EmbedBuilder();
+        if (!Strings.isNullOrEmpty(title)) {
+            eb.setTitle(title);
+        }
+        eb.setDescription(description);
+        eb.setColor(Color.GRAY);
+        return eb.build();
     }
 }
