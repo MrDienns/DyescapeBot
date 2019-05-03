@@ -10,7 +10,7 @@ import com.google.common.base.Strings;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
-import java.awt.*;
+import java.awt.Color;
 
 @CommandAlias("!")
 public class GeneralHelpCommand extends BaseCommand {
@@ -40,20 +40,14 @@ public class GeneralHelpCommand extends BaseCommand {
     private String formatHelpEntry(HelpEntry entry) {
 
         // We start by simply adding the command string
-        StringBuilder builder = new StringBuilder(String.format("`!%s", entry.getCommand()));
-
-        // If it has any arguments, we add those
-        if (!Strings.isNullOrEmpty(entry.getParameterSyntax())) {
-            builder.append(" ").append(entry.getParameterSyntax());
-        }
-        builder.append("`");
+        StringBuilder builder = new StringBuilder(String.format("`!%s`", entry.getCommand()));
 
         // If it has a description, we add it
         if (!Strings.isNullOrEmpty(entry.getDescription())) {
-            builder.append("\n").append(entry.getDescription());
+            builder.append(" - ").append(entry.getDescription());
         }
 
-        builder.append("\n\n");
+        builder.append("\n");
 
         return builder.toString();
     }
