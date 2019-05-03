@@ -11,6 +11,8 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 import java.awt.Color;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @CommandAlias("!")
 public class GeneralHelpCommand extends BaseCommand {
@@ -22,15 +24,31 @@ public class GeneralHelpCommand extends BaseCommand {
     @HelpCommand
     public void help(JDACommandEvent e, CommandHelp help) {
 
-        StringBuilder totalHelpResponse = new StringBuilder();
+        // Stream & filter all relevant commands for the user
+        List<HelpEntry> availableCommands = help.getHelpEntries().stream()
+                .filter(HelpEntry::shouldShow)
+                .filter(entry -> !entry.getCommand().equals(entry.getCommandPrefix() + " " + "help"))
+                .collect(Collectors.toList());
 
-        for (HelpEntry entry : help.getHelpEntries()) {
-            if (!entry.shouldShow()) continue;
-            if (entry.getCommand().equals(entry.getCommandPrefix() + " " + "help")) continue;
-            totalHelpResponse.append(this.formatHelpEntry(entry));
+        // If it's not empty
+        if (!availableCommands.isEmpty()) {
+
+            // Prepare a response
+            StringBuilder totalHelpResponse = new StringBuilder();
+
+            // Append the response
+            for (HelpEntry entry : availableCommands) {
+                totalHelpResponse.append(this.formatHelpEntry(entry));
+            }
+
+            // Send the response
+            e.sendMessage(this.embed("List of commands", totalHelpResponse.toString()));
+        } else {
+
+            // User cannot do anything, send response
+            e.sendMessage(this.embed(null,
+                    "Cannot visualise help page because you don't have permission to any of my commands."));
         }
-
-        e.sendMessage(this.embed("List of commands", totalHelpResponse.toString()));
     }
 
     // -------------------------------------------- //
