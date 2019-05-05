@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 

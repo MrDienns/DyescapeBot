@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import io.vertx.core.Verticle;
 
 import com.dyescape.dyescapebot.verticle.BotGatewayConnectorVerticle;
+import com.dyescape.dyescapebot.verticle.DatabaseConnectorVerticle;
 
 /**
  * Base implementation of the {@link ApplicationVerticleProvider}
@@ -28,6 +29,7 @@ public class ApplicationVerticleProviderImpl implements ApplicationVerticleProvi
         List<Class<? extends Verticle>> verticles = new ArrayList<>();
 
         verticles.add(BotGatewayConnectorVerticle.class);
+        verticles.add(DatabaseConnectorVerticle.class);
 
         return verticles;
     }

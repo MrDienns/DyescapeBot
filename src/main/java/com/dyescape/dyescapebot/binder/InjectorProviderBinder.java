@@ -1,9 +1,9 @@
 package com.dyescape.dyescapebot.binder;
 
-import com.google.inject.AbstractModule;
-
 import com.dyescape.dyescapebot.provider.InjectorProvider;
 import com.dyescape.dyescapebot.provider.InjectorProviderImpl;
+
+import com.google.inject.AbstractModule;
 
 /**
  * InjectorProviderBinder is an extension of Guice's AbstractModule which

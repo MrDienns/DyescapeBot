@@ -1,5 +1,6 @@
 package com.dyescape.dyescapebot;
 
+import io.vertx.config.ConfigRetriever;
 import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -13,6 +14,7 @@ import com.google.inject.Injector;
 import com.intapp.vertx.guice.GuiceVerticleFactory;
 
 import com.dyescape.dyescapebot.binder.InjectorProviderBinder;
+import com.dyescape.dyescapebot.constant.Config;
 import com.dyescape.dyescapebot.provider.InjectorProvider;
 
 /**
