@@ -3,8 +3,11 @@ package com.dyescape.dyescapebot.bootstrap;
 import co.aikar.commands.JDACommandContexts;
 import co.aikar.commands.JDACommandManager;
 import com.dyescape.dyescapebot.command.discord.GeneralHelpCommand;
+import com.dyescape.dyescapebot.command.discord.ModerationCommand;
 import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.PermissionResolver;
+import com.dyescape.dyescapebot.command.discord.resolver.TextChannelResolver;
+import com.dyescape.dyescapebot.moderation.Moderation;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -21,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 public class ConfigurationACF {
 
     private final JDA jda;
+    private final Moderation moderation;
 
     /**
      * Construct a new instance of the {@link ConfigurationACF} object. This Bean class will be used to create a Bean
@@ -30,8 +34,9 @@ public class ConfigurationACF {
      * @author Dennis van der Veeke
      * @since 0.1.0
      */
-    public ConfigurationACF(JDA jda) {
+    public ConfigurationACF(JDA jda, Moderation moderation) {
         this.jda = jda;
+        this.moderation = moderation;
     }
 
     @Bean
@@ -55,6 +60,7 @@ public class ConfigurationACF {
 
         // Register the commands
         commandManager.registerCommand(new GeneralHelpCommand());
+        commandManager.registerCommand(new ModerationCommand(this.moderation));
 
         return commandManager;
     }
