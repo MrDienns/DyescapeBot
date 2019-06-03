@@ -3,4 +3,6 @@ out/
 .idea/
 *.iml
 target/
-conf/config.json
+
+# Configuration
+src/main/resources/application.properties
