@@ -1,8 +1,8 @@
 package com.dyescape.dyescapebot.bootstrap;
 
 import com.dyescape.dyescapebot.configuration.discord.DiscordConfiguration;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
