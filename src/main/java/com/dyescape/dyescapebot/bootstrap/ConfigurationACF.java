@@ -2,6 +2,7 @@ package com.dyescape.dyescapebot.bootstrap;
 
 import co.aikar.commands.JDACommandContexts;
 import co.aikar.commands.JDACommandManager;
+import com.dyescape.dyescapebot.command.discord.GeneralHelpCommand;
 import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.PermissionResolver;
 import net.dv8tion.jda.core.JDA;
@@ -49,6 +50,9 @@ public class ConfigurationACF {
 
         // Register the permission resolver
         commandManager.setPermissionResolver(new PermissionResolver());
+
+        // Register the commands
+        commandManager.registerCommand(new GeneralHelpCommand());
 
         return commandManager;
     }
