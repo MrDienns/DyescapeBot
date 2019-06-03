@@ -7,6 +7,7 @@ import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.PermissionResolver;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,6 +45,7 @@ public class ConfigurationACF {
 
         // Register all context resolvers
         contexts.registerContext(Member.class, new MemberResolver());
+        contexts.registerContext(TextChannel.class, new TextChannelResolver());
 
         // Enable unstable APIs
         commandManager.enableUnstableAPI("help");
