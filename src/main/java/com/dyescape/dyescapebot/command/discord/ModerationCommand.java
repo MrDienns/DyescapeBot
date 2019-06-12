@@ -42,7 +42,8 @@ public class ModerationCommand extends BaseCommand {
     public void onKickCommand(JDACommandEvent e, Member member, @Optional String reason) {
 
         try {
-            this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+            this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
+                    e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was kicked.", member.getEffectiveName())));
         } catch (Exception ex) {
             this.handleError(e, ex);
@@ -56,7 +57,8 @@ public class ModerationCommand extends BaseCommand {
     public void onBanCommand(JDACommandEvent e, Member member, @Optional String reason) {
 
         try {
-            this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+            this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
+                    e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was banned.", member.getEffectiveName())));
         } catch (Exception ex) {
             this.handleError(e ,ex);
@@ -71,7 +73,7 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             this.moderation.tempban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
-                    TimeUtil.parseFromRelativeString(time));
+                    TimeUtil.parseFromRelativeString(time), e.getIssuer().getAuthor().getIdLong());
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was banned for %s.",
                     member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
@@ -87,7 +89,8 @@ public class ModerationCommand extends BaseCommand {
     public void onUnbanCommand(JDACommandEvent e, User user) {
 
         try {
-            this.moderation.unban(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
+            this.moderation.unban(e.getIssuer().getGuild().getIdLong(), user.getIdLong(),
+                    e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was unbanned.",
                     user.getName() + user.getDiscriminator())));
         } catch (Exception ex) {
@@ -102,7 +105,8 @@ public class ModerationCommand extends BaseCommand {
     public void onMuteCommand(JDACommandEvent e, Member member, @Optional String reason) {
 
         try {
-            this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+            this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
+                    e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was muted.", member.getEffectiveName())));
         } catch (Exception ex) {
             this.handleError(e ,ex);
@@ -117,7 +121,7 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             this.moderation.tempmute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
-                    TimeUtil.parseFromRelativeString(time));
+                    TimeUtil.parseFromRelativeString(time), e.getIssuer().getAuthor().getIdLong());
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was muted for %s.",
                     member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
@@ -133,7 +137,8 @@ public class ModerationCommand extends BaseCommand {
     public void onUnmuteCommand(JDACommandEvent e, User user) {
 
         try {
-            this.moderation.unmute(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
+            this.moderation.unmute(e.getIssuer().getGuild().getIdLong(), user.getIdLong(),
+                    e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s#%s was unmuted.",
                     user.getName(), user.getDiscriminator())));
         } catch (Exception ex) {
@@ -150,7 +155,7 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             this.moderation.channelBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
-                    channel.getIdLong(), reason);
+                    channel.getIdLong(), reason, e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was banned from channel #%s.",
                     member.getEffectiveName(), channel.getName())));
         } catch (Exception ex) {
@@ -167,7 +172,8 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             this.moderation.channelTempBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
-                    channel.getIdLong(), reason, TimeUtil.parseFromRelativeString(time));
+                    channel.getIdLong(), reason, TimeUtil.parseFromRelativeString(time),
+                    e.getIssuer().getAuthor().getIdLong());
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was banned from channel #%s for %s.",
                     member.getEffectiveName(), channel.getName(),
@@ -185,7 +191,7 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             this.moderation.channelMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
-                    channel.getIdLong(), reason);
+                    channel.getIdLong(), reason, e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was muted in channel #%s.",
                     member.getEffectiveName(), channel.getName())));
         } catch (Exception ex) {
@@ -202,7 +208,8 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             this.moderation.channelTempMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
-                    channel.getIdLong(), reason, TimeUtil.parseFromRelativeString(time));
+                    channel.getIdLong(), reason, TimeUtil.parseFromRelativeString(time),
+                    e.getIssuer().getAuthor().getIdLong());
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was muted in channel #%s for %s.",
                     member.getEffectiveName(), channel.getName(),
@@ -219,7 +226,8 @@ public class ModerationCommand extends BaseCommand {
     public void onWarnCommand(JDACommandEvent e, Member member, @Optional String reason) {
 
         try {
-            this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason);
+            this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
+                    e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName())));
         } catch (Exception ex) {
             this.handleError(e ,ex);

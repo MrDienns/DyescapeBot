@@ -15,9 +15,8 @@ public class WarningAction implements Serializable {
     // -------------------------------------------- //
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "server_id")
-    private Server server;
+    @Column(name = "server_id")
+    private long server;
 
     @Id
     @Column(name = "points")
@@ -31,10 +30,10 @@ public class WarningAction implements Serializable {
     // -------------------------------------------- //
 
     private WarningAction() {
-        this(null, 0, "");
+        this(0, 0, "");
     }
 
-    public WarningAction(Server server, int points, String action) {
+    public WarningAction(long server, int points, String action) {
         this.server = server;
         this.points = points;
         this.action = action;
@@ -44,7 +43,7 @@ public class WarningAction implements Serializable {
     // FIELD ACCESS
     // -------------------------------------------- //
 
-    public Server getServer() {
+    public long getServer() {
         return this.server;
     }
 
@@ -63,6 +62,10 @@ public class WarningAction implements Serializable {
     public class WarningActionKey implements Serializable {
 
         private static final long serialVersionUID = 1L;
+
+        private WarningActionKey() {
+
+        }
 
         private long server;
         private int points;
