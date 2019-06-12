@@ -2,6 +2,19 @@ version: '3.7'
 
 services:
 
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'dyescape-bot'
+      MYSQL_USER: 'dyescape'
+      MYSQL_PASSWORD: 'bot'
+      MYSQL_ROOT_PASSWORD: 'dyescape-bot'
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql:/var/lib/mysql
+
   dyescape-bot:
     image: dyescape/dyescape-bot:latest
     build:
@@ -9,3 +22,6 @@ services:
     restart: on-failure
     volumes:
       - ./conf:/opt/dyescape/dyescape-bot/conf
+
+volumes:
+  mysql:
