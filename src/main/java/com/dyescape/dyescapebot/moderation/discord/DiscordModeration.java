@@ -16,6 +16,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -56,15 +57,50 @@ public class DiscordModeration implements Moderation {
     // -------------------------------------------- //
 
     @Override
-    public void warn(long serverId, long userId, String reason, long punisher) {
+    public void warn(long serverId, long userId, String reason, long punisher, long time) {
         Warning warning = new Warning(serverId, userId, "WARNING", 0, reason, null, punisher);
         this.warningRepository.save(warning);
 
-        PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "WARNING", 0, reason, 0, punisher);
+        PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "WARNING", 0, reason,
+                time, punisher);
         this.punishmentHistoryRepository.save(punishmentEntry);
 
         this.sendPrivateMessage(userId, this.getWarnMessage(
                 this.getUsername(userId), this.getServername(serverId), reason));
+    }
+
+    @Override
+    public void pardon(long serverId, long userId) {
+
+        List<Warning> warnings = this.warningRepository.findByServerAndUser(serverId, userId);
+
+        if (warnings.isEmpty()) {
+
+            throw new DyescapeBotModerationException("User does not have any active warnings");
+        }
+
+        this.warningRepository.deleteByServerAndUser(serverId, userId);
+
+        this.sendPrivateMessage(userId, this.getPardonMessage(this.getUsername(userId), this.getServername(serverId)));
+    }
+
+    @Override
+    public void pardon(long serverId, long userId, long warningId) {
+
+        if (!this.warningRepository.existsById(warningId)) {
+
+            throw new DyescapeBotModerationException("User does not have any warnings with that ID");
+        }
+
+        Warning warning = this.warningRepository.deleteByServerAndUserAndId(serverId, userId, warningId).get(0);
+
+        this.sendPrivateMessage(userId, this.getPardonMessage(
+                this.getUsername(userId), this.getServername(serverId), warning.getReason()));
+    }
+
+    @Override
+    public List<Warning> getWarnings(long serverId, long userId) {
+        return this.warningRepository.findByServerAndUser(serverId, userId);
     }
 
     @Override
@@ -385,6 +421,33 @@ public class DiscordModeration implements Moderation {
 
         // TODO: Inform user about how many warnings he/she has, and inform them about
         //      automated actions taken when received a certain amount of points.
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
+    private String getPardonMessage(String username, String servername) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("All of your warnings on %s have been revoked by a moderator.\n", servername));
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
+    private String getPardonMessage(String username, String servername, String warningReason) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("One of your warnings on %s has been revoked by a moderator.\n",
+                servername));
+
+        if (!Strings.isNullOrEmpty(warningReason)) {
+            builder.append(String.format("**Revoked warning:** %s\n", warningReason));
+        }
 
         builder.append("\n");
         builder.append("Please respect the rules and guidelines.");

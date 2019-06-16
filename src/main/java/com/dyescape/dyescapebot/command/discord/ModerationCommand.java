@@ -3,6 +3,7 @@ package com.dyescape.dyescapebot.command.discord;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
+import com.dyescape.dyescapebot.entity.discord.Warning;
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.util.TimeUtil;
 import com.google.common.base.Strings;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
+import java.util.List;
 
 @CommandAlias("!")
 public class ModerationCommand extends BaseCommand {
@@ -221,17 +223,72 @@ public class ModerationCommand extends BaseCommand {
 
     @Subcommand("warn")
     @CommandPermission("MESSAGE_MANAGE")
-    @Syntax("<User> [Reason]")
+    @Syntax("<User> <Reason> [Time]")
     @Description("Warn a user on the server")
-    public void onWarnCommand(JDACommandEvent e, Member member, @Optional String reason) {
+    public void onWarnCommand(JDACommandEvent e, Member member, String reason, @Optional String time) {
 
         try {
             this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
-                    e.getIssuer().getAuthor().getIdLong());
+                    e.getIssuer().getAuthor().getIdLong(), TimeUtil.parseFromRelativeString(time));
             e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName())));
         } catch (Exception ex) {
             this.handleError(e ,ex);
         }
+    }
+
+    @Subcommand("pardon")
+    @CommandPermission("MESSAGE_MANAGE")
+    @Syntax("<User> [Warning ID]")
+    @Description("Invokes all or specific warnings given to a user")
+    public void onPardonCommand(JDACommandEvent e, Member member, @Optional Long id) {
+
+        try {
+            if (id != null && id != 0) {
+                this.moderation.pardon(member.getGuild().getIdLong(), member.getUser().getIdLong(), id);
+                e.sendMessage(this.embed(String.format("Revoked all warnings of %s.", member.getEffectiveName())));
+            } else {
+                this.moderation.pardon(member.getGuild().getIdLong(), member.getUser().getIdLong());
+                e.sendMessage(this.embed(String.format("Revoked a warning of %s.", member.getEffectiveName())));
+            }
+        } catch (Exception ex) {
+            this.handleError(e, ex);
+        }
+    }
+
+    @Subcommand("warnings|listwarnings")
+    @CommandPermission("MESSAGE_MANAGE")
+    @Syntax("<User>")
+    @Description("Lists all of the active warnings of a user")
+    public void onListWarningsCommand(JDACommandEvent e, Member member) {
+
+        List<Warning> warnings = this.moderation.getWarnings(e.getIssuer().getMember().getGuild().getIdLong(),
+                member.getUser().getIdLong());
+
+        if (warnings.isEmpty()) {
+
+            e.sendMessage(this.embed("User has no active warnings."));
+            return;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder(String.format(
+                "Active warnings of %s:\n\n", member.getEffectiveName()));
+
+        warnings.forEach(warning -> {
+
+            if (Strings.isNullOrEmpty(warning.getReason())) {
+                stringBuilder.append(String.format("#%s - *No reason provided*\n", warning.getId()));
+            } else {
+                stringBuilder.append(String.format("#%s - %s\n", warning.getId(), warning.getReason()));
+            }
+
+            if (warning.getEnd() != null) {
+                stringBuilder.append(String.format("Expires: %s\n", warning.getEnd().toString()));
+            }
+
+            stringBuilder.append("\n");
+        });
+
+        e.sendMessage(this.embed(stringBuilder.toString()));
     }
 
     // -------------------------------------------- //

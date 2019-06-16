@@ -1,8 +1,15 @@
 package com.dyescape.dyescapebot.moderation;
 
+import com.dyescape.dyescapebot.entity.discord.Warning;
+
+import java.util.List;
+
 public interface Moderation {
 
-    void warn(long serverId, long userId, String reason, long punisher) throws Exception;
+    void warn(long serverId, long userId, String reason, long punisher, long time) throws Exception;
+    void pardon(long serverId, long userId);
+    void pardon(long serverId, long userId, long warningId);
+    List<Warning> getWarnings(long serverId, long userId);
 
     void kick(long serverId, long userId, String reason, long punisher) throws Exception;
 
