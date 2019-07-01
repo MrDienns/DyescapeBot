@@ -95,8 +95,7 @@ public class ModerationCommand extends BaseCommand {
     public void onUnbanCommand(JDACommandEvent e, User user) {
 
         try {
-            this.moderation.unban(e.getIssuer().getGuild().getIdLong(), user.getIdLong(),
-                    e.getIssuer().getAuthor().getIdLong());
+            this.moderation.unban(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
             e.sendMessage(this.embed(String.format("User %s was unbanned.",
                     user.getName() + user.getDiscriminator())));
         } catch (Exception ex) {
@@ -143,8 +142,7 @@ public class ModerationCommand extends BaseCommand {
     public void onUnmuteCommand(JDACommandEvent e, User user) {
 
         try {
-            this.moderation.unmute(e.getIssuer().getGuild().getIdLong(), user.getIdLong(),
-                    e.getIssuer().getAuthor().getIdLong());
+            this.moderation.unmute(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
             e.sendMessage(this.embed(String.format("User %s#%s was unmuted.",
                     user.getName(), user.getDiscriminator())));
         } catch (Exception ex) {
@@ -189,6 +187,22 @@ public class ModerationCommand extends BaseCommand {
         }
     }
 
+    @Subcommand("unchannelmute|channelunmute|unmutechannel")
+    @CommandPermission("MANAGE_ROLES")
+    @Syntax("<User> <Channel>")
+    @Description("Revokes a channel mute")
+    public void onUnchannelMuteCommand(JDACommandEvent e, Member member, TextChannel channel) {
+
+        try {
+            this.moderation.unchannelMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
+                    channel.getIdLong());
+            e.sendMessage(this.embed(String.format("User %s was unmuted in channel #%s.",
+                    member.getEffectiveName(), channel.getName())));
+        } catch (Exception ex) {
+            this.handleError(e, ex);
+        }
+    }
+
     @Subcommand("channelmute|mutechannel")
     @CommandPermission("MANAGE_ROLES")
     @Syntax("<User> <Channel> [Reason]")
@@ -220,6 +234,22 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(this.embed(String.format("User %s was muted in channel #%s for %s.",
                     member.getEffectiveName(), channel.getName(),
                     TimeUtil.parsePunishmentTime(punishmentTime))));
+        } catch (Exception ex) {
+            this.handleError(e, ex);
+        }
+    }
+
+    @Subcommand("unchannelban|channelunban|unbanchannel")
+    @CommandPermission("MANAGE_ROLES")
+    @Syntax("<User> <Channel>")
+    @Description("Revokes a channel mute")
+    public void onUnchannelBanCommand(JDACommandEvent e, Member member, TextChannel channel) {
+
+        try {
+            this.moderation.unchannelBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
+                    channel.getIdLong());
+            e.sendMessage(this.embed(String.format("User %s was unmuted in channel #%s.",
+                    member.getEffectiveName(), channel.getName())));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }

@@ -15,14 +15,17 @@ public interface Moderation {
 
     void mute(long serverId, long userId, String reason, long punisher) throws Exception;
     void tempmute(long serverId, long userId, String reason, long punishmentTime, long punisher) throws Exception;
-    void unmute(long serverId, long userId, long punisher) throws Exception;
+    void unmute(long serverId, long userId) throws Exception;
 
     void channelMute(long serverId, long userId, long channelId, String reason, long punisher) throws Exception;
     void channelTempMute(long serverId, long userId, long channelId, String reason, long punishmentTime, long punisher) throws Exception;
+    void unchannelMute(long serverId, long userId, long channelId);
+
     void channelBan(long serverId, long userId, long channelId, String reason, long punisher) throws Exception;
     void channelTempBan(long serverId, long userId, long channelId, String reason, long punishmentTime, long punisher) throws Exception;
+    void unchannelBan(long serverId, long userId, long channelId);
 
     void ban(long serverId, long userId, String reason, long punisher) throws Exception;
     void tempban(long serverId, long userId, String reason, long punishmentTime, long punisher) throws Exception;
-    void unban(long serverId, long userId, long punisher) throws Exception;
+    void unban(long serverId, long userId) throws Exception;
 }

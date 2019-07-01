@@ -188,7 +188,7 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
-    public void unmute(long serverId, long userId, long punisher) throws Exception {
+    public void unmute(long serverId, long userId) throws Exception {
 
         // Get the guild and controller
         Guild guild = this.jda.getGuildById(serverId);
@@ -203,7 +203,7 @@ public class DiscordModeration implements Moderation {
 
         Role mutedRole = this.ensureGuildHasMutedRole(guild).get();
 
-        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "MUTE", 0, null, null, punisher);
+        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "MUTE", 0, null, null, 0L);
         this.punishmentRepository.delete(activePunishment);
 
         if (!member.getRoles().contains(mutedRole)) {
@@ -275,6 +275,33 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
+    public void unchannelMute(long serverId, long userId, long channelId) {
+
+        Guild guild = this.jda.getGuildById(serverId);
+        Member member = guild.getMemberById(userId);
+        Channel channel = this.jda.getTextChannelById(channelId);
+
+        String role = this.getChannelMutedRoleName(channel);
+
+        if (member.getRoles().stream()
+                .map(Role::getName).noneMatch(n -> n.equalsIgnoreCase(role))) {
+
+            throw new DyescapeBotModerationException("User is not muted in that channel.");
+        }
+
+        GuildController controller = new GuildController(guild);
+        controller.removeRolesFromMember(member, guild.getRolesByName(role, true).get(0)).queue(
+                success -> {
+
+                    this.sendPrivateMessage(userId, this.getUnmuteChannelMessage(this.getUsername(userId),
+                            this.getServername(serverId), channel.getName()));
+                }, failure -> {
+
+                    throw new DyescapeBotModerationException(failure.getMessage());
+                });
+    }
+
+    @Override
     public void channelBan(long serverId, long userId, long channelId, String reason, long punisher) {
 
         // Get the guild and controller
@@ -324,6 +351,32 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
+    public void unchannelBan(long serverId, long userId, long channelId) {
+        Guild guild = this.jda.getGuildById(serverId);
+        Member member = guild.getMemberById(userId);
+        Channel channel = this.jda.getTextChannelById(channelId);
+
+        String role = this.getChannelBannedRoleName(channel);
+
+        if (member.getRoles().stream()
+                .map(Role::getName).noneMatch(n -> n.equalsIgnoreCase(role))) {
+
+            throw new DyescapeBotModerationException("User is not muted in that channel.");
+        }
+
+        GuildController controller = new GuildController(guild);
+        controller.removeRolesFromMember(member, guild.getRolesByName(role, true).get(0)).queue(
+                success -> {
+
+                    this.sendPrivateMessage(userId, this.getUnmuteChannelMessage(this.getUsername(userId),
+                            this.getServername(serverId), channel.getName()));
+                }, failure -> {
+
+                    throw new DyescapeBotModerationException(failure.getMessage());
+                });
+    }
+
+    @Override
     public void ban(long serverId, long userId, String reason, long punisher) {
 
         // Get the guild and controller
@@ -369,9 +422,9 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
-    public void unban(long serverId, long userId, long punisher) {
+    public void unban(long serverId, long userId) {
 
-        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "BAN", 0, null, null, punisher);
+        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "BAN", 0, null, null, 0L);
         this.punishmentRepository.delete(activePunishment);
 
         // Get the guild and controller
@@ -594,6 +647,19 @@ public class DiscordModeration implements Moderation {
         return builder.toString();
     }
 
+    private String getUnmuteChannelMessage(String username, String servername, String channel) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been unmuted in #%s on %s.\n",
+                channel, servername));
+        builder.append(String.format("This means that you can talk again in the #%s channel.\n", channel));
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
     private String getChannelBannedMessage(String username, String servername, String channel, String reason) {
         StringBuilder builder = this.getStringBuilder(username);
 
@@ -622,6 +688,19 @@ public class DiscordModeration implements Moderation {
         if (!Strings.isNullOrEmpty(reason)) {
             builder.append(String.format("**Reason: **%s\n", reason));
         }
+
+        builder.append("\n");
+        builder.append("Please respect the rules and guidelines.");
+
+        return builder.toString();
+    }
+
+    private String getUnbannedChannelMessage(String username, String servername, String channel) {
+        StringBuilder builder = this.getStringBuilder(username);
+
+        builder.append(String.format("You have been unbanned from #%s on %s.\n",
+                channel, servername));
+        builder.append(String.format("This means that you can access the #%s channel again.\n", channel));
 
         builder.append("\n");
         builder.append("Please respect the rules and guidelines.");
