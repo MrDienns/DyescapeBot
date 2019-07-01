@@ -7,6 +7,7 @@ import com.dyescape.dyescapebot.command.discord.ModerationCommand;
 import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.PermissionResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.TextChannelResolver;
+import com.dyescape.dyescapebot.configuration.moderation.ModerationConfiguration;
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.repository.ModerationWarningActionRepository;
 import net.dv8tion.jda.core.JDA;
@@ -27,19 +28,25 @@ public class ConfigurationACF {
     private final JDA jda;
     private final Moderation moderation;
     private final ModerationWarningActionRepository warningActionRepository;
+    private final ModerationConfiguration moderationConfiguration;
 
     /**
      * Construct a new instance of the {@link ConfigurationACF} object. This Bean class will be used to create a Bean
      * for the {@link JDACommandManager} object so that commands, argument resolvers and permission resolvers and be
      * registered.
      * @param jda {@link JDA} JDA instance
+     * @param moderation The moderation interface
+     * @param warningActionRepository The warning action repository instance
+     * @param moderationConfiguration The moderation configuration
      * @author Dennis van der Veeke
      * @since 0.1.0
      */
-    public ConfigurationACF(JDA jda, Moderation moderation, ModerationWarningActionRepository warningActionRepository) {
+    public ConfigurationACF(JDA jda, Moderation moderation, ModerationWarningActionRepository warningActionRepository,
+                            ModerationConfiguration moderationConfiguration) {
         this.jda = jda;
         this.moderation = moderation;
         this.warningActionRepository = warningActionRepository;
+        this.moderationConfiguration = moderationConfiguration;
     }
 
     @Bean
@@ -63,7 +70,8 @@ public class ConfigurationACF {
 
         // Register the commands
         commandManager.registerCommand(new GeneralHelpCommand());
-        commandManager.registerCommand(new ModerationCommand(this.moderation, this.warningActionRepository));
+        commandManager.registerCommand(new ModerationCommand(this.moderation, this.warningActionRepository,
+                this.moderationConfiguration));
 
         return commandManager;
     }

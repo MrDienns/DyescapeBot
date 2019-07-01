@@ -93,7 +93,7 @@ public class DiscordModeration implements Moderation {
     }
 
     @Override
-    public void pardon(long serverId, long userId, long warningId) {
+    public void pardon(long serverId, long userId, long warningId, boolean message) {
 
         if (!this.warningRepository.existsById(warningId)) {
 
@@ -102,8 +102,10 @@ public class DiscordModeration implements Moderation {
 
         Warning warning = this.warningRepository.deleteByServerAndUserAndId(serverId, userId, warningId).get(0);
 
-        this.sendPrivateMessage(userId, this.getPardonMessage(
-                this.getUsername(userId), this.getServername(serverId), warning.getReason()));
+        if (message) {
+            this.sendPrivateMessage(userId, this.getPardonMessage(
+                    this.getUsername(userId), this.getServername(serverId), warning.getReason()));
+        }
     }
 
     @Override

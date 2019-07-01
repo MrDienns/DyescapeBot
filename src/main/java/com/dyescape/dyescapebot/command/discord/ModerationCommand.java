@@ -3,6 +3,7 @@ package com.dyescape.dyescapebot.command.discord;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
+import com.dyescape.dyescapebot.configuration.moderation.ModerationConfiguration;
 import com.dyescape.dyescapebot.entity.discord.Warning;
 import com.dyescape.dyescapebot.entity.discord.WarningAction;
 import com.dyescape.dyescapebot.moderation.Moderation;
@@ -27,14 +28,17 @@ public class ModerationCommand extends BaseCommand {
 
     private final Moderation moderation;
     private final ModerationWarningActionRepository warningActionRepository;
+    private final ModerationConfiguration moderationConfiguration;
 
     // -------------------------------------------- //
     // CONSTRUCT
     // -------------------------------------------- //
 
-    public ModerationCommand(Moderation moderation, ModerationWarningActionRepository warningActionRepository) {
+    public ModerationCommand(Moderation moderation, ModerationWarningActionRepository warningActionRepository,
+                             ModerationConfiguration moderationConfiguration) {
         this.moderation = moderation;
         this.warningActionRepository = warningActionRepository;
+        this.moderationConfiguration = moderationConfiguration;
     }
 
     // -------------------------------------------- //
@@ -259,12 +263,12 @@ public class ModerationCommand extends BaseCommand {
     @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Reason> [Time]")
     @Description("Warn a user on the server")
-    public void onWarnCommand(JDACommandEvent e, Member member, String reason, @Optional String time) {
+    public void onWarnCommand(JDACommandEvent e, Member member, String reason) {
 
         try {
             this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                     e.getIssuer().getAuthor().getIdLong(),
-                    Strings.isNullOrEmpty(time) ? 0L : TimeUtil.parseFromRelativeString(time));
+                    this.moderationConfiguration.getWarningperiod());
             e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName())));
         } catch (Exception ex) {
             this.handleError(e, ex);
@@ -279,7 +283,7 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             if (id != null && id != 0) {
-                this.moderation.pardon(member.getGuild().getIdLong(), member.getUser().getIdLong(), id);
+                this.moderation.pardon(member.getGuild().getIdLong(), member.getUser().getIdLong(), id, true);
                 e.sendMessage(this.embed(String.format("Revoked all warnings of %s.", member.getEffectiveName())));
             } else {
                 this.moderation.pardon(member.getGuild().getIdLong(), member.getUser().getIdLong());

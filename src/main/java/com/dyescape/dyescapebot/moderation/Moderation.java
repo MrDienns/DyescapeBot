@@ -8,7 +8,7 @@ public interface Moderation {
 
     void warn(long serverId, long userId, String reason, long punisher, long time) throws Exception;
     void pardon(long serverId, long userId);
-    void pardon(long serverId, long userId, long warningId);
+    void pardon(long serverId, long userId, long warningId, boolean message);
     List<Warning> getWarnings(long serverId, long userId);
 
     void kick(long serverId, long userId, String reason, long punisher) throws Exception;

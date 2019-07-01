@@ -5,6 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface ModerationWarningRepository extends CrudRepository<Warning, Long> {
@@ -18,4 +19,7 @@ public interface ModerationWarningRepository extends CrudRepository<Warning, Lon
     @Transactional
     List<Warning> deleteByServerAndUserAndId(@Param("server_id") long serverId, @Param("user_id") long userId,
                                              @Param("id") long warningId);
+
+    @Transactional
+    List<Warning> findAllByEndBefore(Instant instant);
 }
