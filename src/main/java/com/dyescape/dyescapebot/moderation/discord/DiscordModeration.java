@@ -12,11 +12,13 @@ import com.dyescape.dyescapebot.repository.ModerationWarningActionRepository;
 import com.dyescape.dyescapebot.repository.ModerationWarningRepository;
 import com.dyescape.dyescapebot.util.TimeUtil;
 import com.google.common.base.Strings;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 
+import java.awt.*;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -72,7 +74,7 @@ public class DiscordModeration implements Moderation {
         this.punishmentHistoryRepository.save(punishmentEntry);
 
         this.sendPrivateMessage(userId, this.getWarnMessage(
-                this.getUsername(userId), this.getServername(serverId), reason));
+                this.getUsername(userId), this.getServername(serverId), reason), Color.RED);
 
         this.handleWarningActions(serverId, userId);
     }
@@ -89,7 +91,8 @@ public class DiscordModeration implements Moderation {
 
         this.warningRepository.deleteByServerAndUser(serverId, userId);
 
-        this.sendPrivateMessage(userId, this.getPardonMessage(this.getUsername(userId), this.getServername(serverId)));
+        this.sendPrivateMessage(userId, this.getPardonMessage(this.getUsername(userId), this.getServername(serverId)),
+                Color.GREEN);
     }
 
     @Override
@@ -104,7 +107,7 @@ public class DiscordModeration implements Moderation {
 
         if (message) {
             this.sendPrivateMessage(userId, this.getPardonMessage(
-                    this.getUsername(userId), this.getServername(serverId), warning.getReason()));
+                    this.getUsername(userId), this.getServername(serverId), warning.getReason()), Color.GREEN);
         }
     }
 
@@ -128,7 +131,7 @@ public class DiscordModeration implements Moderation {
 
             // Succeeded, let's send a message to the user
             this.sendPrivateMessage(userId, this.getKickMessage(
-                    this.getUsername(userId), this.getServername(serverId), reason));
+                    this.getUsername(userId), this.getServername(serverId), reason), Color.RED);
         }, failureConsumer -> {
 
             throw new DyescapeBotModerationException(failureConsumer.getMessage());
@@ -155,7 +158,7 @@ public class DiscordModeration implements Moderation {
             this.applyMute(guild, member).get();
 
             this.sendPrivateMessage(member.getUser().getIdLong(), this.getMuteMessage(
-                    member.getUser().getName(), guild.getName(), reason));
+                    member.getUser().getName(), guild.getName(), reason), Color.RED);
         } catch (InterruptedException | ExecutionException e) {
             throw new DyescapeBotModerationException(e.getMessage());
         }
@@ -183,7 +186,7 @@ public class DiscordModeration implements Moderation {
             this.applyMute(guild, member).get();
 
             this.sendPrivateMessage(member.getUser().getIdLong(), this.getTempMuteMessage(
-                    member.getUser().getName(), guild.getName(), reason, punishmentTime));
+                    member.getUser().getName(), guild.getName(), reason, punishmentTime), Color.RED);
         } catch (InterruptedException | ExecutionException e) {
             throw new DyescapeBotModerationException(e.getMessage());
         }
@@ -219,7 +222,7 @@ public class DiscordModeration implements Moderation {
         guildController.removeRolesFromMember(member, mutedRole).queue(successHandler -> {
 
             this.sendPrivateMessage(userId, this.getUnmuteMessage(
-                    this.getUsername(userId), this.getServername(serverId)));
+                    this.getUsername(userId), this.getServername(serverId)), Color.GREEN);
         }, failureHandler -> {
 
             throw new DyescapeBotModerationException(failureHandler.getMessage());
@@ -247,7 +250,7 @@ public class DiscordModeration implements Moderation {
 
         this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelMutedMessage(
                 member.getUser().getName(), guild.getName(), channel.getName(), reason
-        ));
+        ), Color.RED);
     }
 
     @Override
@@ -273,7 +276,7 @@ public class DiscordModeration implements Moderation {
 
         this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelTempMutedMessage(
                 member.getUser().getName(), guild.getName(), channel.getName(), reason, punishmentTime
-        ));
+        ), Color.RED);
     }
 
     @Override
@@ -296,7 +299,7 @@ public class DiscordModeration implements Moderation {
                 success -> {
 
                     this.sendPrivateMessage(userId, this.getUnmuteChannelMessage(this.getUsername(userId),
-                            this.getServername(serverId), channel.getName()));
+                            this.getServername(serverId), channel.getName()), Color.GREEN);
                 }, failure -> {
 
                     throw new DyescapeBotModerationException(failure.getMessage());
@@ -323,7 +326,7 @@ public class DiscordModeration implements Moderation {
 
         this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelBannedMessage(
                 member.getUser().getName(), guild.getName(), channel.getName(), reason
-        ));
+        ), Color.RED);
     }
 
     @Override
@@ -349,7 +352,7 @@ public class DiscordModeration implements Moderation {
 
         this.sendPrivateMessage(member.getUser().getIdLong(), this.getChannelTempBannedMessage(
                 member.getUser().getName(), guild.getName(), channel.getName(), reason, punishmentTime
-        ));
+        ), Color.RED);
     }
 
     @Override
@@ -371,7 +374,7 @@ public class DiscordModeration implements Moderation {
                 success -> {
 
                     this.sendPrivateMessage(userId, this.getUnbannedChannelMessage(this.getUsername(userId),
-                            this.getServername(serverId), channel.getName()));
+                            this.getServername(serverId), channel.getName()), Color.GREEN);
                 }, failure -> {
 
                     throw new DyescapeBotModerationException(failure.getMessage());
@@ -398,7 +401,7 @@ public class DiscordModeration implements Moderation {
             this.applyBan(guild, user, reason).get();
 
             this.sendPrivateMessage(user.getIdLong(), this.getBanMessage(
-                    user.getName(), guild.getName(), reason));
+                    user.getName(), guild.getName(), reason), Color.RED);
 
         } catch (ExecutionException | InterruptedException e) {
             throw new DyescapeBotModerationException(e.getMessage());
@@ -428,7 +431,7 @@ public class DiscordModeration implements Moderation {
             this.applyBan(guild, user, reason).get();
 
             this.sendPrivateMessage(user.getIdLong(), this.getTempBanMessage(
-                    user.getName(), guild.getName(), reason, punishmentTime));
+                    user.getName(), guild.getName(), reason, punishmentTime), Color.RED);
         } catch (Exception ex) {
             throw new DyescapeBotModerationException(ex.getMessage());
         }
@@ -450,7 +453,7 @@ public class DiscordModeration implements Moderation {
             guildController.unban(user).queue(unbanSuccess -> {
 
                 this.sendPrivateMessage(userId, this.getUnbanMessage(
-                        user.getName(), guild.getName()));
+                        user.getName(), guild.getName()), Color.GREEN);
             }, unbanFailure -> {
 
                 throw new DyescapeBotModerationException(unbanFailure.getMessage());
@@ -469,11 +472,16 @@ public class DiscordModeration implements Moderation {
     // PRIVATE
     // -------------------------------------------- //
 
-    private void sendPrivateMessage(long userId, String message) {
+    private void sendPrivateMessage(long userId, String message, Color color) {
 
         // TODO: Check if the user has PMs disabled
         this.jda.getUserById(userId).openPrivateChannel().queue((channel) -> {
-            channel.sendMessage(message).queue();
+
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setDescription(message);
+            eb.setColor(color);
+
+            channel.sendMessage(eb.build()).queue();
         });
     }
 

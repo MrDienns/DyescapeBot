@@ -54,7 +54,7 @@ public class ModerationCommand extends BaseCommand {
         try {
             this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                     e.getIssuer().getAuthor().getIdLong());
-            e.sendMessage(this.embed(String.format("User %s was kicked.", member.getEffectiveName())));
+            e.sendMessage(this.embed(String.format("User %s was kicked.", member.getEffectiveName()), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -69,7 +69,7 @@ public class ModerationCommand extends BaseCommand {
         try {
             this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                     e.getIssuer().getAuthor().getIdLong());
-            e.sendMessage(this.embed(String.format("User %s was banned.", member.getEffectiveName())));
+            e.sendMessage(this.embed(String.format("User %s was banned.", member.getEffectiveName()), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -86,7 +86,7 @@ public class ModerationCommand extends BaseCommand {
                     TimeUtil.parseFromRelativeString(time), e.getIssuer().getAuthor().getIdLong());
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was banned for %s.",
-                    member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
+                    member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime)), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -101,7 +101,7 @@ public class ModerationCommand extends BaseCommand {
         try {
             this.moderation.unban(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
             e.sendMessage(this.embed(String.format("User %s was unbanned.",
-                    user.getName() + user.getDiscriminator())));
+                    user.getName() + user.getDiscriminator()), Color.GREEN));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -116,7 +116,7 @@ public class ModerationCommand extends BaseCommand {
         try {
             this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                     e.getIssuer().getAuthor().getIdLong());
-            e.sendMessage(this.embed(String.format("User %s was muted.", member.getEffectiveName())));
+            e.sendMessage(this.embed(String.format("User %s was muted.", member.getEffectiveName()), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -133,7 +133,7 @@ public class ModerationCommand extends BaseCommand {
                     TimeUtil.parseFromRelativeString(time), e.getIssuer().getAuthor().getIdLong());
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was muted for %s.",
-                    member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
+                    member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime)), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -148,7 +148,7 @@ public class ModerationCommand extends BaseCommand {
         try {
             this.moderation.unmute(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
             e.sendMessage(this.embed(String.format("User %s#%s was unmuted.",
-                    user.getName(), user.getDiscriminator())));
+                    user.getName(), user.getDiscriminator()), Color.GREEN));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -165,7 +165,7 @@ public class ModerationCommand extends BaseCommand {
             this.moderation.channelBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
                     channel.getIdLong(), reason, e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was banned from channel #%s.",
-                    member.getEffectiveName(), channel.getName())));
+                    member.getEffectiveName(), channel.getName()), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -185,7 +185,7 @@ public class ModerationCommand extends BaseCommand {
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was banned from channel #%s for %s.",
                     member.getEffectiveName(), channel.getName(),
-                    TimeUtil.parsePunishmentTime(punishmentTime))));
+                    TimeUtil.parsePunishmentTime(punishmentTime)), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -201,7 +201,7 @@ public class ModerationCommand extends BaseCommand {
             this.moderation.unchannelMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
                     channel.getIdLong());
             e.sendMessage(this.embed(String.format("User %s was unmuted in channel #%s.",
-                    member.getEffectiveName(), channel.getName())));
+                    member.getEffectiveName(), channel.getName()), Color.GREEN));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -217,7 +217,7 @@ public class ModerationCommand extends BaseCommand {
             this.moderation.channelMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
                     channel.getIdLong(), reason, e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was muted in channel #%s.",
-                    member.getEffectiveName(), channel.getName())));
+                    member.getEffectiveName(), channel.getName()), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -237,7 +237,7 @@ public class ModerationCommand extends BaseCommand {
             long punishmentTime = TimeUtil.parseFromRelativeString(time);
             e.sendMessage(this.embed(String.format("User %s was muted in channel #%s for %s.",
                     member.getEffectiveName(), channel.getName(),
-                    TimeUtil.parsePunishmentTime(punishmentTime))));
+                    TimeUtil.parsePunishmentTime(punishmentTime)), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -253,7 +253,7 @@ public class ModerationCommand extends BaseCommand {
             this.moderation.unchannelBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
                     channel.getIdLong());
             e.sendMessage(this.embed(String.format("User %s was unmuted in channel #%s.",
-                    member.getEffectiveName(), channel.getName())));
+                    member.getEffectiveName(), channel.getName()), Color.GREEN));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -269,7 +269,7 @@ public class ModerationCommand extends BaseCommand {
             this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                     e.getIssuer().getAuthor().getIdLong(),
                     this.moderationConfiguration.getWarningperiod());
-            e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName())));
+            e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName()), Color.RED));
         } catch (Exception ex) {
             this.handleError(e, ex);
         }
@@ -284,10 +284,12 @@ public class ModerationCommand extends BaseCommand {
         try {
             if (id != null && id != 0) {
                 this.moderation.pardon(member.getGuild().getIdLong(), member.getUser().getIdLong(), id, true);
-                e.sendMessage(this.embed(String.format("Revoked all warnings of %s.", member.getEffectiveName())));
+                e.sendMessage(this.embed(String.format("Revoked all warnings of %s.", member.getEffectiveName()),
+                        Color.GREEN));
             } else {
                 this.moderation.pardon(member.getGuild().getIdLong(), member.getUser().getIdLong());
-                e.sendMessage(this.embed(String.format("Revoked a warning of %s.", member.getEffectiveName())));
+                e.sendMessage(this.embed(String.format("Revoked a warning of %s.", member.getEffectiveName()),
+                        Color.GREEN));
             }
         } catch (Exception ex) {
             this.handleError(e, ex);
@@ -305,7 +307,7 @@ public class ModerationCommand extends BaseCommand {
 
         if (warnings.isEmpty()) {
 
-            e.sendMessage(this.embed("User has no active warnings."));
+            e.sendMessage(this.embed("User has no active warnings.", Color.LIGHT_GRAY));
             return;
         }
 
@@ -327,7 +329,7 @@ public class ModerationCommand extends BaseCommand {
             stringBuilder.append("\n");
         });
 
-        e.sendMessage(this.embed(stringBuilder.toString()));
+        e.sendMessage(this.embed(stringBuilder.toString(), Color.LIGHT_GRAY));
     }
 
     // -------------------------------------------- //
@@ -351,11 +353,11 @@ public class ModerationCommand extends BaseCommand {
         if (time == null) {
 
             e.sendMessage(this.embed(String.format("I will %s users that reach %s warning points.",
-                    type.toString(), warningPoints)));
+                    type.toString(), warningPoints), Color.LIGHT_GRAY));
         } else {
 
             e.sendMessage(this.embed(String.format("I will %s users that reach %s warning points for %s.",
-                    type.toString(), warningPoints, TimeUtil.parsePunishmentTime(punishmentTime))));
+                    type.toString(), warningPoints, TimeUtil.parsePunishmentTime(punishmentTime)), Color.LIGHT_GRAY));
         }
     }
 
@@ -364,13 +366,13 @@ public class ModerationCommand extends BaseCommand {
     // -------------------------------------------- //
 
     private void handleError(JDACommandEvent e, Exception ex) {
-        e.sendMessage(this.embed(String.format("Error: %s", ex.getMessage())));
+        e.sendMessage(this.embed(String.format("Error: %s", ex.getMessage()), Color.LIGHT_GRAY));
     }
 
-    private MessageEmbed embed(String message) {
+    private MessageEmbed embed(String message, Color color) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setDescription(message);
-        eb.setColor(Color.RED);
+        eb.setColor(color);
         return eb.build();
     }
 }
