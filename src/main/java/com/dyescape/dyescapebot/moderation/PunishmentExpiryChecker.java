@@ -34,16 +34,16 @@ public class PunishmentExpiryChecker {
         for (ActivePunishment p : expiredPunishments) {
             switch (p.getType()) {
 
-                case "MUTE":
+                case MUTE:
                     this.moderation.unmute(p.getServer(), p.getUser());
                     break;
-                case "CHANNELMUTE":
+                case CHANNELMUTE:
                     this.moderation.unchannelMute(p.getServer(), p.getUser(), p.getChannel());
                     break;
-                case "BAN":
+                case BAN:
                     this.moderation.unban(p.getServer(), p.getUser());
                     break;
-                case "CHANNELBAN":
+                case CHANNELBAN:
                     this.moderation.unchannelBan(p.getServer(), p.getUser(), p.getChannel());
                     break;
                 default:

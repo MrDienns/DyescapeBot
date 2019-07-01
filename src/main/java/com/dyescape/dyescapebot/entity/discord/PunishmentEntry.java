@@ -25,7 +25,7 @@ public class PunishmentEntry implements Serializable {
     private long user;
 
     @Column(name = "type", nullable = false)
-    private String type;
+    private PunishmentType type;
 
     @Column(name = "channel", nullable = true)
     private long channel;
@@ -44,10 +44,10 @@ public class PunishmentEntry implements Serializable {
     // -------------------------------------------- //
 
     private PunishmentEntry() {
-        this(0, 0, "", 0, "", 0, 0);
+        this(0, 0, null, 0, "", 0, 0);
     }
 
-    public PunishmentEntry(long server, long user, String type, long channel, String reason, long duration, long punisher) {
+    public PunishmentEntry(long server, long user, PunishmentType type, long channel, String reason, long duration, long punisher) {
         this.server = server;
         this.user = user;
         this.type = type;
@@ -73,7 +73,7 @@ public class PunishmentEntry implements Serializable {
         return this.user;
     }
 
-    public String getType() {
+    public PunishmentType getType() {
         return this.type;
     }
 

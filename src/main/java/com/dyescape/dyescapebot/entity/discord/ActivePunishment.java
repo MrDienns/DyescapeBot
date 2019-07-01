@@ -25,7 +25,7 @@ public class ActivePunishment implements Serializable {
 
     @Id
     @Column(name = "type", nullable = false)
-    private String type;
+    private PunishmentType type;
 
     @Id
     @Column(name = "channel", nullable = true)
@@ -45,10 +45,10 @@ public class ActivePunishment implements Serializable {
     // -------------------------------------------- //
 
     private ActivePunishment() {
-        this(0, 0, "", 0, "", null, 0);
+        this(0, 0, null, 0, "", null, 0);
     }
 
-    public ActivePunishment(long server, long user, String type, long channel, String reason, Instant end, long punisher) {
+    public ActivePunishment(long server, long user, PunishmentType type, long channel, String reason, Instant end, long punisher) {
         this.server = server;
         this.user = user;
         this.type = type;
@@ -70,7 +70,7 @@ public class ActivePunishment implements Serializable {
         return this.user;
     }
 
-    public String getType() {
+    public PunishmentType getType() {
         return this.type;
     }
 
@@ -102,7 +102,7 @@ public class ActivePunishment implements Serializable {
 
         }
 
-        public PunishmentKey(long server, long user, String type, long channel) {
+        public PunishmentKey(long server, long user, PunishmentType type, long channel) {
             this.server = server;
             this.user = user;
             this.type = type;
@@ -111,7 +111,7 @@ public class ActivePunishment implements Serializable {
 
         private long server;
         private long user;
-        private String type;
+        private PunishmentType type;
         private long channel;
 
         public long getServer() {
@@ -122,7 +122,7 @@ public class ActivePunishment implements Serializable {
             return this.user;
         }
 
-        public String getType() {
+        public PunishmentType getType() {
             return this.type;
         }
 

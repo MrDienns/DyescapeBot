@@ -1,9 +1,6 @@
 package com.dyescape.dyescapebot.moderation.discord;
 
-import com.dyescape.dyescapebot.entity.discord.ActivePunishment;
-import com.dyescape.dyescapebot.entity.discord.PunishmentEntry;
-import com.dyescape.dyescapebot.entity.discord.Warning;
-import com.dyescape.dyescapebot.entity.discord.WarningAction;
+import com.dyescape.dyescapebot.entity.discord.*;
 import com.dyescape.dyescapebot.exception.DyescapeBotModerationException;
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.repository.ModerationActivePunishmentRepository;
@@ -66,10 +63,10 @@ public class DiscordModeration implements Moderation {
             duration = Instant.now().plusMillis(time);
         }
 
-        Warning warning = new Warning(serverId, userId, "WARNING", 0, reason, duration, punisher);
+        Warning warning = new Warning(serverId, userId, 0, reason, duration, punisher);
         this.warningRepository.save(warning);
 
-        PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "WARNING", 0, reason,
+        PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.WARNING, 0, reason,
                 time, punisher);
         this.punishmentHistoryRepository.save(punishmentEntry);
 
@@ -126,7 +123,7 @@ public class DiscordModeration implements Moderation {
         // Kick the user, await async response
         guildController.kick(guild.getMemberById(userId), reason).queue(successConsumer -> {
 
-            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "KICK", 0, reason, 0, punisher);
+            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.KICK, 0, reason, 0, punisher);
             this.punishmentHistoryRepository.save(punishmentEntry);
 
             // Succeeded, let's send a message to the user
@@ -146,12 +143,12 @@ public class DiscordModeration implements Moderation {
         Member member = guild.getMemberById(userId);
 
         try {
-            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "MUTE", 0))) {
+            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.MUTE, 0))) {
 
-                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "MUTE", 0, reason, null, punisher);
+                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.MUTE, 0, reason, null, punisher);
                 this.punishmentRepository.save(activePunishment);
 
-                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "MUTE", 0, reason, 0, punisher);
+                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.MUTE, 0, reason, 0, punisher);
                 this.punishmentHistoryRepository.save(punishmentEntry);
             }
 
@@ -172,14 +169,14 @@ public class DiscordModeration implements Moderation {
         Member member = guild.getMemberById(userId);
 
         try {
-            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "MUTE", 0))) {
+            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.MUTE, 0))) {
 
                 Instant instant = Instant.now().plusMillis(punishmentTime);
 
-                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "MUTE", 0, reason, instant, punisher);
+                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.MUTE, 0, reason, instant, punisher);
                 this.punishmentRepository.save(activePunishment);
 
-                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "MUTE", 0, reason, punishmentTime, punisher);
+                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.MUTE, 0, reason, punishmentTime, punisher);
                 this.punishmentHistoryRepository.save(punishmentEntry);
             }
 
@@ -208,7 +205,7 @@ public class DiscordModeration implements Moderation {
 
         Role mutedRole = this.ensureGuildHasMutedRole(guild).get();
 
-        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "MUTE", 0, null, null, 0L);
+        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.MUTE, 0, null, null, 0L);
         this.punishmentRepository.delete(activePunishment);
 
         if (!member.getRoles().contains(mutedRole)) {
@@ -232,12 +229,12 @@ public class DiscordModeration implements Moderation {
     @Override
     public void channelMute(long serverId, long userId, long channelId, String reason, long punisher) {
 
-        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "CHANNELMUTE", channelId))) {
+        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.CHANNELMUTE, channelId))) {
 
-            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "CHANNELMUTE", channelId, reason, null, punisher);
+            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.CHANNELMUTE, channelId, reason, null, punisher);
             this.punishmentRepository.save(activePunishment);
 
-            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "CHANNELMUTE", 0, reason, 0, punisher);
+            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.CHANNELMUTE, 0, reason, 0, punisher);
             this.punishmentHistoryRepository.save(punishmentEntry);
         }
 
@@ -256,14 +253,14 @@ public class DiscordModeration implements Moderation {
     @Override
     public void channelTempMute(long serverId, long userId, long channelId, String reason, long punishmentTime, long punisher) {
 
-        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "CHANNELMUTE", channelId))) {
+        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.CHANNELMUTE, channelId))) {
 
             Instant end = Instant.now().plusMillis(punishmentTime);
 
-            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "CHANNELMUTE", channelId, reason, end, punisher);
+            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.CHANNELMUTE, channelId, reason, end, punisher);
             this.punishmentRepository.save(activePunishment);
 
-            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "CHANNELMUTE", 0, reason, punishmentTime, punisher);
+            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.CHANNELMUTE, 0, reason, punishmentTime, punisher);
             this.punishmentHistoryRepository.save(punishmentEntry);
         }
 
@@ -314,11 +311,11 @@ public class DiscordModeration implements Moderation {
         Member member = guild.getMemberById(userId);
         Channel channel = this.jda.getTextChannelById(channelId);
 
-        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "CHANNELBAN", channelId))) {
-            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "CHANNELBAN", channelId, reason, null, punisher);
+        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.CHANNELBAN, channelId))) {
+            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.CHANNELBAN, channelId, reason, null, punisher);
             this.punishmentRepository.save(activePunishment);
 
-            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "CHANNELBAN", 0, reason, 0, punisher);
+            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.CHANNELBAN, 0, reason, 0, punisher);
             this.punishmentHistoryRepository.save(punishmentEntry);
         }
 
@@ -337,14 +334,14 @@ public class DiscordModeration implements Moderation {
         Member member = guild.getMemberById(userId);
         Channel channel = this.jda.getTextChannelById(channelId);
 
-        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "CHANNELBAN", channelId))) {
+        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.CHANNELBAN, channelId))) {
 
             Instant end = Instant.now().plusMillis(punishmentTime);
 
-            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "CHANNELMUTE", channelId, reason, end, punisher);
+            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.CHANNELBAN, channelId, reason, end, punisher);
             this.punishmentRepository.save(activePunishment);
 
-            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "CHANNELBAN", 0, reason, punishmentTime, punisher);
+            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.CHANNELBAN, 0, reason, punishmentTime, punisher);
             this.punishmentHistoryRepository.save(punishmentEntry);
         }
 
@@ -389,12 +386,12 @@ public class DiscordModeration implements Moderation {
         User user = this.jda.getUserById(userId);
 
         try {
-            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "BAN", 0))) {
+            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.BAN, 0))) {
 
-                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "BAN", 0, reason, null, punisher);
+                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.BAN, 0, reason, null, punisher);
                 this.punishmentRepository.save(activePunishment);
 
-                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "BAN", 0, reason, 0, punisher);
+                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.BAN, 0, reason, 0, punisher);
                 this.punishmentHistoryRepository.save(punishmentEntry);
             }
 
@@ -417,14 +414,14 @@ public class DiscordModeration implements Moderation {
             Guild guild = this.jda.getGuildById(serverId);
             User user = this.jda.getUserById(userId);
 
-            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "BAN", 0))) {
+            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, PunishmentType.BAN, 0))) {
 
                 Instant end = Instant.now().plusMillis(punishmentTime);
 
-                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "BAN", 0, reason, end, punisher);
+                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.BAN, 0, reason, end, punisher);
                 this.punishmentRepository.save(activePunishment);
 
-                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "BAN", 0, reason, punishmentTime, punisher);
+                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.BAN, 0, reason, punishmentTime, punisher);
                 this.punishmentHistoryRepository.save(punishmentEntry);
             }
 
@@ -440,7 +437,7 @@ public class DiscordModeration implements Moderation {
     @Override
     public void unban(long serverId, long userId) {
 
-        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "BAN", 0, null, null, 0L);
+        ActivePunishment activePunishment = new ActivePunishment(serverId, userId, PunishmentType.BAN, 0, null, null, 0L);
         this.punishmentRepository.delete(activePunishment);
 
         // Get the guild and controller

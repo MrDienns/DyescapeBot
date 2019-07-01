@@ -25,9 +25,6 @@ public class Warning implements Serializable {
     @Column(name = "user_id", nullable = false)
     private long user;
 
-    @Column(name = "type", nullable = false)
-    private String type;
-
     @Column(name = "channel", nullable = true)
     private long channel;
 
@@ -45,14 +42,12 @@ public class Warning implements Serializable {
     // -------------------------------------------- //
 
     private Warning() {
-        this(0, 0, "", 0, "", null, 0);
+        this(0, 0, 0, "", null, 0);
     }
 
-    public Warning(long server, long user, String type, long channel, String reason, Instant end, long punisher) {
-        this.id = id;
+    public Warning(long server, long user, long channel, String reason, Instant end, long punisher) {
         this.server = server;
         this.user = user;
-        this.type = type;
         this.channel = channel;
         this.reason = reason;
         this.end = end;
@@ -73,10 +68,6 @@ public class Warning implements Serializable {
 
     public long getUser() {
         return this.user;
-    }
-
-    public String getType() {
-        return this.type;
     }
 
     public long getChannel() {
