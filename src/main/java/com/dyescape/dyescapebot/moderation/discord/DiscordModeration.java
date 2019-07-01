@@ -368,7 +368,7 @@ public class DiscordModeration implements Moderation {
         controller.removeRolesFromMember(member, guild.getRolesByName(role, true).get(0)).queue(
                 success -> {
 
-                    this.sendPrivateMessage(userId, this.getUnmuteChannelMessage(this.getUsername(userId),
+                    this.sendPrivateMessage(userId, this.getUnbannedChannelMessage(this.getUsername(userId),
                             this.getServername(serverId), channel.getName()));
                 }, failure -> {
 
@@ -395,6 +395,9 @@ public class DiscordModeration implements Moderation {
 
             this.applyBan(guild, user, reason).get();
 
+            this.sendPrivateMessage(user.getIdLong(), this.getBanMessage(
+                    user.getName(), guild.getName(), reason));
+
         } catch (ExecutionException | InterruptedException e) {
             throw new DyescapeBotModerationException(e.getMessage());
         }
@@ -403,22 +406,30 @@ public class DiscordModeration implements Moderation {
     @Override
     public void tempban(long serverId, long userId, String reason, long punishmentTime, long punisher) {
 
-        // Get the guild and controller
-        Guild guild = this.jda.getGuildById(serverId);
-        User user = this.jda.getUserById(userId);
+        try {
 
-        if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "BAN", 0))) {
+            // Get the guild and controller
+            Guild guild = this.jda.getGuildById(serverId);
+            User user = this.jda.getUserById(userId);
 
-            Instant end = Instant.now().plusMillis(punishmentTime);
+            if (!this.punishmentRepository.existsById(new ActivePunishment.PunishmentKey(serverId, userId, "BAN", 0))) {
 
-            ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "BAN", 0, reason, end, punisher);
-            this.punishmentRepository.save(activePunishment);
+                Instant end = Instant.now().plusMillis(punishmentTime);
 
-            PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "BAN", 0, reason, punishmentTime, punisher);
-            this.punishmentHistoryRepository.save(punishmentEntry);
+                ActivePunishment activePunishment = new ActivePunishment(serverId, userId, "BAN", 0, reason, end, punisher);
+                this.punishmentRepository.save(activePunishment);
+
+                PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "BAN", 0, reason, punishmentTime, punisher);
+                this.punishmentHistoryRepository.save(punishmentEntry);
+            }
+
+            this.applyBan(guild, user, reason).get();
+
+            this.sendPrivateMessage(user.getIdLong(), this.getTempBanMessage(
+                    user.getName(), guild.getName(), reason, punishmentTime));
+        } catch (Exception ex) {
+            throw new DyescapeBotModerationException(ex.getMessage());
         }
-
-        this.applyBan(guild, user, reason);
     }
 
     @Override
@@ -981,11 +992,6 @@ public class DiscordModeration implements Moderation {
             GuildController guildController = new GuildController(guild);
             try {
                 guildController.ban(user, 0, reason).queue(banSuccess -> {
-
-                    // TODO: Update database
-
-                    this.sendPrivateMessage(user.getIdLong(), this.getBanMessage(
-                            user.getName(), guild.getName(), reason));
 
                     future.complete(null);
                 }, banFailure -> {
