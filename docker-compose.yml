@@ -20,8 +20,6 @@ services:
     build:
       context: ./
     restart: on-failure
-    volumes:
-      - ./conf:/opt/dyescape/dyescape-bot/conf
 
 volumes:
   mysql:
