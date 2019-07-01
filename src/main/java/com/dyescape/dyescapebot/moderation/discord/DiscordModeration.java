@@ -3,6 +3,7 @@ package com.dyescape.dyescapebot.moderation.discord;
 import com.dyescape.dyescapebot.entity.discord.ActivePunishment;
 import com.dyescape.dyescapebot.entity.discord.PunishmentEntry;
 import com.dyescape.dyescapebot.entity.discord.Warning;
+import com.dyescape.dyescapebot.entity.discord.WarningAction;
 import com.dyescape.dyescapebot.exception.DyescapeBotModerationException;
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.repository.ModerationActivePunishmentRepository;
@@ -16,7 +17,6 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -58,7 +58,13 @@ public class DiscordModeration implements Moderation {
 
     @Override
     public void warn(long serverId, long userId, String reason, long punisher, long time) {
-        Warning warning = new Warning(serverId, userId, "WARNING", 0, reason, null, punisher);
+
+        Instant duration = null;
+        if (time != 0L) {
+            duration = Instant.now().plusMillis(time);
+        }
+
+        Warning warning = new Warning(serverId, userId, "WARNING", 0, reason, duration, punisher);
         this.warningRepository.save(warning);
 
         PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, "WARNING", 0, reason,
@@ -67,6 +73,8 @@ public class DiscordModeration implements Moderation {
 
         this.sendPrivateMessage(userId, this.getWarnMessage(
                 this.getUsername(userId), this.getServername(serverId), reason));
+
+        this.handleWarningActions(serverId, userId);
     }
 
     @Override
@@ -142,7 +150,7 @@ public class DiscordModeration implements Moderation {
                 this.punishmentHistoryRepository.save(punishmentEntry);
             }
 
-            this.applyMute(guild, member, reason).get();
+            this.applyMute(guild, member).get();
 
             this.sendPrivateMessage(member.getUser().getIdLong(), this.getMuteMessage(
                     member.getUser().getName(), guild.getName(), reason));
@@ -170,7 +178,7 @@ public class DiscordModeration implements Moderation {
                 this.punishmentHistoryRepository.save(punishmentEntry);
             }
 
-            this.applyMute(guild, member, reason).get();
+            this.applyMute(guild, member).get();
 
             this.sendPrivateMessage(member.getUser().getIdLong(), this.getTempMuteMessage(
                     member.getUser().getName(), guild.getName(), reason, punishmentTime));
@@ -913,7 +921,7 @@ public class DiscordModeration implements Moderation {
         return future;
     }
 
-    private CompletableFuture applyMute(Guild guild, Member member, String reason) {
+    private CompletableFuture applyMute(Guild guild, Member member) {
 
         CompletableFuture future = new CompletableFuture();
 
@@ -1000,5 +1008,38 @@ public class DiscordModeration implements Moderation {
 
     private String getChannelBannedRoleName(Channel channel) {
         return String.format("TCB: %s", channel.getIdLong());
+    }
+
+    private void handleWarningActions(long serverId, long userId) {
+
+        int warnings = this.warningRepository.findByServerAndUser(serverId, userId).size();
+
+        WarningAction action = this.warningActionRepository.findByServerAndPoints(serverId, warnings);
+        if (action == null) return;
+
+        switch (action.getAction()) {
+            case KICK:
+                this.kick(serverId, userId, String.format("You've been automatically kicked as a result of having %s warnings.",
+                        warnings), 0L);
+                break;
+            case MUTE:
+                this.mute(serverId, userId, String.format("You've been automatically muted as a result of having %s warnings.",
+                        warnings), 0L);
+                break;
+            case TEMPMUTE:
+                this.tempmute(serverId, userId, String.format("You've been automatically muted as a result of having %s warnings.",
+                        warnings), action.getDuration(), 0L);
+                break;
+            case BAN:
+                this.ban(serverId, userId, String.format("You've been automatically muted as a result of having %s warnings.",
+                        warnings), 0L);
+                break;
+            case TEMPBAN:
+                this.tempban(serverId, userId, String.format("You've been automatically muted as a result of having %s warnings.",
+                        warnings), action.getDuration(), 0L);
+                break;
+            default:
+                throw new DyescapeBotModerationException("Unhandled warning action type.");
+        }
     }
 }

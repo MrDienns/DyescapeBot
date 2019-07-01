@@ -4,7 +4,9 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
 import com.dyescape.dyescapebot.entity.discord.Warning;
+import com.dyescape.dyescapebot.entity.discord.WarningAction;
 import com.dyescape.dyescapebot.moderation.Moderation;
+import com.dyescape.dyescapebot.repository.ModerationWarningActionRepository;
 import com.dyescape.dyescapebot.util.TimeUtil;
 import com.google.common.base.Strings;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -24,13 +26,15 @@ public class ModerationCommand extends BaseCommand {
     // -------------------------------------------- //
 
     private final Moderation moderation;
+    private final ModerationWarningActionRepository warningActionRepository;
 
     // -------------------------------------------- //
     // CONSTRUCT
     // -------------------------------------------- //
 
-    public ModerationCommand(Moderation moderation) {
+    public ModerationCommand(Moderation moderation, ModerationWarningActionRepository warningActionRepository) {
         this.moderation = moderation;
+        this.warningActionRepository = warningActionRepository;
     }
 
     // -------------------------------------------- //
@@ -63,7 +67,7 @@ public class ModerationCommand extends BaseCommand {
                     e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was banned.", member.getEffectiveName())));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -80,7 +84,7 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(this.embed(String.format("User %s was banned for %s.",
                     member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -96,7 +100,7 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(this.embed(String.format("User %s was unbanned.",
                     user.getName() + user.getDiscriminator())));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -111,7 +115,7 @@ public class ModerationCommand extends BaseCommand {
                     e.getIssuer().getAuthor().getIdLong());
             e.sendMessage(this.embed(String.format("User %s was muted.", member.getEffectiveName())));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -128,7 +132,7 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(this.embed(String.format("User %s was muted for %s.",
                     member.getEffectiveName(), TimeUtil.parsePunishmentTime(punishmentTime))));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -144,7 +148,7 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(this.embed(String.format("User %s#%s was unmuted.",
                     user.getName(), user.getDiscriminator())));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -161,7 +165,7 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(this.embed(String.format("User %s was banned from channel #%s.",
                     member.getEffectiveName(), channel.getName())));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -181,7 +185,7 @@ public class ModerationCommand extends BaseCommand {
                     member.getEffectiveName(), channel.getName(),
                     TimeUtil.parsePunishmentTime(punishmentTime))));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -197,7 +201,7 @@ public class ModerationCommand extends BaseCommand {
             e.sendMessage(this.embed(String.format("User %s was muted in channel #%s.",
                     member.getEffectiveName(), channel.getName())));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -217,7 +221,7 @@ public class ModerationCommand extends BaseCommand {
                     member.getEffectiveName(), channel.getName(),
                     TimeUtil.parsePunishmentTime(punishmentTime))));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -229,10 +233,11 @@ public class ModerationCommand extends BaseCommand {
 
         try {
             this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
-                    e.getIssuer().getAuthor().getIdLong(), TimeUtil.parseFromRelativeString(time));
+                    e.getIssuer().getAuthor().getIdLong(),
+                    Strings.isNullOrEmpty(time) ? 0L : TimeUtil.parseFromRelativeString(time));
             e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName())));
         } catch (Exception ex) {
-            this.handleError(e ,ex);
+            this.handleError(e, ex);
         }
     }
 
@@ -299,14 +304,24 @@ public class ModerationCommand extends BaseCommand {
     @CommandPermission("MANAGE_ROLES")
     @Syntax("<WarningPoints> <Action> [Time]")
     @Description("Configure the moderation actions for reached warning points")
-    public void onWarningActionCommand(JDACommandEvent e, Integer warningPoints, String action, @Optional String time) {
-        if (Strings.isNullOrEmpty(action)) {
+    public void onWarningActionCommand(JDACommandEvent e, Integer warningPoints, WarningAction.WarningActionType type, @Optional String time) {
 
-            e.sendMessage(String.format("I am going to set the action of %s warning points to %s, action time: %s",
-                    warningPoints, action, time));
+        if (type.toString().contains("TEMP") && time == null) {
+            throw new IllegalArgumentException("Temporarily commands require the time (duration) argument");
+        }
+
+        long punishmentTime = TimeUtil.parseFromRelativeString(time);
+
+        this.warningActionRepository.save(new WarningAction(e.getIssuer().getGuild().getIdLong(), warningPoints, type, punishmentTime));
+
+        if (time == null) {
+
+            e.sendMessage(this.embed(String.format("I will %s users that reach %s warning points.",
+                    type.toString(), warningPoints)));
         } else {
-            e.sendMessage(String.format("I am going to delete the action of %s warning points.",
-                    warningPoints));
+
+            e.sendMessage(this.embed(String.format("I will %s users that reach %s warning points for %s.",
+                    type.toString(), warningPoints, TimeUtil.parsePunishmentTime(punishmentTime))));
         }
     }
 

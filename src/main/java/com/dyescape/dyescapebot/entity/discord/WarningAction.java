@@ -23,20 +23,24 @@ public class WarningAction implements Serializable {
     private int points;
 
     @Column(name = "action")
-    private String action;
+    private WarningActionType action;
+
+    @Column(name = "end")
+    private long duration;
 
     // -------------------------------------------- //
     // CONSTRUCT
     // -------------------------------------------- //
 
     private WarningAction() {
-        this(0, 0, "");
+        this(0, 0, null, 0L);
     }
 
-    public WarningAction(long server, int points, String action) {
+    public WarningAction(long server, int points, WarningActionType action, long duration) {
         this.server = server;
         this.points = points;
         this.action = action;
+        this.duration = duration;
     }
 
     // -------------------------------------------- //
@@ -51,19 +55,36 @@ public class WarningAction implements Serializable {
         return this.points;
     }
 
-    public String getAction() {
+    public WarningActionType getAction() {
         return this.action;
+    }
+
+    public long getDuration() {
+        return this.duration;
+    }
+
+    // -------------------------------------------- //
+    // ENUM
+    // -------------------------------------------- //
+
+    public enum WarningActionType {
+
+        MUTE,
+        TEMPMUTE,
+        KICK,
+        BAN,
+        TEMPBAN
     }
 
     // -------------------------------------------- //
     // ID CLASS
     // -------------------------------------------- //
 
-    public class WarningActionKey implements Serializable {
+    public static class WarningActionKey implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
-        private WarningActionKey() {
+        public WarningActionKey() {
 
         }
 

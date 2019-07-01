@@ -8,6 +8,7 @@ import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.PermissionResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.TextChannelResolver;
 import com.dyescape.dyescapebot.moderation.Moderation;
+import com.dyescape.dyescapebot.repository.ModerationWarningActionRepository;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -25,6 +26,7 @@ public class ConfigurationACF {
 
     private final JDA jda;
     private final Moderation moderation;
+    private final ModerationWarningActionRepository warningActionRepository;
 
     /**
      * Construct a new instance of the {@link ConfigurationACF} object. This Bean class will be used to create a Bean
@@ -34,9 +36,10 @@ public class ConfigurationACF {
      * @author Dennis van der Veeke
      * @since 0.1.0
      */
-    public ConfigurationACF(JDA jda, Moderation moderation) {
+    public ConfigurationACF(JDA jda, Moderation moderation, ModerationWarningActionRepository warningActionRepository) {
         this.jda = jda;
         this.moderation = moderation;
+        this.warningActionRepository = warningActionRepository;
     }
 
     @Bean
@@ -60,7 +63,7 @@ public class ConfigurationACF {
 
         // Register the commands
         commandManager.registerCommand(new GeneralHelpCommand());
-        commandManager.registerCommand(new ModerationCommand(this.moderation));
+        commandManager.registerCommand(new ModerationCommand(this.moderation, this.warningActionRepository));
 
         return commandManager;
     }

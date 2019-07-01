@@ -26,7 +26,7 @@ public final class TimeUtil {
         if(period == null) return null;
         period = period.toLowerCase(Locale.ENGLISH);
         Matcher matcher = PERIOD_PATTERN.matcher(period);
-        Instant instant=Instant.EPOCH;
+        Instant instant = Instant.EPOCH;
         while(matcher.find()){
             int num = Integer.parseInt(matcher.group(1));
             String typ = matcher.group(2);
