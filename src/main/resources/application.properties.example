@@ -1,5 +1,9 @@
+moderation.warningperiod=1209600
 discord.token=
-spring.datasource.url=jdbc:mysql://mysql:3306/dyescape-bot
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.show-sql=true
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/dyescape-bot
 spring.datasource.username=dyescape
 spring.datasource.password=bot
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
