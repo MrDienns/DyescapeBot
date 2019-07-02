@@ -108,7 +108,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("mute")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> [Reason]")
     @Description("Permanently mute a user on the server")
     public void onMuteCommand(JDACommandEvent e, Member member, @Optional String reason) {
@@ -123,7 +123,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("tempmute")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Time> [Reason]")
     @Description("Temporarily mute a user on the server")
     public void onTempMuteCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
@@ -140,7 +140,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("unmute")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User>")
     @Description("Unmute a user on the server")
     public void onUnmuteCommand(JDACommandEvent e, User user) {
@@ -155,7 +155,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("channelban|banchannel")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Channel> [reason]")
     @Description("Ban a user from a channel (revokes read & write access)")
     public void onChannelBanCommand(JDACommandEvent e, Member member, TextChannel channel,
@@ -172,7 +172,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("channeltempban|tempbanchannel|tempchannelban")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Channel> <Time> [Reason]")
     @Description("Temporarily ban a user from a channel (revokes read & write access)")
     public void onChannelTempBanCommand(JDACommandEvent e, Member member, TextChannel channel,
@@ -192,7 +192,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("unchannelmute|channelunmute|unmutechannel")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Channel>")
     @Description("Revokes a channel mute")
     public void onUnchannelMuteCommand(JDACommandEvent e, Member member, TextChannel channel) {
@@ -208,7 +208,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("channelmute|mutechannel")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Channel> [Reason]")
     @Description("Mute a user in a channel (revokes write access)")
     public void onChannelMuteCommand(JDACommandEvent e, Member member, TextChannel channel, @Optional String reason) {
@@ -224,7 +224,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("channeltempmute|tempmutechannel|tempchannelmute")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Channel> <Time> [Reason]")
     @Description("Temporarily mute a user in a channel (revokes  write access)")
     public void onChannelTempMuteCommand(JDACommandEvent e, Member member, TextChannel channel,
@@ -244,7 +244,7 @@ public class ModerationCommand extends BaseCommand {
     }
 
     @Subcommand("unchannelban|channelunban|unbanchannel")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<User> <Channel>")
     @Description("Revokes a channel mute")
     public void onUnchannelBanCommand(JDACommandEvent e, Member member, TextChannel channel) {
@@ -337,7 +337,7 @@ public class ModerationCommand extends BaseCommand {
     // -------------------------------------------- //
 
     @Subcommand("warnaction|warningaction")
-    @CommandPermission("MANAGE_ROLES")
+    @CommandPermission("MESSAGE_MANAGE")
     @Syntax("<WarningPoints> <Action> [Time]")
     @Description("Configure the moderation actions for reached warning points")
     public void onWarningActionCommand(JDACommandEvent e, Integer warningPoints, WarningAction.WarningActionType type, @Optional String time) {
