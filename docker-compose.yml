@@ -15,11 +15,5 @@ services:
     volumes:
       - mysql:/var/lib/mysql
 
-  dyescape-bot:
-    image: dyescape/dyescape-bot:latest
-    build:
-      context: ./
-    restart: on-failure
-
 volumes:
   mysql:

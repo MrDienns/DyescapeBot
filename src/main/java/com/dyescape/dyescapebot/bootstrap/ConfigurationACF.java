@@ -4,10 +4,13 @@ import co.aikar.commands.JDACommandContexts;
 import co.aikar.commands.JDACommandManager;
 import com.dyescape.dyescapebot.command.discord.GeneralHelpCommand;
 import com.dyescape.dyescapebot.command.discord.ModerationCommand;
+import com.dyescape.dyescapebot.command.discord.SuggestionCommand;
 import com.dyescape.dyescapebot.command.discord.resolver.MemberResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.PermissionResolver;
+import com.dyescape.dyescapebot.command.discord.resolver.SuggestionResolver;
 import com.dyescape.dyescapebot.command.discord.resolver.TextChannelResolver;
 import com.dyescape.dyescapebot.configuration.moderation.ModerationConfiguration;
+import com.dyescape.dyescapebot.model.Suggestion;
 import com.dyescape.dyescapebot.moderation.Moderation;
 import com.dyescape.dyescapebot.repository.ModerationWarningActionRepository;
 import net.dv8tion.jda.core.JDA;
@@ -61,6 +64,7 @@ public class ConfigurationACF {
         // Register all context resolvers
         contexts.registerContext(Member.class, new MemberResolver());
         contexts.registerContext(TextChannel.class, new TextChannelResolver());
+        contexts.registerContext(Suggestion.class, new SuggestionResolver());
 
         // Enable unstable APIs
         commandManager.enableUnstableAPI("help");
@@ -70,6 +74,7 @@ public class ConfigurationACF {
 
         // Register the commands
         commandManager.registerCommand(new GeneralHelpCommand());
+        commandManager.registerCommand(new SuggestionCommand());
         commandManager.registerCommand(new ModerationCommand(this.moderation, this.warningActionRepository,
                 this.moderationConfiguration));
 
