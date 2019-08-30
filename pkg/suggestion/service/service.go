@@ -7,7 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	lib "github.com/Dyescape/DyescapeBot/library"
+	lib "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 )
 
 // SuggestionConfiguration struct is a struct used for the configuration of

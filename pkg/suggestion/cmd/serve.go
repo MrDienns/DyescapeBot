@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	lib "github.com/Dyescape/DyescapeBot/library"
+	lib "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 
-	"github.com/Dyescape/DyescapeBot/modules/suggestion/service"
+	"github.com/Dyescape/DyescapeBot/pkg/suggestion/service"
 	"github.com/spf13/cobra"
 )
 
