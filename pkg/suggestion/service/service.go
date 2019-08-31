@@ -75,6 +75,7 @@ func (s *Service) onMessage(sess *discordgo.Session, m *discordgo.MessageCreate)
 	conf, err := s.getConfiguration(m.GuildID)
 	if err != nil {
 		sess.ChannelMessageSend(m.ChannelID, err.Error())
+		return
 	}
 
 	arg := strings.ReplaceAll(m.Content, "!! suggest", "")
