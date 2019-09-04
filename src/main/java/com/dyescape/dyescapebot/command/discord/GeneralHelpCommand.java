@@ -28,6 +28,11 @@ public class GeneralHelpCommand extends BaseCommand {
     @HelpCommand
     public void help(JDACommandEvent e, CommandHelp help) {
 
+        if (e.getIssuer().getAuthor().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
+
         // Stream & filter all relevant commands for the user
         List<HelpEntry> availableCommands = help.getHelpEntries().stream()
                 .filter(HelpEntry::shouldShow)
@@ -81,6 +86,13 @@ public class GeneralHelpCommand extends BaseCommand {
         }
         eb.setDescription(description);
         eb.setColor(Color.GRAY);
+        return eb.build();
+    }
+
+    private MessageEmbed embed(String message, Color color) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setDescription(message);
+        eb.setColor(color);
         return eb.build();
     }
 }

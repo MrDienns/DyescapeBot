@@ -50,6 +50,10 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Kick a user from the server")
     public void onKickCommand(JDACommandEvent e, Member member, @Optional String reason) {
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.kick(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
@@ -65,6 +69,10 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Permanently ban a user from the server")
     public void onBanCommand(JDACommandEvent e, Member member, @Optional String reason) {
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.ban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
@@ -80,6 +88,10 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> <Time> [Reason]")
     @Description("Temporarily ban a user from the server")
     public void onTempBanCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.tempban(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
@@ -97,6 +109,10 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User>")
     @Description("Unban a user from the server")
     public void onUnbanCommand(JDACommandEvent e, User user) {
+        if (user.isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.unban(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
@@ -112,6 +128,10 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Reason]")
     @Description("Permanently mute a user on the server")
     public void onMuteCommand(JDACommandEvent e, Member member, @Optional String reason) {
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.mute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
@@ -127,6 +147,10 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> <Time> [Reason]")
     @Description("Temporarily mute a user on the server")
     public void onTempMuteCommand(JDACommandEvent e, Member member, String time, @Optional String reason) {
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.tempmute(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
@@ -144,6 +168,10 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User>")
     @Description("Unmute a user on the server")
     public void onUnmuteCommand(JDACommandEvent e, User user) {
+        if (user.isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.unmute(e.getIssuer().getGuild().getIdLong(), user.getIdLong());
@@ -161,6 +189,11 @@ public class ModerationCommand extends BaseCommand {
     public void onChannelBanCommand(JDACommandEvent e, Member member, TextChannel channel,
                                     @Optional String reason) {
 
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
+
         try {
             this.moderation.channelBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
                     channel.getIdLong(), reason, e.getIssuer().getAuthor().getIdLong());
@@ -177,6 +210,11 @@ public class ModerationCommand extends BaseCommand {
     @Description("Temporarily ban a user from a channel (revokes read & write access)")
     public void onChannelTempBanCommand(JDACommandEvent e, Member member, TextChannel channel,
                                         String time, @Optional String reason) {
+
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.channelTempBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
@@ -197,6 +235,11 @@ public class ModerationCommand extends BaseCommand {
     @Description("Revokes a channel mute")
     public void onUnchannelMuteCommand(JDACommandEvent e, Member member, TextChannel channel) {
 
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
+
         try {
             this.moderation.unchannelMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
                     channel.getIdLong());
@@ -212,6 +255,11 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> <Channel> [Reason]")
     @Description("Mute a user in a channel (revokes write access)")
     public void onChannelMuteCommand(JDACommandEvent e, Member member, TextChannel channel, @Optional String reason) {
+
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.channelMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
@@ -229,6 +277,11 @@ public class ModerationCommand extends BaseCommand {
     @Description("Temporarily mute a user in a channel (revokes  write access)")
     public void onChannelTempMuteCommand(JDACommandEvent e, Member member, TextChannel channel,
                                          String time, @Optional String reason) {
+
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             this.moderation.channelTempMute(member.getGuild().getIdLong(), member.getUser().getIdLong(),
@@ -249,6 +302,11 @@ public class ModerationCommand extends BaseCommand {
     @Description("Revokes a channel mute")
     public void onUnchannelBanCommand(JDACommandEvent e, Member member, TextChannel channel) {
 
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
+
         try {
             this.moderation.unchannelBan(member.getGuild().getIdLong(), member.getUser().getIdLong(),
                     channel.getIdLong());
@@ -265,6 +323,11 @@ public class ModerationCommand extends BaseCommand {
     @Description("Warn a user on the server")
     public void onWarnCommand(JDACommandEvent e, Member member, String reason) {
 
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
+
         try {
             this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
                     e.getIssuer().getAuthor().getIdLong(),
@@ -280,6 +343,11 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> [Warning ID]")
     @Description("Invokes all or specific warnings given to a user")
     public void onPardonCommand(JDACommandEvent e, Member member, @Optional Long id) {
+
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         try {
             if (id != null && id != 0) {
@@ -301,6 +369,11 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User>")
     @Description("Lists all of the active warnings of a user")
     public void onListWarningsCommand(JDACommandEvent e, Member member) {
+
+        if (member.getUser().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         List<Warning> warnings = this.moderation.getWarnings(e.getIssuer().getMember().getGuild().getIdLong(),
                 member.getUser().getIdLong());
@@ -341,6 +414,11 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<WarningPoints> <Action> [Time]")
     @Description("Configure the moderation actions for reached warning points")
     public void onWarningActionCommand(JDACommandEvent e, Integer warningPoints, WarningAction.WarningActionType type, @Optional String time) {
+
+        if (e.getIssuer().getAuthor().isBot()) {
+            e.sendMessage(this.embed("Nice try.", Color.RED));
+            return;
+        }
 
         if (type.toString().contains("TEMP") && time == null) {
             throw new IllegalArgumentException("Temporarily commands require the time (duration) argument");
