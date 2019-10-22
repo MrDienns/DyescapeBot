@@ -3,7 +3,9 @@ package command
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
+	"strings"
 )
 
 // Resolver interface represents a command argument resolver.
@@ -33,4 +35,18 @@ type StringResolver struct{}
 // implementation.
 func (ir StringResolver) Resolve(arg string) (interface{}, error) {
 	return arg, nil
+}
+
+// UrlResolver will try to parse the provided argument to a URL.
+type UrlResolver struct{}
+
+func (ur UrlResolver) Resolve(arg string) (interface{}, error) {
+	if !(strings.HasPrefix(arg, "http://") && strings.HasPrefix(arg, "https://")) {
+		arg = "https://" + arg
+	}
+	u, err := url.Parse(arg)
+	if err != nil {
+		return nil, fmt.Errorf("invalid, please specify a URL")
+	}
+	return u, nil
 }
