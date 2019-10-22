@@ -38,7 +38,10 @@ func (r FlatFileConfigReader) ReadConfiguration(id string, configObj interface{}
 	if err != nil {
 		return err
 	}
-	json.Unmarshal(b, configObj)
+	err = json.Unmarshal(b, configObj)
+	if err != nil {
+		return err
+	}
 	r.cache[path] = configObj
 	return nil
 }
