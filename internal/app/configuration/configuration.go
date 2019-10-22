@@ -26,7 +26,7 @@ type FlatFileConfigReader struct {
 // NewFlatFileConfigReader constructs a new FlatFileConfigReader struct with the passed folder path
 // for the file configurations.
 func NewFlatFileConfigReader(folderPath string) *FlatFileConfigReader {
-	return &FlatFileConfigReader{folderPath: folderPath}
+	return &FlatFileConfigReader{folderPath: folderPath, cache: make(map[string]interface{}, 0)}
 }
 
 // ReadConfiguration will read and return the provided unmarshalled struct that belongs to
