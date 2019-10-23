@@ -1,0 +1,6 @@
+# Compiled binary
+suggestion
+*.exe
+
+# GoLand
+.idea/
