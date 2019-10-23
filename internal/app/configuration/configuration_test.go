@@ -1,6 +1,7 @@
 package library
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,4 +34,16 @@ func TestFlatFileConfigReader_ReadConfigurationNonExistent(t *testing.T) {
 	err := r.ReadConfiguration("i-dont-exist", &tc)
 	assert.Error(t, err)
 	assert.Equal(t, "", tc.Foo)
+}
+
+func TestFlatFileConfigReader_SaveConfiguration(t *testing.T) {
+	tc := &testConfig{"bar"}
+	r := NewFlatFileConfigReader("configuration_test")
+	err := r.SaveConfiguration("temp", tc)
+	assert.NoError(t, err)
+	read := &testConfig{}
+	err = r.GetConfiguration("temp", read)
+	assert.NoError(t, err)
+	assert.Equal(t, tc, read)
+	os.Remove("configuration_test/temp.json")
 }
