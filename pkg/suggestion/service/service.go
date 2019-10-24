@@ -8,19 +8,19 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	lib "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 )
 
 // Service strict is used as a base struct for the Discord connection to the
 // gateway. Contains a public discordgo.Session field.
 type Service struct {
 	token        string
-	configReader lib.ConfigReader
+	configReader config.ConfigReader
 	Session      *discordgo.Session
 }
 
 // NewService accepts a Discord API token and constructs a new Service struct.
-func NewService(token string, configReader lib.ConfigReader) *Service {
+func NewService(token string, configReader config.ConfigReader) *Service {
 	return &Service{
 		token:        token,
 		configReader: configReader,
@@ -46,7 +46,7 @@ func (s *Service) Connect() error {
 	registry.Commands[suggestCmd.Name] = suggestCmd
 
 	// Prepare our command handler
-	configReader := lib.NewFlatFileConfigReader("command/suggestion")
+	configReader := config.NewFlatFileConfigReader("command/suggestion")
 	cmdHandler := command.NewHandler(configReader, command.NewConfiguration(configReader), registry,
 		command.NewParser(registry))
 	sess.AddHandler(cmdHandler.Handle)

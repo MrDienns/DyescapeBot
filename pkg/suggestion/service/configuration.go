@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 
-	library "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 )
 
 // SuggestionConfiguration struct is a struct used for the configuration of
@@ -19,7 +19,7 @@ type SuggestionConfiguration struct {
 
 // Configuration will return the *SuggestionConfiguration struct if the guild has a valid configuration. If the
 // configuration does not exist, or it exists but it's not valid, an error is returned.
-func Configuration(cf library.ConfigReader, guildID string) (*SuggestionConfiguration, error) {
+func Configuration(cf config.ConfigReader, guildID string) (*SuggestionConfiguration, error) {
 	conf := &SuggestionConfiguration{}
 	err := cf.ReadConfiguration(guildID, conf)
 	if err != nil {

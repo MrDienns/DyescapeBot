@@ -1,11 +1,11 @@
 package command
 
-import conf "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+import config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 
 // Configuration struct is used to keep certain options for commands. It has a reference to a ConfigReader and
 // it has a guild command configuration cache.
 type Configuration struct {
-	Reader      conf.ConfigReader
+	Reader      config.ConfigReader
 	ConfigCache map[string]*guildConfiguration
 }
 
@@ -17,7 +17,7 @@ type guildConfiguration struct {
 
 // NewConfiguration will construct a new *Configuration object. It will contain the passed config reader, and it creates
 // an empty map for the guild configuration cache.
-func NewConfiguration(reader conf.ConfigReader) *Configuration {
+func NewConfiguration(reader config.ConfigReader) *Configuration {
 	return &Configuration{
 		Reader:      reader,
 		ConfigCache: make(map[string]*guildConfiguration, 0),
