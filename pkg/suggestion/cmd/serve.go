@@ -27,7 +27,11 @@ will allow users to use Discord commands to post suggestions.`,
 			}
 
 			serv := service.NewService(fmt.Sprintf("Bot %s", token), configReader)
-			serv.Connect()
+			err = serv.Connect()
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
 
 			// Wait here until CTRL-C or other term signal is received.
 			fmt.Println("Bot is now running. Press CTRL-C to exit.")
