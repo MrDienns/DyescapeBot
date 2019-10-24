@@ -6,21 +6,20 @@ import (
 	"os/signal"
 	"syscall"
 
-	lib "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 
 	"github.com/Dyescape/DyescapeBot/pkg/suggestion/service"
 	"github.com/spf13/cobra"
 )
 
 var (
-	api      bool
 	serveCmd = &cobra.Command{
 		Use:   "serve",
 		Short: "Start the suggestion service",
 		Long: `Start the suggestion verification service in which
 will allow users to use Discord commands to post suggestions.`,
 		Run: func(cmd *cobra.Command, _ []string) {
-			configReader := lib.NewFlatFileConfigReader("data")
+			configReader := config.NewFlatFileConfigReader("data")
 			token, err := cmd.Flags().GetString("token")
 			if err != nil {
 				panic(err)
