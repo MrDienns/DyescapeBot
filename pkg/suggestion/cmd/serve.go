@@ -6,6 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Dyescape/DyescapeBot/internal/app/discord"
+
 	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 
 	"github.com/Dyescape/DyescapeBot/pkg/suggestion/service"
@@ -16,8 +18,8 @@ var (
 	serveCmd = &cobra.Command{
 		Use:   "serve",
 		Short: "Start the suggestion service",
-		Long: `Start the suggestion verification service in which
-will allow users to use Discord commands to post suggestions.`,
+		Long: `Start the suggestion verification service in which will allow users to use Discord commands to post 
+suggestions.`,
 		Run: func(cmd *cobra.Command, _ []string) {
 			configReader := config.NewFlatFileConfigReader("data")
 			token, err := cmd.Flags().GetString("token")
@@ -25,11 +27,18 @@ will allow users to use Discord commands to post suggestions.`,
 				panic(err)
 			}
 
-			serv := service.NewService(fmt.Sprintf("Bot %s", token), configReader)
+			serv := service.NewSuggestionService(discord.NewService(fmt.Sprintf("Bot %s", token)), configReader,
+				[]string{"localhost:9092"}, "CommandRegisteredStream", "CommandCalledStream",
+				"CommandFetchStream")
 			err = serv.Connect()
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(1)
+			}
+			err = serv.Start()
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(2)
 			}
 
 			// Wait here until CTRL-C or other term signal is received.

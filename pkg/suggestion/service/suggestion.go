@@ -35,7 +35,7 @@ func (s *Suggestion) hasHost(host string, allowed []string) bool {
 
 // Post takes the data of the *Suggestion struct and posts a message in the configured channel. Configured reaction
 // emojis are added so that members can vote on the suggestions.
-func (s *Suggestion) Post(serv *Service) error {
+func (s *Suggestion) Post(serv *SuggestionService) error {
 	mess, err := serv.Session.ChannelMessageSend(s.Conf.SuggestionChannelID, fmt.Sprintf("Suggested by %s:\n%s",
 		s.User.Mention(), s.Url))
 	if err != nil {
