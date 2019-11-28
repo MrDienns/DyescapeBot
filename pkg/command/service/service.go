@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Dyescape/DyescapeBot/internal/app/log"
+
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 
@@ -18,10 +20,6 @@ import (
 )
 
 var (
-	logger = watermill.NewStdLogger(
-		true,  // debug
-		false, // trace
-	)
 	marshaler = kafka.DefaultMarshaler{}
 )
 
@@ -52,6 +50,9 @@ func NewCommandService(serv *discord.Service, brokers []string, calledtopic, reg
 
 // Start will start the service. It will setup a Discord message handler and a Kafka publishing connection.
 func (cs *commandService) Start() error {
+
+	logger := log.NewWatermillLogger()
+
 	publisher, err := kafka.NewPublisher(cs.brokers, marshaler, nil, logger)
 	if err != nil {
 		return err
