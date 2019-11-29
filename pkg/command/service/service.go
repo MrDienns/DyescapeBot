@@ -193,6 +193,7 @@ func (cs *commandService) commandsPerModule() map[string][]string {
 // asCommandEvent will take a *discordgo.MessageCreate struct and transforms it into a *CommandCalledEvent
 // struct which represents the created command.
 func asCommandEvent(m *discordgo.MessageCreate) *CommandCalledEvent {
+	// TODO: Dynamic prefix
 	return &CommandCalledEvent{
 		User:    m.Author.ID,
 		Channel: m.ChannelID,
@@ -204,6 +205,6 @@ func asCommandEvent(m *discordgo.MessageCreate) *CommandCalledEvent {
 // commandFromMessage takes a string and trims the prefix from it.
 func commandFromMessage(m string) string {
 	// TODO: Dynamic prefix
-	m = strings.TrimPrefix(m, "!! test")
+	m = strings.TrimPrefix(m, "!!")
 	return strings.TrimSpace(m)
 }
