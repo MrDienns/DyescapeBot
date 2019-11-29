@@ -29,7 +29,7 @@ func (l WatermillLogger) Error(msg string, err error, fields watermill.LogFields
 
 // Trace implements the LoggerAdapter Info function. Invokes the Info function on the parent logger.
 func (l WatermillLogger) Trace(msg string, fields watermill.LogFields) {
-	l.Logger.Info(msg)
+	l.Logger.Debug(msg)
 }
 
 // Error implements the LoggerAdapter Error function. Invokes the Error function on the parent logger.
