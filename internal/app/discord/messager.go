@@ -8,7 +8,7 @@ import (
 
 func (s *Service) SendEmbed(channel, title, message, footer string) {
 	_, err := s.Session.ChannelMessageSendEmbed(channel, &discordgo.MessageEmbed{
-		Title:       title,
+		Title:       fmt.Sprintf("**%s**", title),
 		Description: message,
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: footer,

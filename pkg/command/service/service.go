@@ -9,9 +9,6 @@ import (
 
 	"github.com/Dyescape/DyescapeBot/internal/app/log"
 
-	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
-
 	"github.com/ThreeDotsLabs/watermill/message"
 
 	"github.com/Dyescape/DyescapeBot/internal/app/discord"
@@ -62,45 +59,14 @@ func (cs *commandService) Start() error {
 		return err
 	}
 	cs.subscriber = subscriber
-
-	router, err := message.NewRouter(message.RouterConfig{}, cs.logger)
+	registered, err := cs.subscriber.Subscribe(context.Background(), cs.kafkaConfig.CommandRegisteredTopic)
 	if err != nil {
-		panic(err)
+		cs.logger.Logger.Error(err.Error())
+		return err
 	}
-
-	router.AddPlugin(plugin.SignalsHandler)
-	router.AddMiddleware(middleware.Recoverer)
+	go cs.RegisterCommand(registered)
 
 	cs.Session.AddHandler(cs.ReadMessage)
-
-	// Adding a handler (multiple handlers can be added)
-	router.AddHandler(
-		"command_module",                      // handler name, must be unique
-		cs.kafkaConfig.CommandRegisteredTopic, // topic from which messages should be consumed
-		subscriber,
-		cs.kafkaConfig.CommandCalledTopic, // topic to which messages should be published
-		publisher,
-		func(msg *message.Message) ([]*message.Message, error) {
-			event := &CommandRegisteredEvent{}
-			err := json.Unmarshal(msg.Payload, event)
-			if err != nil {
-				// When a handler returns an error, the default behavior is to send a Nack (negative-acknowledgement).
-				// The message will be processed again.
-				//
-				// You can change the default behaviour by using middlewares, like Retry or PoisonQueue.
-				// You can also implement your own middleware.
-				return nil, err
-			}
-
-			cs.registry.Commands[event.Command] = &command{
-				Module:    event.Module,
-				Name:      event.Command,
-				Arguments: event.Arguments,
-			}
-			// TODO: Log
-			return []*message.Message{}, nil
-		},
-	)
 
 	fetchEvent := &CommandFetchEvent{}
 	payload, err := json.Marshal(fetchEvent)
@@ -114,11 +80,25 @@ func (cs *commandService) Start() error {
 	if err != nil {
 		return err
 	}
-
-	if err := router.Run(context.Background()); err != nil {
-		panic(err)
-	}
 	return nil
+}
+
+// RegisterCommand consumes a channel to register the commands internally.
+func (cs *commandService) RegisterCommand(cmds <-chan *message.Message) {
+	for cmd := range cmds {
+		event := &CommandRegisteredEvent{}
+		err := json.Unmarshal(cmd.Payload, event)
+		if err != nil {
+			cs.logger.Logger.Error(err.Error())
+		}
+
+		cs.registry.Commands[event.Command] = &command{
+			Module:    event.Module,
+			Name:      event.Command,
+			Arguments: event.Arguments,
+		}
+		cs.logger.Logger.Info(fmt.Sprintf("Registered command '%s'", event.Command))
+	}
 }
 
 // ReadMessage will consume all sent messages from Discord. It will try to parse the message to a command. If
@@ -142,14 +122,14 @@ func (cs *commandService) ReadMessage(s *discordgo.Session, m *discordgo.Message
 				help = help + fmt.Sprintf("　%v%v\n", cmd, args)
 			}
 		}
-		cs.Service.SendEmbed(m.ChannelID, "**Command overview**", help, "Command module")
+		cs.Service.SendEmbed(m.ChannelID, "Command overview", help, "Command module")
 		return
 	}
 
 	event := asCommandEvent(m)
 	payload, err := json.Marshal(event)
 	if err != nil {
-		cs.Service.SendEmbed(m.ChannelID, "**Error**", "Failed to process command.", "Command module")
+		cs.Service.SendEmbed(m.ChannelID, "Error", "Failed to process command.", "Command module")
 		cs.logger.Logger.Error(err.Error())
 	}
 
@@ -158,9 +138,9 @@ func (cs *commandService) ReadMessage(s *discordgo.Session, m *discordgo.Message
 		Payload: payload,
 	})
 	if err != nil {
-		cs.Service.SendEmbed(m.ChannelID, "**Error**", "Failed to process command.", "Command module")
+		cs.Service.SendEmbed(m.ChannelID, "Error", "Failed to process command.", "Command module")
 	} else {
-		cs.Service.SendEmbed(m.ChannelID, "**Created command**",
+		cs.Service.SendEmbed(m.ChannelID, "Created command",
 			"Successfully created and published the command.", "Command module")
 	}
 }

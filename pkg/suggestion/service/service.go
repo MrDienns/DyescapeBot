@@ -1,14 +1,12 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"net/url"
 
-	"github.com/Dyescape/DyescapeBot/internal/app/log"
+	"github.com/Dyescape/DyescapeBot/pkg/command/handler"
 
-	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
+	"github.com/Dyescape/DyescapeBot/internal/app/log"
 
 	"github.com/Dyescape/DyescapeBot/pkg/command/service"
 
@@ -35,6 +33,7 @@ type SuggestionService struct {
 	configReader configuration.ConfigReader
 	publisher    message.Publisher
 	subscriber   message.Subscriber
+	cmdhandler   *handler.Handler
 }
 
 func NewSuggestionService(s *discord.Service, config *service.KafkaConfig, l *log.WatermillLogger, c configuration.ConfigReader) *SuggestionService {
@@ -43,6 +42,12 @@ func NewSuggestionService(s *discord.Service, config *service.KafkaConfig, l *lo
 		kafkaConfig:  config,
 		logger:       l,
 		configReader: c,
+		cmdhandler: &handler.Handler{
+			Service:   s,
+			Logger:    l.Logger,
+			Executors: make(map[string]handler.Executor, 0),
+			Topic:     config.CommandCalledTopic,
+		},
 	}
 }
 
@@ -65,32 +70,13 @@ func (s *SuggestionService) Start() error {
 		return err
 	}
 	s.subscriber = subscriber
+	s.cmdhandler.Subscriber = subscriber
 
-	router, err := message.NewRouter(message.RouterConfig{}, s.logger)
-	if err != nil {
-		panic(err)
-	}
+	s.cmdhandler.RegisterCommand("suggest", s.CmdSuggest)
+	return nil
+}
 
-	router.AddPlugin(plugin.SignalsHandler)
-	router.AddMiddleware(middleware.Recoverer)
-
-	// Adding a handler (multiple handlers can be added)
-	router.AddHandler(
-		"suggestion_module",             // handler name, must be unique
-		s.kafkaConfig.CommandFetchTopic, // topic from which messages should be consumed
-		subscriber,
-		s.kafkaConfig.CommandCalledTopic, // topic to which messages should be published
-		publisher,
-		func(msg *message.Message) ([]*message.Message, error) {
-			err := s.registerCommands()
-			// TODO: Log
-			return []*message.Message{}, err
-		},
-	)
-
-	if err := router.Run(context.Background()); err != nil {
-		panic(err)
-	}
+func (s *SuggestionService) CmdSuggest(e *service.CommandCalledEvent) error {
 	return nil
 }
 
