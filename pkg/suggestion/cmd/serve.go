@@ -46,17 +46,17 @@ suggestions.`,
 				cmdConf, logger, configReader)
 			err = serv.Connect()
 			if err != nil {
-				fmt.Println(err.Error())
+				logger.Logger.Error(err.Error())
 				os.Exit(1)
 			}
 			err = serv.Start()
 			if err != nil {
-				fmt.Println(err.Error())
+				logger.Logger.Error(err.Error())
 				os.Exit(2)
 			}
 
 			// Wait here until CTRL-C or other term signal is received.
-			fmt.Println("Bot is now running. Press CTRL-C to exit.")
+			logger.Logger.Info("Bot is now running. Press CTRL-C to exit.")
 			sc := make(chan os.Signal, 1)
 			signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 			<-sc

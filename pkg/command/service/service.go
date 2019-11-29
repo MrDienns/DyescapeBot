@@ -149,9 +149,8 @@ func (cs *commandService) ReadMessage(s *discordgo.Session, m *discordgo.Message
 	event := asCommandEvent(m)
 	payload, err := json.Marshal(event)
 	if err != nil {
-		// TODO: Logger
 		cs.Service.SendEmbed(m.ChannelID, "**Error**", "Failed to process command.", "Command module")
-		fmt.Println(err.Error())
+		cs.logger.Logger.Error(err.Error())
 	}
 
 	err = cs.publisher.Publish(cs.kafkaConfig.CommandCalledTopic, &message.Message{
