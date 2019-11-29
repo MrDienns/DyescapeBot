@@ -1119,15 +1119,15 @@ public class DiscordModeration implements Moderation {
                         warnings), 0L);
                 break;
             case TEMPMUTE:
-                this.tempmute(serverId, userId, String.format("You've been automatically muted as a result of having %s warnings.",
+                this.tempmute(serverId, userId, String.format("You've been automatically temporarily muted as a result of having %s warnings.",
                         warnings), action.getDuration(), 0L);
                 break;
             case BAN:
-                this.ban(serverId, userId, String.format("You've been automatically muted as a result of having %s warnings.",
+                this.ban(serverId, userId, String.format("You've been automatically banned as a result of having %s warnings.",
                         warnings), 0L);
                 break;
             case TEMPBAN:
-                this.tempban(serverId, userId, String.format("You've been automatically muted as a result of having %s warnings.",
+                this.tempban(serverId, userId, String.format("You've been automatically temporarily banned as a result of having %s warnings.",
                         warnings), action.getDuration(), 0L);
                 break;
             default:

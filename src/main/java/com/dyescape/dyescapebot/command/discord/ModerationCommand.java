@@ -424,16 +424,13 @@ public class ModerationCommand extends BaseCommand {
             throw new IllegalArgumentException("Temporarily commands require the time (duration) argument");
         }
 
-        long punishmentTime = TimeUtil.parseFromRelativeString(time);
-
-        this.warningActionRepository.save(new WarningAction(e.getIssuer().getGuild().getIdLong(), warningPoints, type, punishmentTime));
-
         if (time == null) {
-
+            this.warningActionRepository.save(new WarningAction(e.getIssuer().getGuild().getIdLong(), warningPoints, type, -1));
             e.sendMessage(this.embed(String.format("I will %s users that reach %s warning points.",
                     type.toString(), warningPoints), Color.LIGHT_GRAY));
         } else {
-
+            long punishmentTime = TimeUtil.parseFromRelativeString(time);
+            this.warningActionRepository.save(new WarningAction(e.getIssuer().getGuild().getIdLong(), warningPoints, type, punishmentTime));
             e.sendMessage(this.embed(String.format("I will %s users that reach %s warning points for %s.",
                     type.toString(), warningPoints, TimeUtil.parsePunishmentTime(punishmentTime)), Color.LIGHT_GRAY));
         }
