@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/Dyescape/DyescapeBot/internal/app/log"
@@ -128,11 +129,20 @@ func (cs *commandService) ReadMessage(s *discordgo.Session, m *discordgo.Message
 	}
 
 	if strings.HasPrefix(m.Content, "!! help") {
-		cmds := ""
-		for _, command := range cs.registry.Commands {
-			cmds = cmds + fmt.Sprintf("%v", command.Name)
+		cmdsPerModule := cs.commandsPerModule()
+
+		help := "Below is an overview of all of the commands that you have permission to.\n"
+		for module, cmds := range cmdsPerModule {
+			help = help + fmt.Sprintf("\n**%v**\n", module)
+			for _, cmd := range cmds {
+				var args string
+				if cs.registry.Commands[cmd].Arguments != "" {
+					args = " " + cs.registry.Commands[cmd].Arguments
+				}
+				help = help + fmt.Sprintf("　%v%v\n", cmd, args)
+			}
 		}
-		cs.Service.SendEmbed(m.ChannelID, "**Command overview**", cmds, "Command module")
+		cs.Service.SendEmbed(m.ChannelID, "**Command overview**", help, "Command module")
 		return
 	}
 
@@ -160,6 +170,25 @@ func (cs *commandService) ReadMessage(s *discordgo.Session, m *discordgo.Message
 func (cs *commandService) isCommand(m *discordgo.MessageCreate) bool {
 	// TODO: Dynamic prefix
 	return strings.HasPrefix(m.Content, "!!")
+}
+
+// commandsPerModule returns a map with a string - the command module - as key and a slice of strings as value. The
+// value represents the command names. They're sorted alphabetically.
+func (cs *commandService) commandsPerModule() map[string][]string {
+	ret := make(map[string][]string, 0)
+	for _, command := range cs.registry.Commands {
+		if mod, ok := ret[command.Module]; ok {
+			mod = append(mod, command.Name)
+		} else {
+			ret[command.Module] = []string{command.Name}
+		}
+	}
+
+	for _, cmds := range ret {
+		sort.Strings(cmds)
+	}
+
+	return ret
 }
 
 // asCommandEvent will take a *discordgo.MessageCreate struct and transforms it into a *CommandCalledEvent
