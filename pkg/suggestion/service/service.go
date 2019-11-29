@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/Dyescape/DyescapeBot/internal/app/log"
+
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 
@@ -23,38 +25,29 @@ import (
 )
 
 var (
-	logger = watermill.NewStdLogger(
-		true,  // debug
-		false, // trace
-	)
 	marshaler = kafka.DefaultMarshaler{}
 )
 
 type SuggestionService struct {
 	*discord.Service
-	configReader    configuration.ConfigReader
-	brokers         []string
-	registeredtopic string
-	calledtopic     string
-	fetchtopic      string
-	publisher       message.Publisher
-	subscriber      message.Subscriber
+	kafkaConfig  *service.KafkaConfig
+	logger       *log.WatermillLogger
+	configReader configuration.ConfigReader
+	publisher    message.Publisher
+	subscriber   message.Subscriber
 }
 
-func NewSuggestionService(s *discord.Service, c configuration.ConfigReader, brokers []string, registeredtopic,
-	calledtopic, fetchtopic string) *SuggestionService {
+func NewSuggestionService(s *discord.Service, config *service.KafkaConfig, l *log.WatermillLogger, c configuration.ConfigReader) *SuggestionService {
 	return &SuggestionService{
-		Service:         s,
-		configReader:    c,
-		brokers:         brokers,
-		registeredtopic: registeredtopic,
-		fetchtopic:      fetchtopic,
-		calledtopic:     calledtopic,
+		Service:      s,
+		kafkaConfig:  config,
+		logger:       l,
+		configReader: c,
 	}
 }
 
 func (s *SuggestionService) Start() error {
-	publisher, err := kafka.NewPublisher(s.brokers, marshaler, nil, logger)
+	publisher, err := kafka.NewPublisher(s.kafkaConfig.Brokers, marshaler, nil, s.logger)
 	if err != nil {
 		return err
 	}
@@ -65,15 +58,15 @@ func (s *SuggestionService) Start() error {
 	}
 
 	subscriber, err := kafka.NewSubscriber(kafka.SubscriberConfig{
-		Brokers:       s.brokers,
-		ConsumerGroup: s.fetchtopic,
-	}, nil, marshaler, logger)
+		Brokers:       s.kafkaConfig.Brokers,
+		ConsumerGroup: s.kafkaConfig.CommandFetchTopic,
+	}, nil, marshaler, s.logger)
 	if err != nil {
 		return err
 	}
 	s.subscriber = subscriber
 
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	router, err := message.NewRouter(message.RouterConfig{}, s.logger)
 	if err != nil {
 		panic(err)
 	}
@@ -83,10 +76,10 @@ func (s *SuggestionService) Start() error {
 
 	// Adding a handler (multiple handlers can be added)
 	router.AddHandler(
-		"suggestion_module", // handler name, must be unique
-		s.fetchtopic,        // topic from which messages should be consumed
+		"suggestion_module",             // handler name, must be unique
+		s.kafkaConfig.CommandFetchTopic, // topic from which messages should be consumed
 		subscriber,
-		s.calledtopic, // topic to which messages should be published
+		s.kafkaConfig.CommandCalledTopic, // topic to which messages should be published
 		publisher,
 		func(msg *message.Message) ([]*message.Message, error) {
 			err := s.registerCommands()
@@ -111,7 +104,7 @@ func (s *SuggestionService) registerCommands() error {
 	if err != nil {
 		return err
 	}
-	err = s.publisher.Publish(s.registeredtopic, &message.Message{
+	err = s.publisher.Publish(s.kafkaConfig.CommandRegisteredTopic, &message.Message{
 		UUID:    watermill.NewUUID(),
 		Payload: payload,
 	})

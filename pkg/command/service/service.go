@@ -27,48 +27,42 @@ var (
 // CommandCalledEvent on.
 type commandService struct {
 	*discord.Service
-	publisher       message.Publisher
-	subscriber      message.Subscriber
-	brokers         []string
-	calledtopic     string
-	registeredtopic string
-	fetchtopic      string
-	registry        registry
+	kafkaConfig *KafkaConfig
+	logger      *log.WatermillLogger
+	registry    *registry
+	publisher   message.Publisher
+	subscriber  message.Subscriber
 }
 
 // NewCommandService creates a new *commandService struct.
-func NewCommandService(serv *discord.Service, brokers []string, calledtopic, registeredtopic, fetchtopic string) *commandService {
+func NewCommandService(serv *discord.Service, config *KafkaConfig, logger *log.WatermillLogger) *commandService {
 	return &commandService{
-		Service:         serv,
-		brokers:         brokers,
-		calledtopic:     calledtopic,
-		registeredtopic: registeredtopic,
-		fetchtopic:      fetchtopic,
-		registry:        registry{Commands: map[string]*command{}},
+		Service:     serv,
+		kafkaConfig: config,
+		logger:      logger,
+		registry:    &registry{Commands: map[string]*command{}},
 	}
 }
 
 // Start will start the service. It will setup a Discord message handler and a Kafka publishing connection.
 func (cs *commandService) Start() error {
 
-	logger := log.NewWatermillLogger()
-
-	publisher, err := kafka.NewPublisher(cs.brokers, marshaler, nil, logger)
+	publisher, err := kafka.NewPublisher(cs.kafkaConfig.Brokers, marshaler, nil, cs.logger)
 	if err != nil {
 		return err
 	}
 	cs.publisher = publisher
 
 	subscriber, err := kafka.NewSubscriber(kafka.SubscriberConfig{
-		Brokers:       cs.brokers,
-		ConsumerGroup: cs.registeredtopic,
-	}, nil, marshaler, logger)
+		Brokers:       cs.kafkaConfig.Brokers,
+		ConsumerGroup: cs.kafkaConfig.CommandRegisteredTopic,
+	}, nil, marshaler, cs.logger)
 	if err != nil {
 		return err
 	}
 	cs.subscriber = subscriber
 
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	router, err := message.NewRouter(message.RouterConfig{}, cs.logger)
 	if err != nil {
 		panic(err)
 	}
@@ -80,10 +74,10 @@ func (cs *commandService) Start() error {
 
 	// Adding a handler (multiple handlers can be added)
 	router.AddHandler(
-		"command_module",   // handler name, must be unique
-		cs.registeredtopic, // topic from which messages should be consumed
+		"command_module",                      // handler name, must be unique
+		cs.kafkaConfig.CommandRegisteredTopic, // topic from which messages should be consumed
 		subscriber,
-		cs.calledtopic, // topic to which messages should be published
+		cs.kafkaConfig.CommandCalledTopic, // topic to which messages should be published
 		publisher,
 		func(msg *message.Message) ([]*message.Message, error) {
 			event := &CommandRegisteredEvent{}
@@ -112,7 +106,7 @@ func (cs *commandService) Start() error {
 	if err != nil {
 		return err
 	}
-	err = cs.publisher.Publish(cs.fetchtopic, &message.Message{
+	err = cs.publisher.Publish(cs.kafkaConfig.CommandFetchTopic, &message.Message{
 		UUID:    watermill.NewUUID(),
 		Payload: payload,
 	})
@@ -150,7 +144,7 @@ func (cs *commandService) ReadMessage(s *discordgo.Session, m *discordgo.Message
 		fmt.Println(err.Error())
 	}
 
-	err = cs.publisher.Publish(cs.calledtopic, &message.Message{
+	err = cs.publisher.Publish(cs.kafkaConfig.CommandCalledTopic, &message.Message{
 		UUID:    watermill.NewUUID(),
 		Payload: payload,
 	})

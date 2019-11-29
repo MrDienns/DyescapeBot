@@ -6,11 +6,16 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Dyescape/DyescapeBot/pkg/suggestion/service"
+
+	cmdService "github.com/Dyescape/DyescapeBot/pkg/command/service"
+
+	"github.com/Dyescape/DyescapeBot/internal/app/log"
+
 	"github.com/Dyescape/DyescapeBot/internal/app/discord"
 
 	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
 
-	"github.com/Dyescape/DyescapeBot/pkg/suggestion/service"
 	"github.com/spf13/cobra"
 )
 
@@ -21,15 +26,24 @@ var (
 		Long: `Start the suggestion verification service in which will allow users to use Discord commands to post 
 suggestions.`,
 		Run: func(cmd *cobra.Command, _ []string) {
+
+			// Build the logger and configuration
+			logger := log.NewWatermillLogger(log.NewLogger())
+			cmdConf := &cmdService.KafkaConfig{
+				Brokers:                []string{"localhost:9092"},
+				CommandCalledTopic:     "CommandCalledStream",
+				CommandRegisteredTopic: "CommandRegisteredStream",
+				CommandFetchTopic:      "CommandFetchStream",
+			}
+
 			configReader := config.NewFlatFileConfigReader("data")
 			token, err := cmd.Flags().GetString("token")
 			if err != nil {
 				panic(err)
 			}
 
-			serv := service.NewSuggestionService(discord.NewService(fmt.Sprintf("Bot %s", token)), configReader,
-				[]string{"localhost:9092"}, "CommandRegisteredStream", "CommandCalledStream",
-				"CommandFetchStream")
+			serv := service.NewSuggestionService(discord.NewService(fmt.Sprintf("Bot %s", token)),
+				cmdConf, logger, configReader)
 			err = serv.Connect()
 			if err != nil {
 				fmt.Println(err.Error())
