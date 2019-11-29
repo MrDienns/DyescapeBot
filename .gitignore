@@ -1,7 +1,10 @@
 # Compiled binary
-suggestion
-command
+/suggestion
+/command
 *.exe
+
+# Command configuration
+*.toml
 
 # GoLand
 .idea/
