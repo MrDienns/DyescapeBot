@@ -98,7 +98,7 @@ func (s *SuggestionService) registerCommands() error {
 	registeredEvent := &service.CommandRegisteredEvent{
 		Module:    "Suggestion",
 		Command:   "suggest",
-		Arguments: "",
+		Arguments: "<URL>",
 	}
 	payload, err := json.Marshal(registeredEvent)
 	if err != nil {
