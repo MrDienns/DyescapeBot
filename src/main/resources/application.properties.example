@@ -1,4 +1,4 @@
-moderation.warningperiod=1209600
+moderation.warningperiod=15552000
 discord.token=
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
