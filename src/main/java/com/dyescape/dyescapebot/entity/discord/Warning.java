@@ -28,6 +28,9 @@ public class Warning implements Serializable {
     @Column(name = "channel", nullable = true)
     private long channel;
 
+    @Column(name = "points", nullable = false)
+    private int points;
+
     @Column(name = "reason")
     private String reason;
 
@@ -42,13 +45,14 @@ public class Warning implements Serializable {
     // -------------------------------------------- //
 
     private Warning() {
-        this(0, 0, 0, "", null, 0);
+        this(0, 0, 0, 0, "", null, 0);
     }
 
-    public Warning(long server, long user, long channel, String reason, Instant end, long punisher) {
+    public Warning(long server, long user, long channel, int points, String reason, Instant end, long punisher) {
         this.server = server;
         this.user = user;
         this.channel = channel;
+        this.points = points;
         this.reason = reason;
         this.end = end;
         this.punisher = punisher;
@@ -72,6 +76,10 @@ public class Warning implements Serializable {
 
     public long getChannel() {
         return this.channel;
+    }
+
+    public int getPoints() {
+        return this.points;
     }
 
     public String getReason() {

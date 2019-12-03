@@ -319,9 +319,9 @@ public class ModerationCommand extends BaseCommand {
 
     @Subcommand("warn")
     @CommandPermission("MESSAGE_MANAGE")
-    @Syntax("<User> <Reason> [Time]")
+    @Syntax("<User> <Points> <Reason> [Time]")
     @Description("Warn a user on the server")
-    public void onWarnCommand(JDACommandEvent e, Member member, String reason) {
+    public void onWarnCommand(JDACommandEvent e, Member member, Integer points, String reason) {
 
         if (member.getUser().isBot()) {
             e.sendMessage(this.embed("Nice try.", Color.RED));
@@ -329,10 +329,12 @@ public class ModerationCommand extends BaseCommand {
         }
 
         try {
-            this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), reason,
+            this.moderation.warn(member.getGuild().getIdLong(), member.getUser().getIdLong(), points, reason,
                     e.getIssuer().getAuthor().getIdLong(),
                     this.moderationConfiguration.getWarningperiod());
-            e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName()), Color.RED));
+            try {
+                e.sendMessage(this.embed(String.format("User %s was warned.", member.getEffectiveName()), Color.RED));
+            } catch (Exception ignored) {}
         } catch (Exception ex) {
             this.handleError(e, ex);
         }

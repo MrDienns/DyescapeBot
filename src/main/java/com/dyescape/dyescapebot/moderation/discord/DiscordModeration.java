@@ -56,22 +56,24 @@ public class DiscordModeration implements Moderation {
     // -------------------------------------------- //
 
     @Override
-    public void warn(long serverId, long userId, String reason, long punisher, long time) {
+    public void warn(long serverId, long userId, int points, String reason, long punisher, long time) {
 
         Instant duration = null;
         if (time != 0L) {
             duration = Instant.now().plusMillis(time);
         }
 
-        Warning warning = new Warning(serverId, userId, 0, reason, duration, punisher);
+        Warning warning = new Warning(serverId, userId, 0, points, reason, duration, punisher);
         this.warningRepository.save(warning);
 
         PunishmentEntry punishmentEntry = new PunishmentEntry(serverId, userId, PunishmentType.WARNING, 0, reason,
                 time, punisher);
         this.punishmentHistoryRepository.save(punishmentEntry);
 
-        this.sendPrivateMessage(userId, this.getWarnMessage(
-                this.getUsername(userId), this.getServername(serverId), reason), Color.RED);
+        try {
+            this.sendPrivateMessage(userId, this.getWarnMessage(
+                    this.getUsername(userId), this.getServername(serverId), points, reason), Color.RED);
+        } catch (Exception ignored) {}
 
         this.handleWarningActions(serverId, userId);
     }
@@ -79,10 +81,9 @@ public class DiscordModeration implements Moderation {
     @Override
     public void pardon(long serverId, long userId) {
 
-        List<Warning> warnings = this.warningRepository.findByServerAndUser(serverId, userId);
+        int warnings = this.warningRepository.sumByServerAndUser(serverId, userId);
 
-        if (warnings.isEmpty()) {
-
+        if (warnings == 0) {
             throw new DyescapeBotModerationException("User does not have any active warnings");
         }
 
@@ -490,10 +491,10 @@ public class DiscordModeration implements Moderation {
         return this.jda.getGuildById(serverId).getName();
     }
 
-    private String getWarnMessage(String username, String servername, String reason) {
+    private String getWarnMessage(String username, String servername, int points, String reason) {
         StringBuilder builder = this.getStringBuilder(username);
 
-        builder.append(String.format("You have been warned on %s.\n", servername));
+        builder.append(String.format("You have been warned on %s for %s points.\n", servername, points));
         if (!Strings.isNullOrEmpty(reason)) {
             builder.append(String.format("**Reason: **%s\n", reason));
         }
@@ -1104,7 +1105,7 @@ public class DiscordModeration implements Moderation {
 
     private void handleWarningActions(long serverId, long userId) {
 
-        int warnings = this.warningRepository.findByServerAndUser(serverId, userId).size();
+        int warnings = this.warningRepository.sumByServerAndUser(serverId, userId);
 
         WarningAction action = this.warningActionRepository.findByServerAndPoints(serverId, warnings);
         if (action == null) return;
