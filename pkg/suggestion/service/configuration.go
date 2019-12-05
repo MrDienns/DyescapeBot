@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 
-	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	config "github.com/Dyescape/DyescapeBot/internal/configuration"
 )
 
 // SuggestionConfiguration struct is a struct used for the configuration of

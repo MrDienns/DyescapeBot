@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	config "github.com/Dyescape/DyescapeBot/internal/configuration"
 
 	"github.com/bwmarrin/discordgo"
 )

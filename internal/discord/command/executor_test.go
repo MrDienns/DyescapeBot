@@ -1,10 +1,11 @@
 package command
 
 import (
-	library "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	"testing"
+
+	library "github.com/Dyescape/DyescapeBot/internal/configuration"
 	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestNewHandler(t *testing.T) {
@@ -35,4 +36,3 @@ func handler() *Handler {
 	reg := NewRegistry()
 	return NewHandler(reader, NewConfiguration(reader), reg, NewParser(reg))
 }
-

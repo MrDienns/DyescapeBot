@@ -15,9 +15,9 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill-kafka/pkg/kafka"
 
-	"github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	"github.com/Dyescape/DyescapeBot/internal/configuration"
 
-	"github.com/Dyescape/DyescapeBot/internal/app/discord"
+	"github.com/Dyescape/DyescapeBot/internal/discord"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -46,7 +46,7 @@ func NewSuggestionService(s *discord.Service, config *service.KafkaConfig, l *lo
 			Service:   s,
 			Logger:    l.Logger,
 			Executors: make(map[string]handler.Executor, 0),
-			Topic:     config.CommandCalledTopic,
+			Topic:     config.CommandCallTopic,
 		},
 	}
 }
@@ -64,7 +64,7 @@ func (s *SuggestionService) Start() error {
 
 	subscriber, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:       s.kafkaConfig.Brokers,
-		ConsumerGroup: s.kafkaConfig.CommandFetchTopic,
+		ConsumerGroup: s.kafkaConfig.BootstrapTopic,
 	}, nil, marshaler, s.logger)
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func (s *SuggestionService) registerCommands() error {
 	if err != nil {
 		return err
 	}
-	err = s.publisher.Publish(s.kafkaConfig.CommandRegisteredTopic, &message.Message{
+	err = s.publisher.Publish(s.kafkaConfig.CommandRegisterTopic, &message.Message{
 		UUID:    watermill.NewUUID(),
 		Payload: payload,
 	})

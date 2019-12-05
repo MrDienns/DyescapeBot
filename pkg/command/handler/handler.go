@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/Dyescape/DyescapeBot/internal/app/discord"
+	"github.com/Dyescape/DyescapeBot/internal/discord"
 
 	"github.com/Dyescape/DyescapeBot/internal/app/log"
 

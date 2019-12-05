@@ -6,7 +6,9 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.0.2
 	github.com/ThreeDotsLabs/watermill-kafka v1.0.1
 	github.com/bwmarrin/discordgo v0.19.0
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v0.0.5
+	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.4.0
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect

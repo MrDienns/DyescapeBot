@@ -12,7 +12,7 @@ type Logger struct {
 
 // NewLogger returns a new *Logger.
 func NewLogger() *Logger {
-	logger, _ := zap.NewProduction()
+	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
 	return &Logger{logger}
 }

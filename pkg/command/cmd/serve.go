@@ -1,16 +1,19 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/Dyescape/DyescapeBot/pkg/command/config"
+
+	"github.com/spf13/viper"
 
 	"github.com/Dyescape/DyescapeBot/internal/app/log"
 
 	"github.com/Dyescape/DyescapeBot/pkg/command/service"
 
-	"github.com/Dyescape/DyescapeBot/internal/app/discord"
+	"github.com/Dyescape/DyescapeBot/internal/discord"
 
 	"github.com/spf13/cobra"
 )
@@ -22,36 +25,20 @@ var (
 		Long:  `Start the command service so that other modules can register their commands.`,
 		Run: func(cmd *cobra.Command, _ []string) {
 
-			// Build the logger and configuration
 			logger := log.NewLogger()
-			servConf := &service.KafkaConfig{
-				Brokers:                []string{"localhost:9092"},
-				CommandCalledTopic:     "CommandCalledStream",
-				CommandRegisteredTopic: "CommandRegisteredStream",
-				CommandFetchTopic:      "CommandFetchStream",
-			}
+			servConf := config.KafkaConfig()
+			token := viper.GetString("discord.token")
 
-			// Get our token
-			token, err := cmd.Flags().GetString("token")
-			if err != nil {
+			serv := discord.NewService("Bot " + token)
+			if err := serv.Connect(); err != nil {
 				logger.Error(err.Error())
 				os.Exit(1)
 			}
 
-			// Get the base Discord server, connect to the gateway
-			serv := discord.NewService(fmt.Sprintf("Bot %s", token))
-			err = serv.Connect()
-			if err != nil {
-				logger.Error(err.Error())
-				os.Exit(2)
-			}
-
-			// Get our command service, start it
 			cmdServ := service.NewCommandService(serv, servConf, log.NewWatermillLogger(logger))
-			err = cmdServ.Start()
-			if err != nil {
+			if err := cmdServ.Start(); err != nil {
 				logger.Error(err.Error())
-				os.Exit(3)
+				os.Exit(1)
 			}
 
 			// Wait here until CTRL-C or other term signal is received.
@@ -67,6 +54,5 @@ var (
 )
 
 func init() {
-	serveCmd.Flags().StringP("token", "t", "", "Discord API token")
 	rootCmd.AddCommand(serveCmd)
 }

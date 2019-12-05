@@ -1,9 +1,10 @@
 package command
 
 import (
-	library "github.com/Dyescape/DyescapeBot/internal/app/configuration"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	library "github.com/Dyescape/DyescapeBot/internal/configuration"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewConfiguration(t *testing.T) {

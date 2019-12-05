@@ -1,6 +1,9 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/Dyescape/DyescapeBot/internal/cobracmd"
+	"github.com/spf13/cobra"
+)
 
 var (
 	rootCmd = &cobra.Command{
@@ -14,9 +17,13 @@ where users can vote on them.`,
 	}
 )
 
-// Execute is the main entrypoint for the root command. This function
-// will invoke the Cobra implementation of the command, which, in this
-// case, will output the usage guides.
+// Execute is the main entrypoint for the root command. This function will invoke the Cobra implementation of the
+// command, which, in this case, will output the usage guides.
 func Execute() {
 	rootCmd.Execute()
+}
+
+// init gets called by Cobra and serves as command initialisation entry point.
+func init() {
+	cobracmd.NewBootstrap("suggestion", rootCmd).Bootstrap()
 }

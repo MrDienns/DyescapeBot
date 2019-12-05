@@ -11,7 +11,7 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill/message"
 
-	"github.com/Dyescape/DyescapeBot/internal/app/discord"
+	"github.com/Dyescape/DyescapeBot/internal/discord"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/pkg/kafka"
 	"github.com/bwmarrin/discordgo"
@@ -53,13 +53,13 @@ func (cs *commandService) Start() error {
 
 	subscriber, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:       cs.kafkaConfig.Brokers,
-		ConsumerGroup: cs.kafkaConfig.CommandRegisteredTopic,
+		ConsumerGroup: cs.kafkaConfig.CommandRegisterTopic,
 	}, nil, marshaler, cs.logger)
 	if err != nil {
 		return err
 	}
 	cs.subscriber = subscriber
-	registered, err := cs.subscriber.Subscribe(context.Background(), cs.kafkaConfig.CommandRegisteredTopic)
+	registered, err := cs.subscriber.Subscribe(context.Background(), cs.kafkaConfig.CommandRegisterTopic)
 	if err != nil {
 		cs.logger.Logger.Error(err.Error())
 		return err
@@ -73,7 +73,7 @@ func (cs *commandService) Start() error {
 	if err != nil {
 		return err
 	}
-	err = cs.publisher.Publish(cs.kafkaConfig.CommandFetchTopic, &message.Message{
+	err = cs.publisher.Publish(cs.kafkaConfig.BootstrapTopic, &message.Message{
 		UUID:    watermill.NewUUID(),
 		Payload: payload,
 	})
@@ -133,7 +133,7 @@ func (cs *commandService) ReadMessage(s *discordgo.Session, m *discordgo.Message
 		cs.logger.Logger.Error(err.Error())
 	}
 
-	err = cs.publisher.Publish(cs.kafkaConfig.CommandCalledTopic, &message.Message{
+	err = cs.publisher.Publish(cs.kafkaConfig.CommandCallTopic, &message.Message{
 		UUID:    watermill.NewUUID(),
 		Payload: payload,
 	})

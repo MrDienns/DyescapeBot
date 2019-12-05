@@ -1,6 +1,6 @@
 package command
 
-import config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+import config "github.com/Dyescape/DyescapeBot/internal/configuration"
 
 // Configuration struct is used to keep certain options for commands. It has a reference to a ConfigReader and
 // it has a guild command configuration cache.

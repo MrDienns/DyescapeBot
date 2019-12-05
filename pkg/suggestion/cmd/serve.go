@@ -1,20 +1,20 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/Dyescape/DyescapeBot/pkg/suggestion/service"
+	"github.com/spf13/viper"
 
-	cmdService "github.com/Dyescape/DyescapeBot/pkg/command/service"
+	"github.com/Dyescape/DyescapeBot/pkg/suggestion/service"
 
 	"github.com/Dyescape/DyescapeBot/internal/app/log"
 
-	"github.com/Dyescape/DyescapeBot/internal/app/discord"
+	"github.com/Dyescape/DyescapeBot/internal/discord"
 
-	config "github.com/Dyescape/DyescapeBot/internal/app/configuration"
+	config "github.com/Dyescape/DyescapeBot/internal/configuration"
+	cmdconf "github.com/Dyescape/DyescapeBot/pkg/command/config"
 
 	"github.com/spf13/cobra"
 )
@@ -27,36 +27,25 @@ var (
 suggestions.`,
 		Run: func(cmd *cobra.Command, _ []string) {
 
-			// Build the logger and configuration
-			logger := log.NewWatermillLogger(log.NewLogger())
-			cmdConf := &cmdService.KafkaConfig{
-				Brokers:                []string{"localhost:9092"},
-				CommandCalledTopic:     "CommandCalledStream",
-				CommandRegisteredTopic: "CommandRegisteredStream",
-				CommandFetchTopic:      "CommandFetchStream",
+			logger := log.NewLogger()
+			servConf := cmdconf.KafkaConfig()
+			token := viper.GetString("discord.token")
+
+			serv := discord.NewService("Bot " + token)
+			if err := serv.Connect(); err != nil {
+				logger.Error(err.Error())
+				os.Exit(1)
 			}
 
 			configReader := config.NewFlatFileConfigReader("data")
-			token, err := cmd.Flags().GetString("token")
-			if err != nil {
-				panic(err)
-			}
-
-			serv := service.NewSuggestionService(discord.NewService(fmt.Sprintf("Bot %s", token)),
-				cmdConf, logger, configReader)
-			err = serv.Connect()
-			if err != nil {
-				logger.Logger.Error(err.Error())
+			suggestionServ := service.NewSuggestionService(serv, servConf, log.NewWatermillLogger(logger), configReader)
+			if err := suggestionServ.Start(); err != nil {
+				logger.Error(err.Error())
 				os.Exit(1)
-			}
-			err = serv.Start()
-			if err != nil {
-				logger.Logger.Error(err.Error())
-				os.Exit(2)
 			}
 
 			// Wait here until CTRL-C or other term signal is received.
-			logger.Logger.Info("Bot is now running. Press CTRL-C to exit.")
+			logger.Info("Bot is now running. Press CTRL-C to exit.")
 			sc := make(chan os.Signal, 1)
 			signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 			<-sc
@@ -68,8 +57,5 @@ suggestions.`,
 )
 
 func init() {
-	serveCmd.Flags().StringP("token", "t", "", "Discord API token")
-	serveCmd.Flags().Bool("api", false, "enable the restful API")
-	serveCmd.Flags().Int("port", 8080, "specify the port for the REST API to run on")
 	rootCmd.AddCommand(serveCmd)
 }
