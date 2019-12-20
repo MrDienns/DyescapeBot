@@ -8,7 +8,7 @@ import (
 func KafkaConfig() *service.KafkaConfig {
 	return &service.KafkaConfig{
 		Brokers:              viper.GetStringSlice("kafka.brokers"),
-		BootstrapTopic:       viper.GetString("kafka.topics.bootstrap"),
+		CommandFetchTopic:    viper.GetString("kafka.topics.commandFetch"),
 		CommandCallTopic:     viper.GetString("kafka.topics.commandCall"),
 		CommandRegisterTopic: viper.GetString("kafka.topics.commandRegister"),
 	}

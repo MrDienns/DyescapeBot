@@ -2,7 +2,7 @@ package service
 
 type KafkaConfig struct {
 	Brokers              []string
-	BootstrapTopic       string
+	CommandFetchTopic    string
 	CommandCallTopic     string
 	CommandRegisterTopic string
 }

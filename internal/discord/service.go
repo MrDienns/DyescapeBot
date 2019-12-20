@@ -1,20 +1,25 @@
 package discord
 
 import (
+	"github.com/Dyescape/DyescapeBot/internal/app/log"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Service strict is used as a base struct for the Discord connection to the
 // gateway. Contains a public *discordgo.Session field.
 type Service struct {
-	token   string
 	Session *discordgo.Session
+	Logger  *log.Logger
+	token   string
+	Module  string
 }
 
 // NewService accepts a Discord API token and constructs a new Service struct.
-func NewService(token string) *Service {
+func NewService(token, module string, logger *log.Logger) *Service {
 	return &Service{
-		token: token,
+		Logger: logger,
+		token:  token,
+		Module: module,
 	}
 }
 
@@ -27,5 +32,6 @@ func (s *Service) Connect() error {
 	}
 
 	s.Session = sess
+	s.Logger.Info("Connecting to Discord gateway")
 	return sess.Open()
 }

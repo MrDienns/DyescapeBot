@@ -31,7 +31,7 @@ suggestions.`,
 			servConf := cmdconf.KafkaConfig()
 			token := viper.GetString("discord.token")
 
-			serv := discord.NewService("Bot " + token)
+			serv := discord.NewService("Bot "+token, "Suggestion", logger)
 			if err := serv.Connect(); err != nil {
 				logger.Error(err.Error())
 				os.Exit(1)

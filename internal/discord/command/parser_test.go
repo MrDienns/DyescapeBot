@@ -1,19 +1,26 @@
 package command
 
 import (
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
 	testCmd = &Command{
 		Name: "test",
-		Args: map[string]reflect.Type{
-			"one": reflect.TypeOf(""),
-			"two": reflect.TypeOf(1),
+		Args: []*Argument{
+			{
+				Name: "one",
+				Type: reflect.TypeOf(""),
+			},
+			{
+				Name: "two",
+				Type: reflect.TypeOf(1),
+			},
 		},
-		Run:  nil,
+		Run: nil,
 	}
 )
 
@@ -24,15 +31,15 @@ func TestNewParser(t *testing.T) {
 }
 
 func TestParser_ParseNotEnoughArgs(t *testing.T) {
-	p := NewParser(NewRegistry())
-	res, err := p.Parse(testCmd, []string{"one"})
+	p := NewParser(registry())
+	res, err := p.Parse(testCmd.Name, "one")
 	assert.Error(t, err)
 	assert.Nil(t, res)
 }
 
 func TestParser_ParseValidArgs(t *testing.T) {
-	p := NewParser(NewRegistry())
-	res, err := p.Parse(testCmd, []string{"one", "2"})
+	p := NewParser(registry())
+	res, err := p.Parse(testCmd.Name, "one 2")
 	exp := map[string]interface{}{
 		"one": "one",
 		"two": 2,
@@ -42,8 +49,14 @@ func TestParser_ParseValidArgs(t *testing.T) {
 }
 
 func TestParser_ParseInvalidArgs(t *testing.T) {
-	p := NewParser(NewRegistry())
-	res, err := p.Parse(testCmd, []string{"one", "two"})
+	p := NewParser(registry())
+	res, err := p.Parse(testCmd.Name, "one two")
 	assert.Error(t, err)
 	assert.Nil(t, res)
+}
+
+func registry() *Registry {
+	reg := NewRegistry()
+	reg.Commands[testCmd.Name] = testCmd
+	return reg
 }

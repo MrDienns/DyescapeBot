@@ -29,7 +29,7 @@ var (
 			servConf := config.KafkaConfig()
 			token := viper.GetString("discord.token")
 
-			serv := discord.NewService("Bot " + token)
+			serv := discord.NewService("Bot "+token, "Command", logger)
 			if err := serv.Connect(); err != nil {
 				logger.Error(err.Error())
 				os.Exit(1)

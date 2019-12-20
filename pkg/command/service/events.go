@@ -28,8 +28,3 @@ type CommandRegisteredEvent struct {
 	// Arguments is a string which represents a readable format for the arguments of this command.
 	Arguments string `json:"arguments"`
 }
-
-// CommandFetchEvent is an event fired by general command helpers in order to indirectly tell underlying modules that
-// they should publish their command register events so that the command handler can consume them and build a command
-// registry.
-type CommandFetchEvent struct{}

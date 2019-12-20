@@ -14,8 +14,7 @@ func (s *Service) SendEmbed(channel, title, message, footer string) {
 			Text: footer,
 		},
 	})
-	// TODO: Logger
 	if err != nil {
-		fmt.Println(err.Error())
+		s.Logger.Error(err.Error())
 	}
 }

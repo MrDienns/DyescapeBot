@@ -24,6 +24,7 @@ func (s *Suggestion) Validate() error {
 	return nil
 }
 
+// hasHost checks if the passed host is part of the slice of allowed hosts.
 func (s *Suggestion) hasHost(host string, allowed []string) bool {
 	for _, site := range allowed {
 		if site == host {
@@ -35,15 +36,15 @@ func (s *Suggestion) hasHost(host string, allowed []string) bool {
 
 // Post takes the data of the *Suggestion struct and posts a message in the configured channel. Configured reaction
 // emojis are added so that members can vote on the suggestions.
-func (s *Suggestion) Post(serv *SuggestionService) error {
-	mess, err := serv.Session.ChannelMessageSend(s.Conf.SuggestionChannelID, fmt.Sprintf("Suggested by %s:\n%s",
+func (s *Suggestion) Post(session *discordgo.Session) error {
+	mess, err := session.ChannelMessageSend(s.Conf.SuggestionChannelID, fmt.Sprintf("Suggested by %s:\n%s",
 		s.User.Mention(), s.Url))
 	if err != nil {
 		return err
 	}
 
-	serv.Session.MessageReactionAdd(mess.ChannelID, mess.ID, s.Conf.AgreeEmojiID)
-	serv.Session.MessageReactionAdd(mess.ChannelID, mess.ID, s.Conf.NeutralEmojiID)
-	serv.Session.MessageReactionAdd(mess.ChannelID, mess.ID, s.Conf.DisagreeEmojiID)
+	session.MessageReactionAdd(mess.ChannelID, mess.ID, s.Conf.AgreeEmojiID)
+	session.MessageReactionAdd(mess.ChannelID, mess.ID, s.Conf.NeutralEmojiID)
+	session.MessageReactionAdd(mess.ChannelID, mess.ID, s.Conf.DisagreeEmojiID)
 	return nil
 }
