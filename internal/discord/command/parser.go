@@ -24,20 +24,18 @@ func (p *Parser) Parse(cmdStr, argsStr string) (map[string]interface{}, error) {
 	if cmd, ok := p.Registry.Commands[cmdStr]; ok {
 		spacedArgs := strings.Split(argsStr, " ")
 		for i, cmdArg := range cmd.Args {
-			if cmdArg.Concat {
-				// TODO: Take all remaining spaced args
-				continue
-			}
-
 			if len(spacedArgs) <= i && !cmdArg.Optional {
 				return nil, fmt.Errorf("missing mandatory argument '%v'", cmdArg.Name)
 				continue
 			}
 
-			spacedArg := sanitizeArg(spacedArgs[i])
-			if spacedArg == "" && !cmdArg.Optional {
-				return nil, fmt.Errorf("missing mandatory argument '%v'", cmdArg.Name)
+			if cmdArg.Concat {
+				ret[cmdArg.Name] = strings.Join(spacedArgs[i:], " ")
+				// TODO: Take all remaining spaced args
+				continue
 			}
+
+			spacedArg := sanitizeArg(spacedArgs[i])
 
 			if resolver, ok := p.Registry.Resolvers[cmdArg.Type]; ok {
 				parsedArg, err := resolver.Resolve(spacedArg)

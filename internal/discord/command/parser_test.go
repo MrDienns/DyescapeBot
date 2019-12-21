@@ -13,11 +13,12 @@ var (
 		Args: []*Argument{
 			{
 				Name: "one",
-				Type: reflect.TypeOf(""),
+				Type: reflect.TypeOf(1),
 			},
 			{
-				Name: "two",
-				Type: reflect.TypeOf(1),
+				Name:   "two",
+				Type:   reflect.TypeOf(""),
+				Concat: true,
 			},
 		},
 		Run: nil,
@@ -32,17 +33,17 @@ func TestNewParser(t *testing.T) {
 
 func TestParser_ParseNotEnoughArgs(t *testing.T) {
 	p := NewParser(registry())
-	res, err := p.Parse(testCmd.Name, "one")
+	res, err := p.Parse(testCmd.Name, "1")
 	assert.Error(t, err)
 	assert.Nil(t, res)
 }
 
 func TestParser_ParseValidArgs(t *testing.T) {
 	p := NewParser(registry())
-	res, err := p.Parse(testCmd.Name, "one 2")
+	res, err := p.Parse(testCmd.Name, "1 two")
 	exp := map[string]interface{}{
-		"one": "one",
-		"two": 2,
+		"one": 1,
+		"two": "two",
 	}
 	assert.NoError(t, err)
 	assert.Equal(t, exp, res)
@@ -50,6 +51,24 @@ func TestParser_ParseValidArgs(t *testing.T) {
 
 func TestParser_ParseInvalidArgs(t *testing.T) {
 	p := NewParser(registry())
+	res, err := p.Parse(testCmd.Name, "one two")
+	assert.Error(t, err)
+	assert.Nil(t, res)
+}
+
+func TestParser_ParseConcat(t *testing.T) {
+	p := NewParser(registry())
+	res, err := p.Parse(testCmd.Name, "1 two is a long concat argument")
+	exp := map[string]interface{}{
+		"one": 1,
+		"two": "two is a long concat argument",
+	}
+	assert.NoError(t, err)
+	assert.Equal(t, exp, res)
+}
+
+func TestParser_ParseUnknownCommand(t *testing.T) {
+	p := NewParser(NewRegistry())
 	res, err := p.Parse(testCmd.Name, "one two")
 	assert.Error(t, err)
 	assert.Nil(t, res)
