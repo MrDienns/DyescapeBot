@@ -31,3 +31,10 @@ func TestConfiguration_ConfigurationRead(t *testing.T) {
 	act := conf.Configuration("testGuild")
 	assert.Equal(t, exp, act)
 }
+
+func TestConfiguration_Configuration(t *testing.T) {
+	conf := NewConfiguration(library.NewFlatFileConfigReader("configuration_test"))
+	exp := &guildConfiguration{Prefix: "!!"}
+	act := conf.Configuration("i-dont-exist")
+	assert.Equal(t, exp, act)
+}
