@@ -17,8 +17,8 @@ type Suggestion struct {
 // Validate will validate the suggestion data and return an error if anything is wrong.
 func (s *Suggestion) Validate() error {
 	if !s.hasHost(s.Url.Hostname(), s.Conf.SuggestionWebsites) {
-		return fmt.Errorf("please send a %s URL pointing to your suggestion",
-			s.Conf.SuggestionWebsites)
+		return fmt.Errorf("Please send a %s URL pointing to your suggestion.",
+			s.Conf.SuggestionWebsites[0])
 	}
 
 	return nil
