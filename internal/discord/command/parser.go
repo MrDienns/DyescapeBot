@@ -22,20 +22,19 @@ func NewParser(registry *Registry) *Parser {
 func (p *Parser) Parse(cmdStr, argsStr string) (map[string]interface{}, error) {
 	ret := make(map[string]interface{}, 0)
 	if cmd, ok := p.Registry.Commands[cmdStr]; ok {
-		spacedArgs := strings.Split(argsStr, " ")
+		passedArgs := args(argsStr)
 		for i, cmdArg := range cmd.Args {
-			if len(spacedArgs) <= i && !cmdArg.Optional {
-				return nil, fmt.Errorf("missing mandatory argument '%v'", cmdArg.Name)
-				continue
+			if len(passedArgs) <= i && !cmdArg.Optional {
+				return nil, fmt.Errorf("Missing mandatory argument '%v'.\nUsage: %v %v",
+					cmdArg.Name, cmd.Name, cmd.Usage)
 			}
 
 			if cmdArg.Concat {
-				ret[cmdArg.Name] = strings.Join(spacedArgs[i:], " ")
-				// TODO: Take all remaining spaced args
-				continue
+				ret[cmdArg.Name] = strings.Join(passedArgs[i:], " ")
+				return ret, nil
 			}
 
-			spacedArg := sanitizeArg(spacedArgs[i])
+			spacedArg := sanitizeArg(passedArgs[i])
 
 			if resolver, ok := p.Registry.Resolvers[cmdArg.Type]; ok {
 				parsedArg, err := resolver.Resolve(spacedArg)
@@ -47,7 +46,15 @@ func (p *Parser) Parse(cmdStr, argsStr string) (map[string]interface{}, error) {
 		}
 		return ret, nil
 	}
-	return nil, fmt.Errorf("unknown command while parsing")
+	return nil, fmt.Errorf("Unknown command while parsing.")
+}
+
+func args(argString string) []string {
+	argString = sanitizeArg(argString)
+	if argString == "" {
+		return make([]string, 0)
+	}
+	return strings.Split(argString, " ")
 }
 
 func sanitizeArg(arg string) string {
