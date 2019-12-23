@@ -164,6 +164,7 @@ func (cs *commandService) commandsPerModule() map[string][]string {
 	for _, command := range cs.registry.Commands {
 		if mod, ok := ret[command.Module]; ok {
 			mod = append(mod, command.Name)
+			ret[command.Module] = mod
 		} else {
 			ret[command.Module] = []string{command.Name}
 		}
