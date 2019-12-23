@@ -1,6 +1,7 @@
 # Compiled binary
 /suggestion
 /command
+/moderation
 *.exe
 
 # Command configuration
