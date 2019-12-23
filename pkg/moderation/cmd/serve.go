@@ -5,9 +5,12 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Dyescape/DyescapeBot/pkg/command/config"
+
 	"github.com/spf13/viper"
 
 	"github.com/Dyescape/DyescapeBot/internal/app/log"
+	"github.com/Dyescape/DyescapeBot/pkg/moderation/service"
 
 	"github.com/Dyescape/DyescapeBot/internal/discord"
 
@@ -22,11 +25,17 @@ var (
 		Run: func(cmd *cobra.Command, _ []string) {
 
 			logger := log.NewLogger()
-			//servConf := config.KafkaConfig()
+			servConf := config.KafkaConfig()
 			token := viper.GetString("discord.token")
 
-			serv := discord.NewService("Bot "+token, "Command", logger)
+			serv := discord.NewService("Bot "+token, "Moderation", logger)
 			if err := serv.Connect(); err != nil {
+				logger.Error(err.Error())
+				os.Exit(1)
+			}
+
+			moderationServuce := service.NewModerationService(serv, servConf, log.NewWatermillLogger(logger))
+			if err := moderationServuce.Start(); err != nil {
 				logger.Error(err.Error())
 				os.Exit(1)
 			}

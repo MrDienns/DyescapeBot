@@ -63,7 +63,7 @@ func (s *SuggestionService) Start() error {
 
 	subscriber, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:       s.kafkaConfig.Brokers,
-		ConsumerGroup: s.kafkaConfig.CommandFetchTopic,
+		ConsumerGroup: "suggestion",
 	}, nil, marshaler, s.logger)
 	if err != nil {
 		return err
