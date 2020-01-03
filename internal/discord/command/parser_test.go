@@ -35,7 +35,7 @@ func TestParser_ParseNoArgs(t *testing.T) {
 	p := NewParser(registry())
 	res, err := p.Parse(testCmd.Name, "")
 	assert.Error(t, err)
-	assert.Equal(t, "Missing mandatory argument 'one'.", err.Error())
+	assert.Equal(t, "Missing mandatory argument 'one'.\nUsage: test", err.Error())
 	assert.Nil(t, res)
 }
 
@@ -43,7 +43,7 @@ func TestParser_ParseNotEnoughArgs(t *testing.T) {
 	p := NewParser(registry())
 	res, err := p.Parse(testCmd.Name, "1")
 	assert.Error(t, err)
-	assert.Equal(t, "Missing mandatory argument 'two'.", err.Error())
+	assert.Equal(t, "Missing mandatory argument 'two'.\nUsage: test", err.Error())
 	assert.Nil(t, res)
 }
 

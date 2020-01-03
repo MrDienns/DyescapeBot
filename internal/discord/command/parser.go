@@ -25,8 +25,9 @@ func (p *Parser) Parse(cmdStr, argsStr string) (map[string]interface{}, error) {
 		passedArgs := args(argsStr)
 		for i, cmdArg := range cmd.Args {
 			if len(passedArgs) <= i && !cmdArg.Optional {
-				return nil, fmt.Errorf("Missing mandatory argument '%v'.\nUsage: %v %v",
-					cmdArg.Name, cmd.Name, cmd.Usage)
+				errStr := strings.TrimSpace(fmt.Sprintf("Missing mandatory argument '%v'.\nUsage: %v %v",
+					cmdArg.Name, cmd.Name, cmd.Usage))
+				return nil, fmt.Errorf(errStr)
 			}
 
 			if cmdArg.Concat {
