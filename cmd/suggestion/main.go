@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/Dyescape/DyescapeBot/pkg/suggestion/cmd"
-)
+import cmd "github.com/Dyescape/DyescapeBot/internal/module/suggestion/command"
 
 func main() {
 	cmd.Execute()
