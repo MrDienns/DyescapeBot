@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      - MYSQL_DATABASE=dyescape-bot
+      - MYSQL_USER=dyescape
+      - MYSQL_PASSWORD=bot
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+
+  discord-bot:
+    image: dyescape/bot/discord:latest
+    build:
+      context: ./discord
+    ports:
+      - 8080:8080
