@@ -2,14 +2,18 @@ version: '3'
 
 services:
 
-  db:
+  database:
     image: mariadb
     restart: always
     environment:
-      - MYSQL_DATABASE=dyescape-bot
-      - MYSQL_USER=dyescape
-      - MYSQL_PASSWORD=bot
-      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      MYSQL_DATABASE: 'dyescape-bot'
+      MYSQL_USER: 'dyescape'
+      MYSQL_PASSWORD: 'bot'
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql:/var/lib/mysql
 
   discord-bot:
     image: dyescape/bot/discord:latest
@@ -17,3 +21,11 @@ services:
       context: ./discord
     ports:
       - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:mysql://database:3306/dyescape-bot'
+      SPRING_DATASOURCE_USERNAME: 'dyescape'
+      SPRING_DATASOURCE_PASSWORD: 'bot'
+    restart: always
+
+volumes:
+  mysql:
