@@ -6,3 +6,6 @@
 *.iml
 *.jar
 
+# Ignore our application.properties for development
+**/application.properties
+
