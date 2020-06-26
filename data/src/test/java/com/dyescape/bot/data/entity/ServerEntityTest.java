@@ -15,16 +15,17 @@ public class ServerEntityTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("286476446338252800");
+        ServerEntity server = new ServerEntity("286476446338252800", "!");
         assertEquals(server.getId(), "286476446338252800", "ID value was not passed or returned correctly");
+        assertEquals(server.getCommandPrefix(), "!", "Command prefix value was not passed or returned correctly");
     }
 
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
-        ServerEntity serverOne = new ServerEntity("Server1");
-        ServerEntity serverOneCopy = new ServerEntity("Server1");
-        ServerEntity serverTwo = new ServerEntity("Server2");
+        ServerEntity serverOne = new ServerEntity("Server1", "!");
+        ServerEntity serverOneCopy = new ServerEntity("Server1", "!");
+        ServerEntity serverTwo = new ServerEntity("Server2", "!");
         assertEquals(serverOne, serverOneCopy, "Equal objects were not seen as equal");
         assertEquals(serverOne.hashCode(), serverOneCopy.hashCode(), "Hashcode of equal objects were not seen as equal");
         assertNotEquals(serverOne.hashCode(), serverTwo.hashCode(), "Unequal objects were seen as equal");

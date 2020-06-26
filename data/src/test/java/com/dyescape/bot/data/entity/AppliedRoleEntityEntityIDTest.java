@@ -12,7 +12,7 @@ public class AppliedRoleEntityEntityIDTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("286476446338252800");
+        ServerEntity server = new ServerEntity("286476446338252800", "!");
         UserEntity user = new UserEntity("MrDienns");
         AppliedRoleEntity.ID id = new AppliedRoleEntity.ID(user.getId(), server.getId());
         assertEquals(id.getUserId(), user.getId(), "User value was not passed or returned correctly");
@@ -22,15 +22,15 @@ public class AppliedRoleEntityEntityIDTest {
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
-        ServerEntity serverOne = new ServerEntity("Server1");
+        ServerEntity serverOne = new ServerEntity("Server1", "!");
         UserEntity userOne = new UserEntity("MrDienns");
         AppliedRoleEntity.ID id = new AppliedRoleEntity.ID(userOne.getId(), serverOne.getId());
 
-        ServerEntity serverOneCopy = new ServerEntity("Server1");
+        ServerEntity serverOneCopy = new ServerEntity("Server1", "!");
         UserEntity userOneCopy = new UserEntity("MrDienns");
         AppliedRoleEntity.ID idOneCopy = new AppliedRoleEntity.ID(userOneCopy.getId(), serverOneCopy.getId());
 
-        ServerEntity serverTwo = new ServerEntity("Server2");
+        ServerEntity serverTwo = new ServerEntity("Server2", "!");
         UserEntity userTwo = new UserEntity("MrDienns");
         AppliedRoleEntity.ID idTwo = new AppliedRoleEntity.ID(serverTwo.getId(), userTwo.getId());
 

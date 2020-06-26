@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ public class DiscordJDABootstrap {
 
     private final String token;
 
+    @Autowired
     public DiscordJDABootstrap(@Value("${discord.token}") String token) {
         this.token = stripOptionalBotPrefix(token);
     }
@@ -26,7 +28,8 @@ public class DiscordJDABootstrap {
         JDABuilder builder = JDABuilder.create(this.token,
                 GatewayIntent.GUILD_BANS,
                 GatewayIntent.GUILD_MEMBERS,
-                GatewayIntent.DIRECT_MESSAGES
+                GatewayIntent.DIRECT_MESSAGES,
+                GatewayIntent.GUILD_MESSAGES
         );
 
         builder.disableCache(
