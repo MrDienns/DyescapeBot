@@ -44,4 +44,12 @@ public class ServerEntityTest {
             fail("ServerEntity class has no empty public/protected constructor");
         }
     }
+
+    @Test
+    @DisplayName("Change command prefix")
+    public void changeCommandPrefix() {
+        ServerEntity server = new ServerEntity("Server1", "!");
+        server.setCommandPrefix("?");
+        assertEquals("?", server.getCommandPrefix(), "Command prefix was not changed");
+    }
 }
