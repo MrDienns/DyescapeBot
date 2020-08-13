@@ -1,11 +1,12 @@
 package com.dyescape.bot.discord.command.configuration;
 
+import com.dyescape.bot.data.entity.ServerEntity;
+import com.dyescape.bot.data.repository.ServerRepository;
+
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
-import com.dyescape.bot.data.entity.ServerEntity;
-import com.dyescape.bot.data.repository.ServerRepository;
 
 import java.util.Optional;
 

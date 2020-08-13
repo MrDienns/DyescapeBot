@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.command.resolver.processor;
 
-public interface ArgumentProcessor {
+public interface ArgumentProcessor<Result> {
 
-    String process(String argument);
+    Result process(String argument);
 }

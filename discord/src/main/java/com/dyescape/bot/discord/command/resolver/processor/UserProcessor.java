@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.command.resolver.processor;
 
-public class UserProcessor implements ArgumentProcessor {
+public class UserProcessor implements ArgumentProcessor<String> {
 
     @Override
     public String process(String argument) {

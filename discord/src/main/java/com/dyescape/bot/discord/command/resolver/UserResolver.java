@@ -1,14 +1,15 @@
 package com.dyescape.bot.discord.command.resolver;
 
-import co.aikar.commands.InvalidCommandArgument;
-import co.aikar.commands.JDACommandExecutionContext;
-import co.aikar.commands.contexts.ContextResolver;
 import com.dyescape.bot.discord.command.resolver.processor.ArgumentProcessor;
 import com.dyescape.bot.discord.command.resolver.processor.UserProcessor;
 import com.dyescape.bot.discord.command.resolver.validator.ArgumentValidator;
 import com.dyescape.bot.discord.command.resolver.validator.UserValidator;
 import com.dyescape.bot.discord.domain.DiscordUser;
 import com.dyescape.bot.domain.model.User;
+
+import co.aikar.commands.InvalidCommandArgument;
+import co.aikar.commands.JDACommandExecutionContext;
+import co.aikar.commands.contexts.ContextResolver;
 import net.dv8tion.jda.api.JDA;
 
 import javax.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ import javax.validation.constraints.NotNull;
 public class UserResolver implements ContextResolver<User, JDACommandExecutionContext> {
 
     private final JDA jda;
-    private final ArgumentProcessor processor;
+    private final ArgumentProcessor<String> processor;
     private final ArgumentValidator validator;
 
     public UserResolver(@NotNull JDA jda) {
