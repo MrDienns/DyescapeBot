@@ -2,7 +2,6 @@ package com.dyescape.bot.discord.command;
 
 import co.aikar.commands.CommandConfig;
 import co.aikar.commands.CommandConfigProvider;
-import com.google.common.base.Strings;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -21,12 +20,7 @@ public class ServerConfigProvider implements CommandConfigProvider {
 
         List<String> prefixes = new ArrayList<>();
         String prefix = this.serverPrefixProvider.getPrefix(event.getGuild().getId());
-
-        // Add excessive space margins for people who can't type, but ACF doesn't seem to do this
-        // TODO: Make a PR to ACF to fix this
-        for (int i = 5; i >= 0; i--) {
-            prefixes.add(prefix + Strings.repeat(" ", i));
-        }
+        prefixes.add(prefix);
 
         return () -> prefixes;
     }
