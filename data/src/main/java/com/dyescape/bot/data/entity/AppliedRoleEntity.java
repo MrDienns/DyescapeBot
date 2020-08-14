@@ -1,11 +1,12 @@
 package com.dyescape.bot.data.entity;
 
-import java.io.Serializable;
+import com.dyescape.bot.data.id.UserServerID;
+
 import java.util.Objects;
 import javax.persistence.*;
 
 @Entity
-@IdClass(AppliedRoleEntity.ID.class)
+@IdClass(UserServerID.class)
 @Table(name = "discord_assigned_role")
 public class AppliedRoleEntity {
 
@@ -79,43 +80,5 @@ public class AppliedRoleEntity {
     @Override
     public int hashCode() {
         return Objects.hash(userId, roleId, serverId, user, role);
-    }
-
-    public static class ID implements Serializable {
-
-        @Id
-        @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
-        private final String userId;
-
-        @Id
-        @Column(name = "server_id", nullable = false, insertable = false, updatable = false)
-        private final String serverId;
-
-        public ID(String userId, String serverId) {
-            this.userId = userId;
-            this.serverId = serverId;
-        }
-
-        public String getUserId() {
-            return this.userId;
-        }
-
-        public String getServerId() {
-            return this.serverId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ID id = (ID) o;
-            return Objects.equals(userId, id.userId) &&
-                    Objects.equals(serverId, id.serverId);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(userId, serverId);
-        }
     }
 }

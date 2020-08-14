@@ -1,4 +1,7 @@
-package com.dyescape.bot.data.entity;
+package com.dyescape.bot.data.id;
+
+import com.dyescape.bot.data.entity.ServerEntity;
+import com.dyescape.bot.data.entity.UserEntity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,15 +9,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@DisplayName("Role database entity test")
-public class AppliedRoleEntityEntityIDTest {
+@DisplayName("User Server ID test")
+public class UserServerIDTest {
 
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
         ServerEntity server = new ServerEntity("286476446338252800", "!");
         UserEntity user = new UserEntity("MrDienns");
-        AppliedRoleEntity.ID id = new AppliedRoleEntity.ID(user.getId(), server.getId());
+        UserServerID id = new UserServerID(user.getId(), server.getId());
         assertEquals(id.getUserId(), user.getId(), "User value was not passed or returned correctly");
         assertEquals(id.getServerId(), server.getId(), "Server value was not passed or returned correctly");
     }
@@ -24,15 +27,15 @@ public class AppliedRoleEntityEntityIDTest {
     public void objectComparison() {
         ServerEntity serverOne = new ServerEntity("Server1", "!");
         UserEntity userOne = new UserEntity("MrDienns");
-        AppliedRoleEntity.ID id = new AppliedRoleEntity.ID(userOne.getId(), serverOne.getId());
+        UserServerID id = new UserServerID(userOne.getId(), serverOne.getId());
 
         ServerEntity serverOneCopy = new ServerEntity("Server1", "!");
         UserEntity userOneCopy = new UserEntity("MrDienns");
-        AppliedRoleEntity.ID idOneCopy = new AppliedRoleEntity.ID(userOneCopy.getId(), serverOneCopy.getId());
+        UserServerID idOneCopy = new UserServerID(userOneCopy.getId(), serverOneCopy.getId());
 
         ServerEntity serverTwo = new ServerEntity("Server2", "!");
         UserEntity userTwo = new UserEntity("MrDienns");
-        AppliedRoleEntity.ID idTwo = new AppliedRoleEntity.ID(serverTwo.getId(), userTwo.getId());
+        UserServerID idTwo = new UserServerID(serverTwo.getId(), userTwo.getId());
 
         assertEquals(id, idOneCopy, "Equal objects were not seen as equal");
         assertEquals(id.hashCode(), idOneCopy.hashCode(), "Hashcode of equal objects were not seen as equal");
