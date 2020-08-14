@@ -13,6 +13,7 @@ import com.dyescape.bot.domain.model.User;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
@@ -41,10 +42,16 @@ public class ModerationCommand extends BaseCommand {
     @Description("Warn a user")
     public void warn(JDACommandEvent e, User user, Integer points, @Optional String reason) {
 
+        MessageChannel channel = e.getIssuer().getChannel();
+        this.markProcessing(channel);
+
         Server server = new DiscordServer(e.getIssuer().getGuild());
         User warner = this.getUserFromJDA(e.getIssuer().getAuthor());
 
         this.warn(server, user, points, warner, reason);
+
+        // TODO: Fancy
+        this.sendMessage(channel, "Warned");
     }
 
     /**
@@ -229,5 +236,13 @@ public class ModerationCommand extends BaseCommand {
     private User getUserFromJDA(net.dv8tion.jda.api.entities.User jdaUser) {
         UserEntity author = this.dataSuit.getOrCreateUserById(jdaUser.getId());
         return new DiscordUser(this.dataSuit, author, jdaUser);
+    }
+
+    private void markProcessing(MessageChannel channel) {
+        channel.sendTyping().queue();
+    }
+
+    private void sendMessage(MessageChannel channel, String message) {
+        channel.sendMessage(message).queue();
     }
 }

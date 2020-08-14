@@ -44,7 +44,6 @@ public class DiscordUser extends UserAbstract {
         return false;
     }
 
-
     @Override
     public void warn(Server server, int points, String reason, User givenBy) {
 
