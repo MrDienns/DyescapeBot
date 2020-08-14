@@ -1,6 +1,7 @@
 package com.dyescape.bot.discord.bootstrap;
 
 import com.dyescape.bot.data.repository.ServerRepository;
+import com.dyescape.bot.data.repository.UserRepository;
 import com.dyescape.bot.discord.command.ServerConfigProvider;
 import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.discord.command.configuration.ConfigurationCommand;
@@ -22,12 +23,15 @@ import org.springframework.context.annotation.Configuration;
 public class ACFBootstrap {
 
     private final JDA jda;
+    private final UserRepository userRepository;
     private final ServerRepository serverRepository;
     private final ServerPrefixProvider prefixProvider;
 
     @Autowired
-    public ACFBootstrap(JDA jda, ServerRepository serverRepository, ServerPrefixProvider prefixProvider) {
+    public ACFBootstrap(JDA jda, UserRepository userRepository, ServerRepository serverRepository,
+                        ServerPrefixProvider prefixProvider) {
         this.jda = jda;
+        this.userRepository = userRepository;
         this.serverRepository = serverRepository;
         this.prefixProvider = prefixProvider;
     }
@@ -43,7 +47,7 @@ public class ACFBootstrap {
         JDACommandContexts contexts = (JDACommandContexts) manager.getCommandContexts();
 
         // Register resolvers
-        contexts.registerContext(User.class, new UserResolver(this.jda));
+        contexts.registerContext(User.class, new UserResolver(this.userRepository, this.jda));
         contexts.registerContext(TimeFrame.class, new TimeFrameResolver());
 
         // Register commands
