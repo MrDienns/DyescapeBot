@@ -1,31 +1,30 @@
 package com.dyescape.bot.data.entity;
 
-import com.dyescape.bot.data.id.UserServerID;
-
 import java.time.Instant;
-import java.util.Date;
 import java.util.Objects;
 import javax.persistence.*;
 
 @Entity
-@IdClass(UserServerID.class)
 @Table(name = "discord_warning")
 public class WarningEntity {
 
     @Id
-    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private Long id;
+
+    @Column(name = "user_id")
     private String userId;
 
-    @Id
-    @Column(name = "server_id", nullable = false, insertable = false, updatable = false)
+    @Column(name = "server_id")
     private String serverId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "server_id", referencedColumnName = "id")
+    @JoinColumn(name = "server_id", referencedColumnName = "id", insertable = false, updatable = false)
     private ServerEntity server;
 
     @Column(name = "points")
@@ -35,21 +34,21 @@ public class WarningEntity {
     private String givenById;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "given_by_id", referencedColumnName = "id", insertable = false, updatable = false)
     private UserEntity givenBy;
 
     @Column(name = "given_at")
     private Instant givenAt;
 
-    @Column(name = "expires_at")
-    private Instant expiresAt;
+    @Column(name = "reason")
+    private String reason;
 
     protected WarningEntity() {
 
     }
 
     public WarningEntity(UserEntity user, ServerEntity server, int points, UserEntity givenBy, Instant givenAt,
-                         Instant expiresAt) {
+                         String reason) {
         this.user = user;
         this.userId = user.getId();
         this.server = server;
@@ -58,7 +57,7 @@ public class WarningEntity {
         this.givenById = givenBy.getId();
         this.points = points;
         this.givenAt = givenAt;
-        this.expiresAt = expiresAt;
+        this.reason = reason;
     }
 
     public String getUserId() {
@@ -93,10 +92,6 @@ public class WarningEntity {
         return this.givenAt;
     }
 
-    public Instant getExpiresAt() {
-        return this.expiresAt;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -109,12 +104,11 @@ public class WarningEntity {
                 Objects.equals(server, that.server) &&
                 Objects.equals(givenById, that.givenById) &&
                 Objects.equals(givenBy, that.givenBy) &&
-                Objects.equals(givenAt, that.givenAt) &&
-                Objects.equals(expiresAt, that.expiresAt);
+                Objects.equals(givenAt, that.givenAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, serverId, user, server, points, givenById, givenBy, givenAt, expiresAt);
+        return Objects.hash(userId, serverId, user, server, points, givenById, givenBy, givenAt);
     }
 }

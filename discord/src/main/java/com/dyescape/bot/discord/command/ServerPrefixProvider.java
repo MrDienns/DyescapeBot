@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public class ServerPrefixProvider {
 
+    public static final String DEFAULT_COMMAND_PREFIX = "!";
+
     private final ServerRepository serverRepository;
 
     public ServerPrefixProvider(ServerRepository serverRepository) {
@@ -20,6 +22,6 @@ public class ServerPrefixProvider {
     private ServerEntity getServerEntityFromGuildID(String guildId) {
         Optional<ServerEntity> result = this.serverRepository.findById(guildId);
         // Should always be true under normal conditions
-        return result.orElseGet(() -> new ServerEntity(guildId, "!"));
+        return result.orElseGet(() -> new ServerEntity(guildId, DEFAULT_COMMAND_PREFIX));
     }
 }

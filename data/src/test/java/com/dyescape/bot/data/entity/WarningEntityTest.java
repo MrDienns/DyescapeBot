@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
-import java.time.Duration;
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,8 +18,7 @@ public class WarningEntityTest {
         UserEntity userOne = new UserEntity("userOne");
         UserEntity userTwo = new UserEntity("userTwo");
         Instant givenAt = Instant.now();
-        Instant expiresAt = Instant.now().plus(Duration.ofDays(1));
-        WarningEntity warning = new WarningEntity(userOne, server, 5, userTwo, givenAt, expiresAt);
+        WarningEntity warning = new WarningEntity(userOne, server, 5, userTwo, givenAt, "test");
 
         assertEquals(server, warning.getServer(), "Server value was not passed or returned correctly");
         assertEquals(server.getId(), warning.getServerId(), "Server ID value was not passed or returned correctly");
@@ -30,7 +28,6 @@ public class WarningEntityTest {
         assertEquals(userTwo, warning.getGivenBy(), "GivenBy value was not passed or returned correctly");
         assertEquals(userTwo.getId(), warning.getGivenById(), "GivenBy ID value was not passed or returned correctly");
         assertEquals(givenAt, warning.getGivenAt(), "GivenAt value was not passed or returned correctly");
-        assertEquals(expiresAt, warning.getExpiresAt(), "ExpiresAt value was not passed or returned correctly");
     }
 
     @Test
@@ -52,7 +49,7 @@ public class WarningEntityTest {
         ServerEntity server = new ServerEntity("testId", "!");
         UserEntity userOne = new UserEntity(punishedUser);
         UserEntity userTwo = new UserEntity("userTwo");
-        return new WarningEntity(userOne, server, 5, userTwo, time, time);
+        return new WarningEntity(userOne, server, 5, userTwo, time, "test");
     }
 
     @Test

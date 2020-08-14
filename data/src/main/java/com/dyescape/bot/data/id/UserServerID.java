@@ -10,11 +10,15 @@ public class UserServerID implements Serializable {
 
     @Id
     @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
-    private final String userId;
+    private String userId;
 
     @Id
     @Column(name = "server_id", nullable = false, insertable = false, updatable = false)
-    private final String serverId;
+    private String serverId;
+
+    protected UserServerID() {
+
+    }
 
     public UserServerID(String userId, String serverId) {
         this.userId = userId;

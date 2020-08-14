@@ -1,7 +1,7 @@
 package com.dyescape.bot.discord.command.resolver;
 
 import com.dyescape.bot.data.entity.UserEntity;
-import com.dyescape.bot.data.repository.UserRepository;
+import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.resolver.processor.ArgumentProcessor;
 import com.dyescape.bot.discord.command.resolver.processor.UserProcessor;
 import com.dyescape.bot.discord.command.resolver.validator.ArgumentValidator;
@@ -13,20 +13,19 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.JDACommandExecutionContext;
 import co.aikar.commands.contexts.ContextResolver;
 import net.dv8tion.jda.api.JDA;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
 public class UserResolver implements ContextResolver<User, JDACommandExecutionContext> {
 
-    private final UserRepository userRepository;
+    private final DataSuit dataSuit;
     private final JDA jda;
     private final ArgumentProcessor<String> processor;
     private final ArgumentValidator validator;
 
-    public UserResolver(@NotNull UserRepository userRepository, @NotNull JDA jda) {
-        this.userRepository = userRepository;
+    public UserResolver(@NotNull DataSuit dataSuit, @NotNull JDA jda) {
+        this.dataSuit = dataSuit;
         this.jda = jda;
         this.processor = new UserProcessor();
         this.validator = new UserValidator();
@@ -46,16 +45,16 @@ public class UserResolver implements ContextResolver<User, JDACommandExecutionCo
         }
 
         // Get or create our user in our database
-        Optional<UserEntity> userEntityResult = this.userRepository.findById(argument);
+        Optional<UserEntity> userEntityResult = this.dataSuit.getUserRepository().findById(argument);
         UserEntity userEntity;
         if (userEntityResult.isPresent()) {
             userEntity = userEntityResult.get();
         } else {
             userEntity = new UserEntity(jdaUser.getId());
-            this.userRepository.save(userEntity);
+            this.dataSuit.getUserRepository().save(userEntity);
         }
 
         // Create a domain model implementation with it
-        return new DiscordUser(userEntity, jdaUser);
+        return new DiscordUser(this.dataSuit, userEntity, jdaUser);
     }
 }

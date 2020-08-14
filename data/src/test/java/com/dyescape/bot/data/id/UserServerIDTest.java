@@ -2,12 +2,14 @@ package com.dyescape.bot.data.id;
 
 import com.dyescape.bot.data.entity.ServerEntity;
 import com.dyescape.bot.data.entity.UserEntity;
+import com.dyescape.bot.data.entity.WarningEntity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import java.lang.reflect.Constructor;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("User Server ID test")
 public class UserServerIDTest {
@@ -43,5 +45,16 @@ public class UserServerIDTest {
         assertNotEquals(id, idTwo, "Hashcode of unequal objects were seen as equal");
         assertNotEquals(idOneCopy, idTwo, "Unequal objects were seen as equal");
         assertNotEquals(idOneCopy.hashCode(), idTwo.hashCode(), "Hashcode of unequal objects were seen as equal");
+    }
+
+    @Test
+    @DisplayName("Serialization constructor")
+    public void serializationConstructor() {
+        try {
+            Constructor<UserServerID> constructor = UserServerID.class.getDeclaredConstructor();
+            constructor.newInstance();
+        } catch (Exception ignored) {
+            fail("UserServerID class has no empty public/protected constructor");
+        }
     }
 }

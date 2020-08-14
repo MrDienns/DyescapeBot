@@ -2,6 +2,8 @@ package com.dyescape.bot.discord.bootstrap;
 
 import com.dyescape.bot.data.repository.ServerRepository;
 import com.dyescape.bot.data.repository.UserRepository;
+import com.dyescape.bot.data.repository.WarningRepository;
+import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.ServerConfigProvider;
 import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.discord.command.configuration.ConfigurationCommand;
@@ -9,7 +11,6 @@ import com.dyescape.bot.discord.command.model.TimeFrame;
 import com.dyescape.bot.discord.command.moderation.ModerationCommand;
 import com.dyescape.bot.discord.command.resolver.TimeFrameResolver;
 import com.dyescape.bot.discord.command.resolver.UserResolver;
-import com.dyescape.bot.discord.command.suggest.SuggestionCommand;
 import com.dyescape.bot.domain.model.User;
 
 import co.aikar.commands.JDACommandContexts;
@@ -23,16 +24,13 @@ import org.springframework.context.annotation.Configuration;
 public class ACFBootstrap {
 
     private final JDA jda;
-    private final UserRepository userRepository;
-    private final ServerRepository serverRepository;
+    private final DataSuit dataSuit;
     private final ServerPrefixProvider prefixProvider;
 
     @Autowired
-    public ACFBootstrap(JDA jda, UserRepository userRepository, ServerRepository serverRepository,
-                        ServerPrefixProvider prefixProvider) {
+    public ACFBootstrap(JDA jda, DataSuit dataSuit, ServerPrefixProvider prefixProvider) {
         this.jda = jda;
-        this.userRepository = userRepository;
-        this.serverRepository = serverRepository;
+        this.dataSuit = dataSuit;
         this.prefixProvider = prefixProvider;
     }
 
@@ -47,12 +45,12 @@ public class ACFBootstrap {
         JDACommandContexts contexts = (JDACommandContexts) manager.getCommandContexts();
 
         // Register resolvers
-        contexts.registerContext(User.class, new UserResolver(this.userRepository, this.jda));
+        contexts.registerContext(User.class, new UserResolver(this.dataSuit, this.jda));
         contexts.registerContext(TimeFrame.class, new TimeFrameResolver());
 
         // Register commands
-        manager.registerCommand(new ModerationCommand());
-        manager.registerCommand(new ConfigurationCommand(this.serverRepository));
+        manager.registerCommand(new ModerationCommand(this.dataSuit));
+        manager.registerCommand(new ConfigurationCommand(this.dataSuit));
         manager.enableUnstableAPI("help");
         return manager;
     }

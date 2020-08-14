@@ -1,8 +1,13 @@
 package com.dyescape.bot.discord.command.moderation;
 
+import com.dyescape.bot.data.entity.UserEntity;
+import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.CommandPermissions;
 import com.dyescape.bot.discord.command.model.TimeFrame;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
+import com.dyescape.bot.discord.domain.DiscordServer;
+import com.dyescape.bot.discord.domain.DiscordUser;
+import com.dyescape.bot.domain.model.Server;
 import com.dyescape.bot.domain.model.User;
 
 import co.aikar.commands.BaseCommand;
@@ -15,6 +20,12 @@ import java.util.regex.Pattern;
 public class ModerationCommand extends BaseCommand {
 
     private static final Pattern TIMEFRAME = Pattern.compile("[0-9dhm]+");
+
+    private final DataSuit dataSuit;
+
+    public ModerationCommand(DataSuit dataSuit) {
+        this.dataSuit = dataSuit;
+    }
 
     /**
      * Entry point for the JDA mute command. This method will be invoked for chat messages starting with the configured
@@ -29,7 +40,11 @@ public class ModerationCommand extends BaseCommand {
     @Syntax("<User> <points> [reason]")
     @Description("Warn a user")
     public void warn(JDACommandEvent e, User user, Integer points, @Optional String reason) {
-        this.warn(user, points, reason);
+
+        Server server = new DiscordServer(e.getIssuer().getGuild());
+        User warner = this.getUserFromJDA(e.getIssuer().getAuthor());
+
+        this.warn(server, user, points, warner, reason);
     }
 
     /**
@@ -118,8 +133,8 @@ public class ModerationCommand extends BaseCommand {
      * @param points    Points to warn the user for.
      * @param reason    Reason to warn the user for.
      */
-    private void warn(User user, int points, @Nullable String reason) {
-        // TODO
+    private void warn(Server server, User user, int points, User warnedBy, @Nullable String reason) {
+        user.warn(server, points, reason, warnedBy);
     }
 
     /**
@@ -204,5 +219,15 @@ public class ModerationCommand extends BaseCommand {
 
         // Found nothing
         return null;
+    }
+
+    /**
+     * Takes a {@link net.dv8tion.jda.api.entities.User} and gives back a corresponding {@link User}.
+     * @param jdaUser The JDA user.
+     * @return {@link User}
+     */
+    private User getUserFromJDA(net.dv8tion.jda.api.entities.User jdaUser) {
+        UserEntity author = this.dataSuit.getOrCreateUserById(jdaUser.getId());
+        return new DiscordUser(this.dataSuit, author, jdaUser);
     }
 }
