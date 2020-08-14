@@ -28,7 +28,7 @@ public class ModerationCommand extends BaseCommand {
     @CommandPermission(CommandPermissions.KICK_MEMBER)
     @Syntax("<User> <points> [reason]")
     @Description("Warn a user")
-    public void kick(JDACommandEvent e, User user, Integer points, @Optional String reason) {
+    public void warn(JDACommandEvent e, User user, Integer points, @Optional String reason) {
         this.warn(user, points, reason);
     }
 
