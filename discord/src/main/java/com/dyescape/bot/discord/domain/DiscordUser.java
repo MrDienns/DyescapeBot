@@ -5,16 +5,14 @@ import com.dyescape.bot.data.entity.UserEntity;
 import com.dyescape.bot.data.entity.WarningActionEntity;
 import com.dyescape.bot.data.entity.WarningEntity;
 import com.dyescape.bot.data.suit.DataSuit;
+import com.dyescape.bot.discord.util.DiscordMessage;
 import com.dyescape.bot.domain.model.Server;
 import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.domain.model.User;
 import com.dyescape.bot.domain.model.impl.UserAbstract;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,6 +92,23 @@ public class DiscordUser extends UserAbstract {
     @Override
     public void kick(Server server, String reason) {
 
+        Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
+        if (guild == null) return;
+
+        try {
+            PrivateChannel privateChannel = this.jdaUser.openPrivateChannel().complete();
+            if (privateChannel != null) {
+                String messageBody = String.format("You've been kicked from %s. You can still rejoin the server. Please " +
+                        "respect the rules and guidelines.", guild.getName());
+                if (reason != null && !reason.isEmpty()) {
+                    messageBody = messageBody + "\n\nReason: " + reason;
+                }
+                MessageEmbed message = DiscordMessage.CreateEmbeddedMessage(null, messageBody, this.jdaUser);
+                privateChannel.sendMessage(message).complete();
+            }
+        } catch (Exception ignored) { }
+
+        guild.kick(this.jdaUser.getId(), reason).queue();
     }
 
     @Override

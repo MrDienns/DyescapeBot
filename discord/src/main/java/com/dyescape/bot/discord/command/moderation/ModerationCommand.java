@@ -35,7 +35,7 @@ public class ModerationCommand extends BotCommand {
      * @param reason    The reason for warn.
      */
     @CommandAlias("warn")
-    @CommandPermission(CommandPermissions.KICK_MEMBER)
+    @CommandPermission(CommandPermissions.WARN_MEMBER)
     @Syntax("<User> <points> [reason]")
     @Description("Warn a user")
     public void warn(JDACommandEvent e, User user, Integer points, @Optional String reason) {
@@ -67,7 +67,10 @@ public class ModerationCommand extends BotCommand {
     @Syntax("<User> [reason]")
     @Description("Kick a user")
     public void kick(JDACommandEvent e, User user, @Optional String reason) {
-        this.mute(this.getServerFromJDA(e.getIssuer().getGuild()), user, reason);
+        Server server = this.getServerFromJDA(e.getIssuer().getGuild());
+        this.kick(server, user, reason);
+
+        this.sendMessage(e.getIssuer().getChannel(), user, "User has been kicked.");
     }
 
     /**
@@ -149,8 +152,8 @@ public class ModerationCommand extends BotCommand {
      * @param user      User to kick.
      * @param reason    Reason to kick the user for.
      */
-    private void kick(User user, @Nullable String reason) {
-        // TODO
+    private void kick(Server server, User user, @Nullable String reason) {
+        user.kick(server, reason);
     }
 
     /**
