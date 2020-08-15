@@ -9,13 +9,14 @@ import com.dyescape.bot.domain.model.TimeFrame;
 
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
+import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("configuration")
 public class ConfigurationCommand extends BotCommand {
 
-    public ConfigurationCommand(DataSuit dataSuit) {
-        super(dataSuit);
+    public ConfigurationCommand(JDA jda, DataSuit dataSuit) {
+        super(jda, dataSuit);
     }
 
     @Subcommand("setprefix")

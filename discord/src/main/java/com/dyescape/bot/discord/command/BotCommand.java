@@ -9,14 +9,21 @@ import com.dyescape.bot.domain.model.Server;
 import com.dyescape.bot.domain.model.User;
 
 import co.aikar.commands.BaseCommand;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 
 public abstract class BotCommand extends BaseCommand {
 
+    private final JDA jda;
     private final DataSuit dataSuit;
 
-    public BotCommand(DataSuit dataSuit) {
+    public BotCommand(JDA jda, DataSuit dataSuit) {
+        this.jda = jda;
         this.dataSuit = dataSuit;
+    }
+
+    public JDA getJda() {
+        return this.jda;
     }
 
     protected DataSuit getDataSuit() {

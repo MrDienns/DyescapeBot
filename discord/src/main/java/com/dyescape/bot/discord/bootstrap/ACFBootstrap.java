@@ -46,8 +46,8 @@ public class ACFBootstrap {
         contexts.registerContext(TimeFrame.class, new TimeFrameResolver());
 
         // Register commands
-        manager.registerCommand(new ModerationCommand(this.dataSuit));
-        manager.registerCommand(new ConfigurationCommand(this.dataSuit));
+        manager.registerCommand(new ModerationCommand(this.jda, this.dataSuit));
+        manager.registerCommand(new ConfigurationCommand(this.jda, this.dataSuit));
         manager.enableUnstableAPI("help");
         return manager;
     }

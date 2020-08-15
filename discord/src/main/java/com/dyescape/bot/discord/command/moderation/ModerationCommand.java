@@ -4,13 +4,16 @@ import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
+import com.dyescape.bot.discord.util.DiscordMessage;
 import com.dyescape.bot.domain.model.Server;
 import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.domain.model.User;
 
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
@@ -19,8 +22,8 @@ public class ModerationCommand extends BotCommand {
 
     private static final Pattern TIMEFRAME = Pattern.compile("[0-9dhm]+");
 
-    public ModerationCommand(DataSuit dataSuit) {
-        super(dataSuit);
+    public ModerationCommand(JDA jda, DataSuit dataSuit) {
+        super(jda, dataSuit);
     }
 
     /**
@@ -45,8 +48,10 @@ public class ModerationCommand extends BotCommand {
 
         this.warn(server, user, points, warner, reason);
 
-        // TODO: Fancy
-        this.sendMessage(channel, "Warned: " + user.getActiveWarningPoints(server));
+        String unit = points == 1 ? "point" : "points";
+        this.sendMessage(channel, user, String.format("You've been warned for %s %s. Automated " +
+                "punishments may be applied if you reach a certain threshold. Please respect the rules and guidelines.",
+                points, unit));
     }
 
     /**
@@ -227,7 +232,10 @@ public class ModerationCommand extends BotCommand {
         channel.sendTyping().queue();
     }
 
-    private void sendMessage(MessageChannel channel, String message) {
-        channel.sendMessage(message).queue();
+    private void sendMessage(MessageChannel channel, User user,
+                             String body) {
+        net.dv8tion.jda.api.entities.User jdaUser = this.getJda().getUserById(user.getId());
+        MessageEmbed embed = DiscordMessage.CreateEmbeddedMessage(null, body, jdaUser);
+        channel.sendMessage(embed).queue();
     }
 }
