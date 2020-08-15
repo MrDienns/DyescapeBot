@@ -2,13 +2,16 @@ package com.dyescape.bot.discord.domain;
 
 import com.dyescape.bot.data.entity.ServerEntity;
 import com.dyescape.bot.data.entity.UserEntity;
+import com.dyescape.bot.data.entity.WarningActionEntity;
 import com.dyescape.bot.data.entity.WarningEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.domain.model.Server;
+import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.domain.model.User;
 import com.dyescape.bot.domain.model.impl.UserAbstract;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.time.Period;
@@ -54,6 +57,16 @@ public class DiscordUser extends UserAbstract {
                 Instant.now(), reason);
 
         this.dataSuit.getWarningRepository().save(warning);
+
+        int totalPoints = this.getActiveWarningPoints(server);
+        WarningActionEntity applicableAction = this.dataSuit.getWarningActionRepository()
+                .findFirstByServerIdAndPointsIsLessThanEqualOrderByPointsDesc(server.getId(), totalPoints);
+
+        if (applicableAction != null) {
+            this.applyWarningAction(server, reason, applicableAction);
+        } else {
+            // TODO: Inform user
+        }
     }
 
     @Override
@@ -77,7 +90,7 @@ public class DiscordUser extends UserAbstract {
     }
 
     @Override
-    public void mute(Server server, Instant expiryTime, String reason) {
+    public void mute(Server server, TimeFrame timeFrame, String reason) {
 
     }
 
@@ -87,12 +100,36 @@ public class DiscordUser extends UserAbstract {
     }
 
     @Override
-    public void ban(Server server, Instant expiryTime, String reason) {
+    public void ban(Server server, TimeFrame timeFrame, String reason) {
 
     }
 
     @Override
     public boolean isBanned(Server server) {
         return false;
+    }
+
+    private void applyWarningAction(Server server, String reason, WarningActionEntity warningActionEntity) {
+
+        switch (warningActionEntity.getAction()) {
+            case KICK:
+                this.kick(server, reason);
+                return;
+            case MUTE:
+                this.mute(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason);
+            case BAN:
+                this.ban(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason);
+            default:
+                break;
+        }
+
+        if (warningActionEntity.getAction().equals(WarningActionEntity.Action.KICK)) {
+            this.kick(server, reason);
+        }
+    }
+
+    private TimeFrame tryMakeTimeFrame(@Nullable String format) {
+        if (format == null) return null;
+        return new TimeFrame(format);
     }
 }

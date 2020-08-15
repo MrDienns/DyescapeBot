@@ -1,7 +1,5 @@
 package com.dyescape.bot.domain.model;
 
-import java.time.Instant;
-
 public interface Moderatable {
 
     void warn(Server server, int points, String reason, User givenBy);
@@ -9,9 +7,9 @@ public interface Moderatable {
 
     void kick(Server server, String reason);
 
-    void mute(Server server, Instant expiryTime, String reason);
+    void mute(Server server, TimeFrame timeFrame, String reason);
     boolean isMuted(Server server);
 
-    void ban(Server server, Instant expiryTime, String reason);
+    void ban(Server server, TimeFrame timeFrame, String reason);
     boolean isBanned(Server server);
 }
