@@ -13,5 +13,6 @@ public class WhenValidatingAnInvalidUserArgumentTest {
         validator.validate("<@!267965217412087818>");
         validator.validate("<@267965217412087818>");
         validator.validate("267965217412087818");
+        validator.validate("MrDienns#0001");
     }
 }

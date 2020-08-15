@@ -3,6 +3,7 @@ package com.dyescape.bot.discord.bootstrap;
 import com.dyescape.bot.data.entity.ServerEntity;
 import com.dyescape.bot.data.repository.ServerRepository;
 import com.dyescape.bot.discord.command.ServerPrefixProvider;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

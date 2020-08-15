@@ -1,8 +1,9 @@
 package com.dyescape.bot.data.entity;
 
+import javax.persistence.*;
+
 import java.time.Instant;
 import java.util.Objects;
-import javax.persistence.*;
 
 @Entity
 @Table(name = "discord_warning")

@@ -16,8 +16,5 @@ public class WhenValidatingAValidUserArgumentTest {
         assertThrows(InvalidCommandArgument.class, () -> {
             validator.validate("MrDienns");
         });
-        assertThrows(InvalidCommandArgument.class, () -> {
-            validator.validate("MrDienns#0001");
-        });
     }
 }

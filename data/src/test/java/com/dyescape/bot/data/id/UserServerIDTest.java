@@ -2,7 +2,6 @@ package com.dyescape.bot.data.id;
 
 import com.dyescape.bot.data.entity.ServerEntity;
 import com.dyescape.bot.data.entity.UserEntity;
-import com.dyescape.bot.data.entity.WarningEntity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -4,10 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @DisplayName("User database entity test")
 public class ServerEntityTest {

@@ -1,14 +1,9 @@
 package com.dyescape.bot.data.entity;
 
+import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 @Entity
 @IdClass(RoleEntity.ID.class)

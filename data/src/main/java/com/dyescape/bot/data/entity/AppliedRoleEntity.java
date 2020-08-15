@@ -2,8 +2,9 @@ package com.dyescape.bot.data.entity;
 
 import com.dyescape.bot.data.id.UserServerID;
 
-import java.util.Objects;
 import javax.persistence.*;
+
+import java.util.Objects;
 
 @Entity
 @IdClass(UserServerID.class)

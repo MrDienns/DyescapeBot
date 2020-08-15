@@ -1,10 +1,10 @@
 package com.dyescape.bot.discord.command.resolver;
 
-import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.discord.command.resolver.processor.ArgumentProcessor;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
 import com.dyescape.bot.discord.command.resolver.validator.ArgumentValidator;
 import com.dyescape.bot.discord.command.resolver.validator.TimeFrameValidator;
+import com.dyescape.bot.domain.model.TimeFrame;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.JDACommandExecutionContext;

@@ -1,7 +1,6 @@
 package com.dyescape.bot.discord.command.resolver.validator;
 
 import co.aikar.commands.InvalidCommandArgument;
-import net.dv8tion.jda.api.JDA;
 
 import java.util.regex.Pattern;
 

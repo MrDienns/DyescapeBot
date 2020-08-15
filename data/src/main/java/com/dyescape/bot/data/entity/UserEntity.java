@@ -3,6 +3,7 @@ package com.dyescape.bot.data.entity;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 import java.util.Objects;
 
 @Entity
