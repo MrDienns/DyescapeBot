@@ -72,6 +72,7 @@ public class ModerationCommand extends BotCommand {
     @Description("Kick a user")
     public void kick(JDACommandEvent e, User user, @Optional String reason) {
         try {
+            this.markProcessing(e.getIssuer().getChannel());
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
             this.kick(server, user, reason);
 
@@ -98,6 +99,9 @@ public class ModerationCommand extends BotCommand {
     public void mute(JDACommandEvent e, User user, @Optional String reasonOrTimeFrame) {
 
         try {
+
+            this.markProcessing(e.getIssuer().getChannel());
+
             // To prevent situations where people get banned permanently instead of temporarily, we use this little hack.
             // ACF doesn't exactly support two optional parameters properly.
             // If we found anything, invoke the other temp ban command.
@@ -134,6 +138,9 @@ public class ModerationCommand extends BotCommand {
     public void ban(JDACommandEvent e, User user, @Optional String reasonOrTimeFrame) {
 
         try {
+
+            this.markProcessing(e.getIssuer().getChannel());
+
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
 
             // To prevent situations where people get banned permanently instead of temporarily, we use this little hack.
