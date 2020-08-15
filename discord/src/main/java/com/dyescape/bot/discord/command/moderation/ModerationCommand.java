@@ -265,10 +265,20 @@ public class ModerationCommand extends BotCommand {
         return null;
     }
 
+    /**
+     * Send a packet which sends a "is now typing..." message in the channel.
+     * @param channel Channel to send the packet in.
+     */
     private void markProcessing(MessageChannel channel) {
         channel.sendTyping().queue();
     }
 
+    /**
+     * Sends an embedded message in the provided channel.
+     * @param channel   The channel to send the message in.
+     * @param user      The user which the message is directed to.
+     * @param body      The body of the message.
+     */
     private void sendMessage(MessageChannel channel, User user,
                              String body) {
         net.dv8tion.jda.api.entities.User jdaUser = this.getJda().getUserById(user.getId());
@@ -276,6 +286,11 @@ public class ModerationCommand extends BotCommand {
         channel.sendMessage(embed).queue();
     }
 
+    /**
+     * Sends an error response in the given channel.
+     * @param channel   The channel to send the message in.
+     * @param e         The exception which caused the error.
+     */
     private void error(MessageChannel channel, Exception e) {
         MessageEmbed embed = DiscordMessage.CreateEmbeddedMessage("**An error occurred**", e.getMessage(), null);
         channel.sendMessage(embed).queue();
