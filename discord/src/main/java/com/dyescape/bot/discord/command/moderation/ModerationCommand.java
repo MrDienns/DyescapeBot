@@ -1,5 +1,6 @@
 package com.dyescape.bot.discord.command.moderation;
 
+import com.dyescape.bot.data.entity.ServerEntity;
 import com.dyescape.bot.data.entity.UserEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.CommandPermissions;
@@ -13,6 +14,7 @@ import com.dyescape.bot.domain.model.User;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.Nullable;
 
@@ -226,6 +228,16 @@ public class ModerationCommand extends BaseCommand {
 
         // Found nothing
         return null;
+    }
+
+    /**
+     * Takes a {@link Guild} and gives back a corresponding {@link Server}.
+     * @param guild The JDA guild.
+     * @return {@link Server}
+     */
+    private Server getServerFromJDA(Guild guild) {
+        ServerEntity serverEntity = this.dataSuit.getOrCreateServerById(guild.getId());
+        return new DiscordServer(serverEntity, guild);
     }
 
     /**
