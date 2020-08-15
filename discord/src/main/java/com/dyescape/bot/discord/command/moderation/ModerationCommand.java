@@ -45,13 +45,13 @@ public class ModerationCommand extends BaseCommand {
         MessageChannel channel = e.getIssuer().getChannel();
         this.markProcessing(channel);
 
-        Server server = new DiscordServer(e.getIssuer().getGuild());
+        Server server = this.getServerFromJDA(e.getIssuer().getGuild());
         User warner = this.getUserFromJDA(e.getIssuer().getAuthor());
 
         this.warn(server, user, points, warner, reason);
 
         // TODO: Fancy
-        this.sendMessage(channel, "Warned");
+        this.sendMessage(channel, "Warned: " + user.getActiveWarningPoints(server));
     }
 
     /**

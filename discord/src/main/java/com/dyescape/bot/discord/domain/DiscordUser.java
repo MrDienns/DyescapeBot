@@ -60,7 +60,7 @@ public class DiscordUser extends UserAbstract {
     public int getActiveWarningPoints(Server server) {
 
         // TODO: Configurable
-        Instant expiryTime = Instant.now().plus(Period.ofMonths(6));
+        Instant expiryTime = Instant.now().minus(Period.ofDays(180));
 
         Spliterator<WarningEntity> spliterator = this.dataSuit.getWarningRepository()
                 .findAllByUserIdAndServerIdAndGivenAtAfter(this.getId(), server.getId(),
