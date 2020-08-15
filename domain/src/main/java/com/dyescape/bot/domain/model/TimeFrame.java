@@ -1,4 +1,4 @@
-package com.dyescape.bot.discord.command.model;
+package com.dyescape.bot.domain.model;
 
 public class TimeFrame {
 

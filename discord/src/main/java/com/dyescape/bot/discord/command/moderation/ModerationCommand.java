@@ -4,7 +4,7 @@ import com.dyescape.bot.data.entity.ServerEntity;
 import com.dyescape.bot.data.entity.UserEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.CommandPermissions;
-import com.dyescape.bot.discord.command.model.TimeFrame;
+import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
 import com.dyescape.bot.discord.domain.DiscordServer;
 import com.dyescape.bot.discord.domain.DiscordUser;

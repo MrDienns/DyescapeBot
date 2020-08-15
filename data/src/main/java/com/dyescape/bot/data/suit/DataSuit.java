@@ -14,16 +14,18 @@ public class DataSuit {
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
     private final WarningRepository warningRepository;
+    private final WarningActionRepository warningActionRepository;
 
     public DataSuit(AppliedRoleRepository appliedRoleRepository, RoleRepository roleRepository,
                     ServerRepository serverRepository, UserRepository userRepository,
-                    WarningRepository warningRepository) {
+                    WarningRepository warningRepository, WarningActionRepository warningActionRepository) {
 
         this.appliedRoleRepository = appliedRoleRepository;
         this.roleRepository = roleRepository;
         this.serverRepository = serverRepository;
         this.userRepository = userRepository;
         this.warningRepository = warningRepository;
+        this.warningActionRepository = warningActionRepository;
     }
 
     public AppliedRoleRepository getAppliedRoleRepository() {
@@ -44,6 +46,10 @@ public class DataSuit {
 
     public WarningRepository getWarningRepository() {
         return this.warningRepository;
+    }
+
+    public WarningActionRepository getWarningActionRepository() {
+        return this.warningActionRepository;
     }
 
     public UserEntity getOrCreateUserById(String userId) {
@@ -81,11 +87,12 @@ public class DataSuit {
                 Objects.equals(roleRepository, dataSuit.roleRepository) &&
                 Objects.equals(serverRepository, dataSuit.serverRepository) &&
                 Objects.equals(userRepository, dataSuit.userRepository) &&
-                Objects.equals(warningRepository, dataSuit.warningRepository);
+                Objects.equals(warningRepository, dataSuit.warningRepository) &&
+                Objects.equals(warningActionRepository, dataSuit.warningActionRepository);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(appliedRoleRepository, roleRepository, serverRepository, userRepository, warningRepository);
+        return Objects.hash(appliedRoleRepository, roleRepository, serverRepository, userRepository, warningRepository, warningActionRepository);
     }
 }

@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.command.resolver;
 
-import com.dyescape.bot.discord.command.model.TimeFrame;
+import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.discord.command.resolver.processor.ArgumentProcessor;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
 import com.dyescape.bot.discord.command.resolver.validator.ArgumentValidator;

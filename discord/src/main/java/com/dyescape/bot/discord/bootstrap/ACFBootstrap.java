@@ -1,13 +1,10 @@
 package com.dyescape.bot.discord.bootstrap;
 
-import com.dyescape.bot.data.repository.ServerRepository;
-import com.dyescape.bot.data.repository.UserRepository;
-import com.dyescape.bot.data.repository.WarningRepository;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.ServerConfigProvider;
 import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.discord.command.configuration.ConfigurationCommand;
-import com.dyescape.bot.discord.command.model.TimeFrame;
+import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.discord.command.moderation.ModerationCommand;
 import com.dyescape.bot.discord.command.resolver.TimeFrameResolver;
 import com.dyescape.bot.discord.command.resolver.UserResolver;

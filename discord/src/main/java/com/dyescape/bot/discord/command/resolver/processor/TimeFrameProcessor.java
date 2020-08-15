@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.command.resolver.processor;
 
-import com.dyescape.bot.discord.command.model.TimeFrame;
+import com.dyescape.bot.domain.model.TimeFrame;
 
 public class TimeFrameProcessor implements ArgumentProcessor<TimeFrame> {
 
