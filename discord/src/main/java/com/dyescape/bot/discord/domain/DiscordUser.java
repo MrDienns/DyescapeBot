@@ -135,6 +135,10 @@ public class DiscordUser extends UserAbstract {
     @Override
     public void ban(Server server, TimeFrame timeFrame, String reason) {
 
+        Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
+        if (guild == null) return;
+
+        guild.ban(this.jdaUser, 0, reason).queue();
     }
 
     @Override
