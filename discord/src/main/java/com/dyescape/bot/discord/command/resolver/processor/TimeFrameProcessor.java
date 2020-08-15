@@ -6,7 +6,6 @@ public class TimeFrameProcessor implements ArgumentProcessor<TimeFrame> {
 
     @Override
     public TimeFrame process(String argument) {
-        // TODO
-        return null;
+        return new TimeFrame(argument);
     }
 }

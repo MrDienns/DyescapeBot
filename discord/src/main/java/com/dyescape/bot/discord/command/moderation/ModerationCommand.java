@@ -1,33 +1,26 @@
 package com.dyescape.bot.discord.command.moderation;
 
-import com.dyescape.bot.data.entity.ServerEntity;
-import com.dyescape.bot.data.entity.UserEntity;
 import com.dyescape.bot.data.suit.DataSuit;
+import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;
-import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
-import com.dyescape.bot.discord.domain.DiscordServer;
-import com.dyescape.bot.discord.domain.DiscordUser;
 import com.dyescape.bot.domain.model.Server;
+import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.domain.model.User;
 
-import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
-public class ModerationCommand extends BaseCommand {
+public class ModerationCommand extends BotCommand {
 
     private static final Pattern TIMEFRAME = Pattern.compile("[0-9dhm]+");
 
-    private final DataSuit dataSuit;
-
     public ModerationCommand(DataSuit dataSuit) {
-        this.dataSuit = dataSuit;
+        super(dataSuit);
     }
 
     /**
@@ -230,25 +223,7 @@ public class ModerationCommand extends BaseCommand {
         return null;
     }
 
-    /**
-     * Takes a {@link Guild} and gives back a corresponding {@link Server}.
-     * @param guild The JDA guild.
-     * @return {@link Server}
-     */
-    private Server getServerFromJDA(Guild guild) {
-        ServerEntity serverEntity = this.dataSuit.getOrCreateServerById(guild.getId());
-        return new DiscordServer(serverEntity, guild);
-    }
 
-    /**
-     * Takes a {@link net.dv8tion.jda.api.entities.User} and gives back a corresponding {@link User}.
-     * @param jdaUser The JDA user.
-     * @return {@link User}
-     */
-    private User getUserFromJDA(net.dv8tion.jda.api.entities.User jdaUser) {
-        UserEntity author = this.dataSuit.getOrCreateUserById(jdaUser.getId());
-        return new DiscordUser(this.dataSuit, author, jdaUser);
-    }
 
     private void markProcessing(MessageChannel channel) {
         channel.sendTyping().queue();

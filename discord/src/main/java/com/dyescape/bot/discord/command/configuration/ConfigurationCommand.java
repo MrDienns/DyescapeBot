@@ -1,27 +1,29 @@
 package com.dyescape.bot.discord.command.configuration;
 
 import com.dyescape.bot.data.entity.ServerEntity;
+import com.dyescape.bot.data.entity.WarningActionEntity;
 import com.dyescape.bot.data.suit.DataSuit;
+import com.dyescape.bot.discord.command.BotCommand;
+import com.dyescape.bot.discord.command.CommandPermissions;
+import com.dyescape.bot.domain.model.TimeFrame;
 
-import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandEvent;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.Subcommand;
-
-import java.util.Optional;
+import co.aikar.commands.annotation.*;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("configuration")
-public class ConfigurationCommand extends BaseCommand {
-
-    private final DataSuit dataSuit;
+public class ConfigurationCommand extends BotCommand {
 
     public ConfigurationCommand(DataSuit dataSuit) {
-        this.dataSuit = dataSuit;
+        super(dataSuit);
     }
 
     @Subcommand("setprefix")
+    @CommandPermission(CommandPermissions.CONFIGURE_COMMAND_PREFIX)
+    @Syntax("<prefix>")
+    @Description("Change the bot command prefix")
     public void setPrefix(JDACommandEvent e, String prefix) {
-        Optional<ServerEntity> query = this.dataSuit.getServerRepository().findById(e.getEvent().getGuild().getId());
+        java.util.Optional<ServerEntity> query = this.getDataSuit().getServerRepository().findById(e.getEvent().getGuild().getId());
         ServerEntity serverEntity;
         if (query.isEmpty()) {
             serverEntity = new ServerEntity(e.getEvent().getGuild().getId(), prefix);
@@ -29,7 +31,26 @@ public class ConfigurationCommand extends BaseCommand {
             serverEntity = query.get();
         }
         serverEntity.setCommandPrefix(prefix);
-        this.dataSuit.getServerRepository().save(serverEntity);
+        this.getDataSuit().getServerRepository().save(serverEntity);
         e.getEvent().getChannel().sendMessage(String.format("Changed command prefix to %s", prefix)).submit();
+    }
+
+    @Subcommand("setwarningaction")
+    @CommandPermission(CommandPermissions.CONFIGURE_WARNING_ACTION)
+    @Syntax("<points> <action> [timeframe]")
+    @Description("Configure automated actions for specific warning points")
+    public void setWarningAction(JDACommandEvent e, int points, WarningActionEntity.Action action,
+                                 @Optional TimeFrame timeFrame) {
+
+        ServerEntity serverEntity = this.getDataSuit().getOrCreateServerById(e.getIssuer().getGuild().getId());
+        WarningActionEntity warningAction = new WarningActionEntity(serverEntity, points, action,
+                timeFrameAsString(timeFrame));
+
+        this.getDataSuit().getWarningActionRepository().save(warningAction);
+    }
+
+    private String timeFrameAsString(@Nullable TimeFrame timeFrame) {
+        if (timeFrame == null) return null;
+        return timeFrame.toString();
     }
 }

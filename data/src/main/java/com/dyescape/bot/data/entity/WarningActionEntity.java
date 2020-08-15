@@ -16,7 +16,7 @@ public class WarningActionEntity {
     private String serverId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "server_id", referencedColumnName = "id")
+    @JoinColumn(name = "server_id", referencedColumnName = "id", insertable = false, updatable = false)
     private ServerEntity server;
 
     @Id
@@ -24,7 +24,7 @@ public class WarningActionEntity {
     private int points;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "action", nullable = false, insertable = false, columnDefinition = "enum('KICK', 'MUTE', 'BAN')")
+    @Column(name = "action", nullable = false, columnDefinition = "enum('KICK', 'MUTE', 'BAN')")
     private Action action;
 
     @Column(name = "time_frame", insertable = false)
