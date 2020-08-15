@@ -10,11 +10,18 @@ import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.domain.model.User;
 import com.dyescape.bot.domain.model.impl.UserAbstract;
 
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
+import net.dv8tion.jda.api.requests.restaction.RoleAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.jmx.export.assembler.MethodExclusionMBeanInfoAssembler;
 
+import java.awt.*;
 import java.time.Instant;
 import java.time.Period;
+import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.StreamSupport;
 
@@ -92,6 +99,17 @@ public class DiscordUser extends UserAbstract {
     @Override
     public void mute(Server server, TimeFrame timeFrame, String reason) {
 
+        Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
+        if (guild == null) return;
+
+        Member member = guild.getMemberById(this.jdaUser.getId());
+        if (member != null) {
+            // apply mute role
+            Role mutedRole = this.getOrCreateMutedRole(guild);
+            guild.addRoleToMember(member, mutedRole).queue();
+        }
+
+        // apply database change
     }
 
     @Override
@@ -131,5 +149,37 @@ public class DiscordUser extends UserAbstract {
     private TimeFrame tryMakeTimeFrame(@Nullable String format) {
         if (format == null) return null;
         return new TimeFrame(format);
+    }
+
+    private Role getOrCreateMutedRole(Guild guild) {
+
+        List<Role> roles = guild.getRolesByName("Muted", true);
+        if (roles.isEmpty()) {
+            return this.createMutedRole(guild);
+        }
+
+        // Not sure why you'd want multiple roles called muted.
+        return roles.get(0);
+    }
+
+    private Role createMutedRole(Guild guild) {
+
+        Role role = guild.createRole()
+                .setName("Muted")
+                .setColor(Color.GRAY)
+                .complete();
+
+        guild.modifyRolePositions()
+                .selectPosition(role)
+                .moveTo(1)
+                .queue();
+
+        for (TextChannel textChannel : guild.getTextChannels()) {
+            textChannel.createPermissionOverride(role)
+                    .deny(Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_WRITE)
+                    .queue();
+        }
+
+        return role;
     }
 }

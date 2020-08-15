@@ -1,6 +1,5 @@
 package com.dyescape.bot.discord.command.moderation;
 
-import com.dyescape.bot.data.entity.WarningActionEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;
@@ -14,7 +13,6 @@ import co.aikar.commands.annotation.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class ModerationCommand extends BotCommand {
@@ -64,7 +62,7 @@ public class ModerationCommand extends BotCommand {
     @Syntax("<User> [reason]")
     @Description("Kick a user")
     public void kick(JDACommandEvent e, User user, @Optional String reason) {
-        this.mute(user, reason);
+        this.mute(this.getServerFromJDA(e.getIssuer().getGuild()), user, reason);
     }
 
     /**
@@ -92,11 +90,11 @@ public class ModerationCommand extends BotCommand {
             // Parse our time frame and temp ban the user.
             TimeFrame timeFrame = this.getTimeFrameFromString(foundTimeFrame);
             String trimmedReason = reasonOrTimeFrame.replace(foundTimeFrame, "").trim();
-            this.tempMute(user, timeFrame, trimmedReason);
+            this.tempMute(this.getServerFromJDA(e.getIssuer().getGuild()), user, timeFrame, trimmedReason);
             return;
         }
 
-        this.mute(user, reasonOrTimeFrame);
+        this.mute(this.getServerFromJDA(e.getIssuer().getGuild()), user, reasonOrTimeFrame);
     }
 
     /**
@@ -155,8 +153,8 @@ public class ModerationCommand extends BotCommand {
      * @param user      User to mute.
      * @param reason    Reason to mute the user for.
      */
-    private void mute(User user, @Nullable String reason) {
-        // TODO
+    private void mute(Server server, User user, @Nullable String reason) {
+        user.mute(server, null, reason);
     }
 
     /**
@@ -165,8 +163,8 @@ public class ModerationCommand extends BotCommand {
      * @param timeFrame Time frame to mute the user for.
      * @param reason    Reason to mute the user for.
      */
-    private void tempMute(User user, TimeFrame timeFrame, @Nullable String reason) {
-        // TODO
+    private void tempMute(Server server, User user, TimeFrame timeFrame, @Nullable String reason) {
+        user.mute(server, timeFrame, reason);
     }
 
     /**
@@ -224,8 +222,6 @@ public class ModerationCommand extends BotCommand {
         // Found nothing
         return null;
     }
-
-
 
     private void markProcessing(MessageChannel channel) {
         channel.sendTyping().queue();

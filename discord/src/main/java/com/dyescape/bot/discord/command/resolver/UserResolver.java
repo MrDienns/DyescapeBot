@@ -21,13 +21,13 @@ public class UserResolver implements ContextResolver<User, JDACommandExecutionCo
 
     private final DataSuit dataSuit;
     private final JDA jda;
-    private final ArgumentProcessor<String> processor;
+    private final ArgumentProcessor<net.dv8tion.jda.api.entities.User> processor;
     private final ArgumentValidator validator;
 
     public UserResolver(@NotNull DataSuit dataSuit, @NotNull JDA jda) {
         this.dataSuit = dataSuit;
         this.jda = jda;
-        this.processor = new UserProcessor();
+        this.processor = new UserProcessor(this.jda);
         this.validator = new UserValidator();
     }
 
@@ -35,26 +35,27 @@ public class UserResolver implements ContextResolver<User, JDACommandExecutionCo
     public User getContext(JDACommandExecutionContext context) throws InvalidCommandArgument {
 
         // Validate and process the argument
-        String argument = this.processor.process(context.popFirstArg());
-        this.validator.validate(argument);
+        String arg = context.popFirstArg();
+        this.validator.validate(arg);
 
         // Get our user from Discord
-        net.dv8tion.jda.api.entities.User jdaUser = this.jda.getUserById(argument);
-        if (jdaUser == null) {
-            throw new InvalidCommandArgument("User does not exist.");
+        net.dv8tion.jda.api.entities.User user = this.processor.process(arg);
+        if (user == null) {
+            throw new InvalidCommandArgument("User does not exist, or cannot be found. Please use the full numeric " +
+                    "user ID (not discriminator!) when loading a user that's not in the server.");
         }
 
         // Get or create our user in our database
-        Optional<UserEntity> userEntityResult = this.dataSuit.getUserRepository().findById(argument);
+        Optional<UserEntity> userEntityResult = this.dataSuit.getUserRepository().findById(arg);
         UserEntity userEntity;
         if (userEntityResult.isPresent()) {
             userEntity = userEntityResult.get();
         } else {
-            userEntity = new UserEntity(jdaUser.getId());
+            userEntity = new UserEntity(user.getId());
             this.dataSuit.getUserRepository().save(userEntity);
         }
 
         // Create a domain model implementation with it
-        return new DiscordUser(this.dataSuit, userEntity, jdaUser);
+        return new DiscordUser(this.dataSuit, userEntity, user);
     }
 }
