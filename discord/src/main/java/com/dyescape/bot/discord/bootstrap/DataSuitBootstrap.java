@@ -16,11 +16,13 @@ public class DataSuitBootstrap {
     private final UserRepository userRepository;
     private final WarningRepository warningRepository;
     private final WarningActionRepository warningActionRepository;
+    private final PunishmentRepository punishmentRepositoryOne;
 
     @Autowired
     public DataSuitBootstrap(AppliedRoleRepository appliedRoleRepository, RoleRepository roleRepository,
                              ServerRepository serverRepository, UserRepository userRepository,
-                             WarningRepository warningRepository, WarningActionRepository warningActionRepository) {
+                             WarningRepository warningRepository, WarningActionRepository warningActionRepository,
+                             PunishmentRepository punishmentRepository) {
 
         this.appliedRoleRepository = appliedRoleRepository;
         this.roleRepository = roleRepository;
@@ -28,11 +30,13 @@ public class DataSuitBootstrap {
         this.userRepository = userRepository;
         this.warningRepository = warningRepository;
         this.warningActionRepository = warningActionRepository;
+        this.punishmentRepositoryOne = punishmentRepository;
     }
 
     @Bean
     public DataSuit getDataSuit() {
         return new DataSuit(this.appliedRoleRepository, this.roleRepository, this.serverRepository,
-                this.userRepository, this.warningRepository, this.warningActionRepository);
+                this.userRepository, this.warningRepository, this.warningActionRepository,
+                this.punishmentRepositoryOne);
     }
 }

@@ -22,9 +22,10 @@ public class DataSuitTest {
         UserRepository userRepository = mock(UserRepository.class);
         WarningRepository warningRepository = mock(WarningRepository.class);
         WarningActionRepository warningActionRepository = mock(WarningActionRepository.class);
+        PunishmentRepository punishmentRepository = mock(PunishmentRepository.class);
 
         DataSuit suit = new DataSuit(appliedRoleRepository, roleRepository, serverRepository,
-                userRepository, warningRepository, warningActionRepository);
+                userRepository, warningRepository, warningActionRepository, punishmentRepository);
 
         assertEquals(appliedRoleRepository, suit.getAppliedRoleRepository(), "AppliedRoleRepository value was not passed or returned correctly");
         assertEquals(roleRepository, suit.getRoleRepository(), "RoleRepository value was not passed or returned correctly");
@@ -32,6 +33,7 @@ public class DataSuitTest {
         assertEquals(userRepository, suit.getUserRepository(), "UserRepository value was not passed or returned correctly");
         assertEquals(warningRepository, suit.getWarningRepository(), "WarningRepository value was not passed or returned correctly");
         assertEquals(warningActionRepository, suit.getWarningActionRepository(), "WarningActionRepository value was not passed or returned correctly");
+        assertEquals(punishmentRepository, suit.getPunishmentRepository(), "PunishmentRepository value was not passed or returned correctly");
     }
 
     @Test
@@ -44,6 +46,7 @@ public class DataSuitTest {
         UserRepository userRepositoryOne = mock(UserRepository.class);
         WarningRepository warningRepositoryOne = mock(WarningRepository.class);
         WarningActionRepository warningActionRepositoryOne = mock(WarningActionRepository.class);
+        PunishmentRepository punishmentRepositoryOne = mock(PunishmentRepository.class);
 
         AppliedRoleRepository appliedRoleRepositoryTwo = mock(AppliedRoleRepository.class);
         RoleRepository roleRepositoryTwo = mock(RoleRepository.class);
@@ -51,13 +54,14 @@ public class DataSuitTest {
         UserRepository userRepositoryTwo = mock(UserRepository.class);
         WarningRepository warningRepositoryTwo = mock(WarningRepository.class);
         WarningActionRepository warningActionRepositoryTwo = mock(WarningActionRepository.class);
+        PunishmentRepository punishmentRepositoryTwo = mock(PunishmentRepository.class);
 
         DataSuit dataSuitOne = new DataSuit(appliedRoleRepositoryOne, roleRepositoryOne, serverRepositoryOne,
-                userRepositoryOne, warningRepositoryOne, warningActionRepositoryOne);
+                userRepositoryOne, warningRepositoryOne, warningActionRepositoryOne, punishmentRepositoryOne);
         DataSuit dataSuitOneCopy = new DataSuit(appliedRoleRepositoryOne, roleRepositoryOne, serverRepositoryOne,
-                userRepositoryOne, warningRepositoryOne, warningActionRepositoryOne);
+                userRepositoryOne, warningRepositoryOne, warningActionRepositoryOne, punishmentRepositoryOne);
         DataSuit dataSuitTwo = new DataSuit(appliedRoleRepositoryTwo, roleRepositoryTwo, serverRepositoryTwo,
-                userRepositoryTwo, warningRepositoryTwo, warningActionRepositoryTwo);
+                userRepositoryTwo, warningRepositoryTwo, warningActionRepositoryTwo, punishmentRepositoryTwo);
 
         assertEquals(dataSuitOne, dataSuitOneCopy, "Equal objects were not seen as equal");
         assertEquals(dataSuitOne.hashCode(), dataSuitOneCopy.hashCode(), "Hashcode of equal objects were not seen as equal");

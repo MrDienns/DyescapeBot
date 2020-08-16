@@ -1,9 +1,6 @@
 package com.dyescape.bot.discord.domain;
 
-import com.dyescape.bot.data.entity.ServerEntity;
-import com.dyescape.bot.data.entity.UserEntity;
-import com.dyescape.bot.data.entity.WarningActionEntity;
-import com.dyescape.bot.data.entity.WarningEntity;
+import com.dyescape.bot.data.entity.*;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.util.DiscordMessage;
 import com.dyescape.bot.domain.model.Server;
@@ -58,9 +55,11 @@ public class DiscordUser extends UserAbstract {
         ServerEntity serverEntity = this.dataSuit.getOrCreateServerById(server.getId());
         UserEntity givenByEntity = this.dataSuit.getOrCreateUserById(givenBy.getId());
 
-        WarningEntity warning = new WarningEntity(this.userEntity, serverEntity, points, givenByEntity,
-                Instant.now(), reason);
+        PunishmentEntity punishment = new PunishmentEntity(this.userEntity,  serverEntity, PunishmentEntity.Action.WARN,
+                givenByEntity, Instant.now(), null, reason);
+        punishment = this.dataSuit.getPunishmentRepository().save(punishment);
 
+        WarningEntity warning = new WarningEntity(punishment, points);
         this.dataSuit.getWarningRepository().save(warning);
 
         int totalPoints = this.getActiveWarningPoints(server);
@@ -81,7 +80,7 @@ public class DiscordUser extends UserAbstract {
         Instant expiryTime = Instant.now().minus(Period.ofDays(180));
 
         Spliterator<WarningEntity> spliterator = this.dataSuit.getWarningRepository()
-                .findAllByUserIdAndServerIdAndGivenAtAfter(this.getId(), server.getId(),
+                .findAllByPunishmentUserIdAndPunishmentServerIdAndPunishmentGivenAtAfter(this.getId(), server.getId(),
                         expiryTime).spliterator();
 
         return StreamSupport.stream(spliterator, false)

@@ -17,17 +17,16 @@ public class WarningEntityTest {
         ServerEntity server = new ServerEntity("testId", "!");
         UserEntity userOne = new UserEntity("userOne");
         UserEntity userTwo = new UserEntity("userTwo");
+        PunishmentEntity.Action action = PunishmentEntity.Action.WARN;
         Instant givenAt = Instant.now();
-        WarningEntity warning = new WarningEntity(userOne, server, 5, userTwo, givenAt, "test");
 
-        assertEquals(server, warning.getServer(), "Server value was not passed or returned correctly");
-        assertEquals(server.getId(), warning.getServerId(), "Server ID value was not passed or returned correctly");
-        assertEquals(userOne, warning.getUser(), "User value was not passed or returned correctly");
-        assertEquals(userOne.getId(), warning.getUserId(), "User ID value was not passed or returned correctly");
+        PunishmentEntity punishment = new PunishmentEntity(userOne, server, action, userTwo, givenAt, null, "test");
+
+        WarningEntity warning = new WarningEntity(punishment, 5);
+
+        assertEquals(punishment.getId(), warning.getPunishmentId(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(punishment, warning.getPunishment(), "Punishment ID value was not passed or returned correctly");
         assertEquals(5, warning.getPoints(), "Points value was not passed or returned correctly");
-        assertEquals(userTwo, warning.getGivenBy(), "GivenBy value was not passed or returned correctly");
-        assertEquals(userTwo.getId(), warning.getGivenById(), "GivenBy ID value was not passed or returned correctly");
-        assertEquals(givenAt, warning.getGivenAt(), "GivenAt value was not passed or returned correctly");
     }
 
     @Test
@@ -49,7 +48,8 @@ public class WarningEntityTest {
         ServerEntity server = new ServerEntity("testId", "!");
         UserEntity userOne = new UserEntity(punishedUser);
         UserEntity userTwo = new UserEntity("userTwo");
-        return new WarningEntity(userOne, server, 5, userTwo, time, "test");
+        PunishmentEntity punishment = new PunishmentEntity(userOne, server, PunishmentEntity.Action.WARN, userTwo, time, null, "test");
+        return new WarningEntity(punishment, 5);
     }
 
     @Test

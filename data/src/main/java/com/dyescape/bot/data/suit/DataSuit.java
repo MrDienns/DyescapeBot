@@ -15,10 +15,12 @@ public class DataSuit {
     private final UserRepository userRepository;
     private final WarningRepository warningRepository;
     private final WarningActionRepository warningActionRepository;
+    private final PunishmentRepository punishmentRepository;
 
     public DataSuit(AppliedRoleRepository appliedRoleRepository, RoleRepository roleRepository,
                     ServerRepository serverRepository, UserRepository userRepository,
-                    WarningRepository warningRepository, WarningActionRepository warningActionRepository) {
+                    WarningRepository warningRepository, WarningActionRepository warningActionRepository,
+                    PunishmentRepository punishmentRepository) {
 
         this.appliedRoleRepository = appliedRoleRepository;
         this.roleRepository = roleRepository;
@@ -26,6 +28,7 @@ public class DataSuit {
         this.userRepository = userRepository;
         this.warningRepository = warningRepository;
         this.warningActionRepository = warningActionRepository;
+        this.punishmentRepository = punishmentRepository;
     }
 
     public AppliedRoleRepository getAppliedRoleRepository() {
@@ -50,6 +53,10 @@ public class DataSuit {
 
     public WarningActionRepository getWarningActionRepository() {
         return this.warningActionRepository;
+    }
+
+    public PunishmentRepository getPunishmentRepository() {
+        return this.punishmentRepository;
     }
 
     public UserEntity getOrCreateUserById(String userId) {
@@ -88,11 +95,12 @@ public class DataSuit {
                 Objects.equals(serverRepository, dataSuit.serverRepository) &&
                 Objects.equals(userRepository, dataSuit.userRepository) &&
                 Objects.equals(warningRepository, dataSuit.warningRepository) &&
-                Objects.equals(warningActionRepository, dataSuit.warningActionRepository);
+                Objects.equals(warningActionRepository, dataSuit.warningActionRepository) &&
+                Objects.equals(punishmentRepository, dataSuit.punishmentRepository);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(appliedRoleRepository, roleRepository, serverRepository, userRepository, warningRepository, warningActionRepository);
+        return Objects.hash(appliedRoleRepository, roleRepository, serverRepository, userRepository, warningRepository, warningActionRepository, punishmentRepository);
     }
 }
