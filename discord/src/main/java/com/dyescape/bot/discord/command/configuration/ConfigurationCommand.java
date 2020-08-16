@@ -33,7 +33,7 @@ public class ConfigurationCommand extends BotCommand {
         }
         serverEntity.setCommandPrefix(prefix);
         this.getDataSuit().getServerRepository().save(serverEntity);
-        e.getEvent().getChannel().sendMessage(String.format("Changed command prefix to %s", prefix)).submit();
+        this.sendMessage(e.getIssuer().getChannel(), null, "Changed command prefix to " + prefix);
     }
 
     @Subcommand("setwarningaction")
@@ -48,6 +48,7 @@ public class ConfigurationCommand extends BotCommand {
                 timeFrameAsString(timeFrame));
 
         this.getDataSuit().getWarningActionRepository().save(warningAction);
+        this.sendMessage(e.getIssuer().getChannel(), null, "Action set.");
     }
 
     private String timeFrameAsString(@Nullable TimeFrame timeFrame) {

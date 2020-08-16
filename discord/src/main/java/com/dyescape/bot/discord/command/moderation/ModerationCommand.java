@@ -6,7 +6,6 @@ import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
 import com.dyescape.bot.discord.domain.DiscordUser;
-import com.dyescape.bot.discord.util.DiscordMessage;
 import com.dyescape.bot.domain.model.Server;
 import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.domain.model.User;
@@ -15,7 +14,6 @@ import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
@@ -118,7 +116,8 @@ public class ModerationCommand extends BotCommand {
                 TimeFrame timeFrame = this.getTimeFrameFromString(foundTimeFrame);
                 String trimmedReason = reasonOrTimeFrame.replace(foundTimeFrame, "").trim();
                 this.tempMute(this.getServerFromJDA(e.getIssuer().getGuild()), user, timeFrame, trimmedReason, byUser);
-                this.sendMessage(e.getIssuer().getChannel(), user, "User has been temporarily muted.");
+                this.sendMessage(e.getIssuer().getChannel(), user, String.format("User has been temporarily muted for %s.",
+                        timeFrame.asMessage()));
                 return;
             }
 
@@ -179,7 +178,8 @@ public class ModerationCommand extends BotCommand {
                 String trimmedReason = reasonOrTimeFrame.replace(foundTimeFrame, "").trim();
                 this.tempBan(server, user, timeFrame, trimmedReason, byUser);
 
-                this.sendMessage(e.getIssuer().getChannel(), user, "User has been temporarily banned.");
+                this.sendMessage(e.getIssuer().getChannel(), user, String.format("User has been temporarily banned for %s.",
+                        timeFrame.asMessage()));
                 return;
             }
 
@@ -321,36 +321,5 @@ public class ModerationCommand extends BotCommand {
 
         // Found nothing
         return null;
-    }
-
-    /**
-     * Send a packet which sends a "is now typing..." message in the channel.
-     * @param channel Channel to send the packet in.
-     */
-    private void markProcessing(MessageChannel channel) {
-        channel.sendTyping().queue();
-    }
-
-    /**
-     * Sends an embedded message in the provided channel.
-     * @param channel   The channel to send the message in.
-     * @param user      The user which the message is directed to.
-     * @param body      The body of the message.
-     */
-    private void sendMessage(MessageChannel channel, User user,
-                             String body) {
-        net.dv8tion.jda.api.entities.User jdaUser = this.getJda().getUserById(user.getId());
-        MessageEmbed embed = DiscordMessage.CreateEmbeddedMessage(null, body, jdaUser);
-        channel.sendMessage(embed).queue();
-    }
-
-    /**
-     * Sends an error response in the given channel.
-     * @param channel   The channel to send the message in.
-     * @param e         The exception which caused the error.
-     */
-    private void error(MessageChannel channel, Exception e) {
-        MessageEmbed embed = DiscordMessage.CreateEmbeddedMessage("**An error occurred**", e.getMessage(), null);
-        channel.sendMessage(embed).queue();
     }
 }

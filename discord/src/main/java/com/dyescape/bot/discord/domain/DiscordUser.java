@@ -179,8 +179,14 @@ public class DiscordUser extends UserAbstract {
                 givenByUser, Instant.now(), expiry, reason);
         this.dataSuit.getPunishmentRepository().save(punishment);
 
-        String messageBody = String.format("You've been muted on %s. Your chat privileges have been revoked. Please " +
-                "respect the rules and guidelines.", guild.getName());
+        String messageBody;
+        if (timeFrame != null) {
+            messageBody = String.format("You've been temporarily muted on %s for %s. Your chat privileges have been revoked. Please " +
+                    "respect the rules and guidelines.", guild.getName(), timeFrame.asMessage());
+        } else {
+            messageBody = String.format("You've been muted on %s. Your chat privileges have been revoked. Please " +
+                    "respect the rules and guidelines.", guild.getName());
+        }
         this.trySendPrivateMessage(messageBody);
     }
 
@@ -229,6 +235,16 @@ public class DiscordUser extends UserAbstract {
         PunishmentEntity punishment = new PunishmentEntity(this.userEntity, serverEntity, PunishmentEntity.Action.BAN,
                 givenByUser, Instant.now(), this.getExpiryTime(timeFrame), reason);
         this.dataSuit.getPunishmentRepository().save(punishment);
+
+        String messageBody;
+        if (timeFrame != null) {
+            messageBody = String.format("You've been temporarily banned from %s for %s. Please " +
+                    "respect the rules and guidelines.", guild.getName(), timeFrame.asMessage());
+        } else {
+            messageBody = String.format("You've been banned from %s. Please " +
+                    "respect the rules and guidelines.", guild.getName());
+        }
+        this.trySendPrivateMessage(messageBody);
     }
 
     @Override
