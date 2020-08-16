@@ -106,6 +106,10 @@ public class PunishmentEntity {
         return this.expiresAt;
     }
 
+    public void setExpiresAt(Instant expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

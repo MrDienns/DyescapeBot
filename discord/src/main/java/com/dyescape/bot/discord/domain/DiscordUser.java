@@ -50,6 +50,11 @@ public class DiscordUser extends UserAbstract {
     }
 
     @Override
+    public void unwarn(Server server) {
+
+    }
+
+    @Override
     public void warn(Server server, int points, String reason, User givenBy) {
 
         ServerEntity serverEntity = this.dataSuit.getOrCreateServerById(server.getId());
@@ -67,10 +72,19 @@ public class DiscordUser extends UserAbstract {
                 .findFirstByServerIdAndPointsIsLessThanEqualOrderByPointsDesc(server.getId(), totalPoints);
 
         if (applicableAction != null) {
-            this.applyWarningAction(server, reason, applicableAction);
+            this.applyWarningAction(server, reason, applicableAction, givenBy);
         } else {
-            // TODO: Inform user
+            Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
+            if (guild == null) return;
+            String unit = points == 1 ? "point" : "points";
+            String messageBody = String.format("You've been warned on from %s for %s %s. You can still rejoin the server. Please " +
+                    "respect the rules and guidelines.", guild.getName(), points, unit);
+            if (reason != null && !reason.isEmpty()) {
+                messageBody = messageBody + "\n\nReason: " + reason;
+            }
+            this.trySendPrivateMessage(messageBody);
         }
+
     }
 
     @Override
@@ -89,41 +103,85 @@ public class DiscordUser extends UserAbstract {
     }
 
     @Override
-    public void kick(Server server, String reason) {
+    public void kick(Server server, String reason, User givenBy) {
 
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
 
-        try {
-            PrivateChannel privateChannel = this.jdaUser.openPrivateChannel().complete();
-            if (privateChannel != null) {
-                String messageBody = String.format("You've been kicked from %s. You can still rejoin the server. Please " +
-                        "respect the rules and guidelines.", guild.getName());
-                if (reason != null && !reason.isEmpty()) {
-                    messageBody = messageBody + "\n\nReason: " + reason;
-                }
-                MessageEmbed message = DiscordMessage.CreateEmbeddedMessage(null, messageBody, this.jdaUser);
-                privateChannel.sendMessage(message).complete();
-            }
-        } catch (Exception ignored) { }
+        if (!guild.isMember(this.jdaUser)) {
+            throw new IllegalStateException("User is not part of this server, cannot be kicked.");
+        }
+
+        String messageBody = String.format("You've been kicked from %s. You can still rejoin the server. Please " +
+                "respect the rules and guidelines.", guild.getName());
+        if (reason != null && !reason.isEmpty()) {
+            messageBody = messageBody + "\n\nReason: " + reason;
+        }
+        this.trySendPrivateMessage(messageBody);
 
         guild.kick(this.jdaUser.getId(), reason).queue();
     }
 
     @Override
-    public void mute(Server server, TimeFrame timeFrame, String reason) {
+    public void unmute(Server server) {
+        Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
+        if (guild == null) return;
+        List<Role> mutedRoles = guild.getRolesByName("muted", true);
+        if (!mutedRoles.isEmpty()) {
+            guild.removeRoleFromMember(this.jdaUser.getId(), mutedRoles.get(0)).queue();
+        }
+
+        PunishmentEntity lastMute = this.dataSuit.getPunishmentRepository()
+                .findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(this.getId(),
+                        server.getId(), PunishmentEntity.Action.MUTE);
+
+        if (lastMute == null || (lastMute.getExpiresAt() != null && lastMute.getExpiresAt().isBefore(Instant.now()))) {
+            throw new IllegalStateException("User is not muted.");
+        }
+
+        lastMute.setExpiresAt(Instant.now());
+        this.dataSuit.getPunishmentRepository().save(lastMute);
+
+        String messageBody = String.format("You've been unmuted on %s. You may chat again. Please " +
+                "respect the rules and guidelines.", guild.getName());
+        this.trySendPrivateMessage(messageBody);
+    }
+
+    @Override
+    public void mute(Server server, TimeFrame timeFrame, String reason, User givenBy) {
 
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
 
         Member member = guild.getMemberById(this.jdaUser.getId());
         if (member != null) {
-            // apply mute role
             Role mutedRole = this.getOrCreateMutedRole(guild);
             guild.addRoleToMember(member, mutedRole).queue();
         }
 
-        // apply database change
+        PunishmentEntity lastMute = this.dataSuit.getPunishmentRepository()
+                .findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(this.getId(),
+                        server.getId(), PunishmentEntity.Action.MUTE);
+
+        if (lastMute != null && (lastMute.getExpiresAt() == null || lastMute.getExpiresAt().isAfter(Instant.now()))) {
+            throw new IllegalStateException("User is already muted.");
+        }
+
+        ServerEntity serverEntity = this.dataSuit.getOrCreateServerById(server.getId());
+        UserEntity givenByUser = this.dataSuit.getOrCreateUserById(givenBy.getId());
+
+        Instant expiry = null;
+        if (timeFrame != null) {
+            expiry = Instant.now().plus(timeFrame.getDuration());
+        }
+
+        PunishmentEntity punishment = new PunishmentEntity(this.userEntity, serverEntity, PunishmentEntity.Action.MUTE,
+                givenByUser, Instant.now(), expiry, reason);
+        this.dataSuit.getPunishmentRepository().save(punishment);
+
+        String messageBody = String.format("You've been muted on %s. Your chat privileges have been revoked. Please " +
+                "respect the rules and guidelines.", guild.getName());
+        this.trySendPrivateMessage(messageBody);
     }
 
     @Override
@@ -132,12 +190,45 @@ public class DiscordUser extends UserAbstract {
     }
 
     @Override
-    public void ban(Server server, TimeFrame timeFrame, String reason) {
+    public void unban(Server server) {
+        Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
+        if (guild == null) return;
+        guild.unban(this.jdaUser).queue();
+
+        PunishmentEntity lastBan = this.dataSuit.getPunishmentRepository()
+                .findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(this.getId(),
+                        server.getId(), PunishmentEntity.Action.BAN);
+
+        if (lastBan == null || (lastBan.getExpiresAt() != null && lastBan.getExpiresAt().isBefore(Instant.now()))) {
+            throw new IllegalStateException("User is not banned.");
+        }
+
+        lastBan.setExpiresAt(Instant.now());
+        this.dataSuit.getPunishmentRepository().save(lastBan);
+    }
+
+    @Override
+    public void ban(Server server, TimeFrame timeFrame, String reason, User givenBy) {
 
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
 
         guild.ban(this.jdaUser, 0, reason).queue();
+
+        PunishmentEntity lastBan = this.dataSuit.getPunishmentRepository()
+                .findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(this.getId(),
+                        server.getId(), PunishmentEntity.Action.BAN);
+
+        if (lastBan != null && (lastBan.getExpiresAt() == null || lastBan.getExpiresAt().isAfter(Instant.now()))) {
+            throw new IllegalStateException("User is already banned.");
+        }
+
+        ServerEntity serverEntity = this.dataSuit.getOrCreateServerById(server.getId());
+        UserEntity givenByUser = this.dataSuit.getOrCreateUserById(givenBy.getId());
+
+        PunishmentEntity punishment = new PunishmentEntity(this.userEntity, serverEntity, PunishmentEntity.Action.BAN,
+                givenByUser, Instant.now(), this.getExpiryTime(timeFrame), reason);
+        this.dataSuit.getPunishmentRepository().save(punishment);
     }
 
     @Override
@@ -145,22 +236,18 @@ public class DiscordUser extends UserAbstract {
         return false;
     }
 
-    private void applyWarningAction(Server server, String reason, WarningActionEntity warningActionEntity) {
+    private void applyWarningAction(Server server, String reason, WarningActionEntity warningActionEntity, User givenBy) {
 
         switch (warningActionEntity.getAction()) {
             case KICK:
-                this.kick(server, reason);
+                this.kick(server, reason, givenBy);
                 return;
             case MUTE:
-                this.mute(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason);
+                this.mute(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason, givenBy);
             case BAN:
-                this.ban(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason);
+                this.ban(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason, givenBy);
             default:
                 break;
-        }
-
-        if (warningActionEntity.getAction().equals(WarningActionEntity.Action.KICK)) {
-            this.kick(server, reason);
         }
     }
 
@@ -199,5 +286,20 @@ public class DiscordUser extends UserAbstract {
         }
 
         return role;
+    }
+
+    private void trySendPrivateMessage(String messageText) {
+        try {
+            PrivateChannel privateChannel = this.jdaUser.openPrivateChannel().complete();
+            if (privateChannel != null) {
+                MessageEmbed message = DiscordMessage.CreateEmbeddedMessage(null, messageText, this.jdaUser);
+                privateChannel.sendMessage(message).complete();
+            }
+        } catch (Exception ignored) { }
+    }
+
+    private Instant getExpiryTime(TimeFrame timeFrame) {
+        if (timeFrame == null) return null;
+        return Instant.now().plus(timeFrame.getDuration());
     }
 }

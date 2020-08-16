@@ -1,9 +1,11 @@
 package com.dyescape.bot.discord.command.moderation;
 
+import com.dyescape.bot.data.entity.UserEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;
 import com.dyescape.bot.discord.command.resolver.processor.TimeFrameProcessor;
+import com.dyescape.bot.discord.domain.DiscordUser;
 import com.dyescape.bot.discord.util.DiscordMessage;
 import com.dyescape.bot.domain.model.Server;
 import com.dyescape.bot.domain.model.TimeFrame;
@@ -47,7 +49,7 @@ public class ModerationCommand extends BotCommand {
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
             User warner = this.getUserFromJDA(e.getIssuer().getAuthor());
 
-            this.warn(server, user, points, warner, reason);
+            this.warn(server, user, points, reason, warner);
 
             String unit = points == 1 ? "point" : "points";
             this.sendMessage(channel, user, String.format("You've been warned for %s %s. Automated " +
@@ -74,7 +76,9 @@ public class ModerationCommand extends BotCommand {
         try {
             this.markProcessing(e.getIssuer().getChannel());
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
-            this.kick(server, user, reason);
+            UserEntity byEntity = this.getDataSuit().getOrCreateUserById(e.getIssuer().getAuthor().getId());
+            User byUser = new DiscordUser(this.getDataSuit(), byEntity, e.getIssuer().getAuthor());
+            this.kick(server, user, reason, byUser);
 
             this.sendMessage(e.getIssuer().getChannel(), user, "User has been kicked.");
         } catch (Exception ex) {
@@ -101,6 +105,8 @@ public class ModerationCommand extends BotCommand {
         try {
 
             this.markProcessing(e.getIssuer().getChannel());
+            UserEntity byEntity = this.getDataSuit().getOrCreateUserById(e.getIssuer().getAuthor().getId());
+            User byUser = new DiscordUser(this.getDataSuit(), byEntity, e.getIssuer().getAuthor());
 
             // To prevent situations where people get banned permanently instead of temporarily, we use this little hack.
             // ACF doesn't exactly support two optional parameters properly.
@@ -111,11 +117,28 @@ public class ModerationCommand extends BotCommand {
                 // Parse our time frame and temp ban the user.
                 TimeFrame timeFrame = this.getTimeFrameFromString(foundTimeFrame);
                 String trimmedReason = reasonOrTimeFrame.replace(foundTimeFrame, "").trim();
-                this.tempMute(this.getServerFromJDA(e.getIssuer().getGuild()), user, timeFrame, trimmedReason);
+                this.tempMute(this.getServerFromJDA(e.getIssuer().getGuild()), user, timeFrame, trimmedReason, byUser);
+                this.sendMessage(e.getIssuer().getChannel(), user, "User has been temporarily muted.");
                 return;
             }
 
-            this.mute(this.getServerFromJDA(e.getIssuer().getGuild()), user, reasonOrTimeFrame);
+            this.mute(this.getServerFromJDA(e.getIssuer().getGuild()), user, reasonOrTimeFrame, byUser);
+            this.sendMessage(e.getIssuer().getChannel(), user, "User has been muted.");
+        } catch (Exception ex) {
+            this.error(e.getIssuer().getChannel(), ex);
+        }
+    }
+
+    @CommandAlias("unmute")
+    @CommandPermission(CommandPermissions.MUTE_MEMBER)
+    @Syntax("<User>")
+    @Description("Unmute a user")
+    public void unmute(JDACommandEvent e, User user) {
+        try {
+            this.markProcessing(e.getIssuer().getChannel());
+            Server server = this.getServerFromJDA(e.getIssuer().getGuild());
+            this.unmute(server, user);
+            this.sendMessage(e.getIssuer().getChannel(), user, "User has been unmuted.");
         } catch (Exception ex) {
             this.error(e.getIssuer().getChannel(), ex);
         }
@@ -142,6 +165,8 @@ public class ModerationCommand extends BotCommand {
             this.markProcessing(e.getIssuer().getChannel());
 
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
+            UserEntity byEntity = this.getDataSuit().getOrCreateUserById(e.getIssuer().getAuthor().getId());
+            User byUser = new DiscordUser(this.getDataSuit(), byEntity, e.getIssuer().getAuthor());
 
             // To prevent situations where people get banned permanently instead of temporarily, we use this little hack.
             // ACF doesn't exactly support two optional parameters properly.
@@ -152,14 +177,29 @@ public class ModerationCommand extends BotCommand {
                 // Parse our time frame and temp ban the user.
                 TimeFrame timeFrame = this.getTimeFrameFromString(foundTimeFrame);
                 String trimmedReason = reasonOrTimeFrame.replace(foundTimeFrame, "").trim();
-                this.tempBan(server, user, timeFrame, trimmedReason);
+                this.tempBan(server, user, timeFrame, trimmedReason, byUser);
 
                 this.sendMessage(e.getIssuer().getChannel(), user, "User has been temporarily banned.");
                 return;
             }
 
-            this.ban(server, user, reasonOrTimeFrame);
+            this.ban(server, user, reasonOrTimeFrame, byUser);
             this.sendMessage(e.getIssuer().getChannel(), user, "User has been banned.");
+        } catch (Exception ex) {
+            this.error(e.getIssuer().getChannel(), ex);
+        }
+    }
+
+    @CommandAlias("unban")
+    @CommandPermission(CommandPermissions.BAN_MEMBER)
+    @Syntax("<User>")
+    @Description("Unban a user")
+    public void unban(JDACommandEvent e, User user) {
+        try {
+            this.markProcessing(e.getIssuer().getChannel());
+            Server server = this.getServerFromJDA(e.getIssuer().getGuild());
+            this.unban(server, user);
+            this.sendMessage(e.getIssuer().getChannel(), user, "User has been unbanned.");
         } catch (Exception ex) {
             this.error(e.getIssuer().getChannel(), ex);
         }
@@ -172,7 +212,7 @@ public class ModerationCommand extends BotCommand {
      * @param points    Points to warn the user for.
      * @param reason    Reason to warn the user for.
      */
-    private void warn(Server server, User user, int points, User warnedBy, @Nullable String reason) {
+    private void warn(Server server, User user, int points, @Nullable String reason, User warnedBy) {
         user.warn(server, points, reason, warnedBy);
     }
 
@@ -182,8 +222,8 @@ public class ModerationCommand extends BotCommand {
      * @param user      User to kick.
      * @param reason    Reason to kick the user for.
      */
-    private void kick(Server server, User user, @Nullable String reason) {
-        user.kick(server, reason);
+    private void kick(Server server, User user, @Nullable String reason, User givenBy) {
+        user.kick(server, reason, givenBy);
     }
 
     /**
@@ -192,8 +232,17 @@ public class ModerationCommand extends BotCommand {
      * @param user      User to mute.
      * @param reason    Reason to mute the user for.
      */
-    private void mute(Server server, User user, @Nullable String reason) {
-        user.mute(server, null, reason);
+    private void mute(Server server, User user, @Nullable String reason, User givenBy) {
+        user.mute(server, null, reason, givenBy);
+    }
+
+    /**
+     * Unmute a user.
+     * @param server    The server to unmute the user on.
+     * @param user      The user to unmute.
+     */
+    private void unmute(Server server, User user) {
+        user.unmute(server);
     }
 
     /**
@@ -203,8 +252,17 @@ public class ModerationCommand extends BotCommand {
      * @param timeFrame Time frame to mute the user for.
      * @param reason    Reason to mute the user for.
      */
-    private void tempMute(Server server, User user, TimeFrame timeFrame, @Nullable String reason) {
-        user.mute(server, timeFrame, reason);
+    private void tempMute(Server server, User user, TimeFrame timeFrame, @Nullable String reason, User givenBy) {
+        user.mute(server, timeFrame, reason, givenBy);
+    }
+
+    /**
+     * Unban the user from the server.
+     * @param server    The server to unban the user form.
+     * @param user      The user to unban.
+     */
+    private void unban(Server server, User user) {
+        user.unban(server);
     }
 
     /**
@@ -213,8 +271,8 @@ public class ModerationCommand extends BotCommand {
      * @param user      User to ban.
      * @param reason    Reason to ban the user for.
      */
-    private void ban(Server server, User user, @Nullable String reason) {
-        user.ban(server, null, reason);
+    private void ban(Server server, User user, @Nullable String reason, User givenBy) {
+        user.ban(server, null, reason, givenBy);
     }
 
     /**
@@ -224,8 +282,8 @@ public class ModerationCommand extends BotCommand {
      * @param timeFrame Time frame to ban the user for.
      * @param reason    Reason to ban the user for.
      */
-    private void tempBan(Server server, User user, TimeFrame timeFrame, @Nullable String reason) {
-        user.ban(server, timeFrame, reason);
+    private void tempBan(Server server, User user, TimeFrame timeFrame, @Nullable String reason, User givenBy) {
+        user.ban(server, timeFrame, reason, givenBy);
     }
 
     /**

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PunishmentRepository extends CrudRepository<PunishmentEntity, UserServerID> {
 
+    PunishmentEntity findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(String userId, String serverId,
+                                                                           PunishmentEntity.Action action);
 }
