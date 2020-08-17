@@ -29,13 +29,13 @@ public class DiscordJDABootstrap {
                 GatewayIntent.GUILD_BANS,
                 GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.DIRECT_MESSAGES,
-                GatewayIntent.GUILD_MESSAGES
+                GatewayIntent.GUILD_MESSAGES,
+                GatewayIntent.GUILD_EMOJIS
         );
 
         builder.disableCache(
                 CacheFlag.ACTIVITY,
                 CacheFlag.VOICE_STATE,
-                CacheFlag.EMOTE,
                 CacheFlag.CLIENT_STATUS
         );
 
