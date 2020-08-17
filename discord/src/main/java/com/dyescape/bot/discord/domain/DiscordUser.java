@@ -147,11 +147,12 @@ public class DiscordUser extends UserAbstract {
                 .findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(this.getId(),
                         server.getId(), PunishmentEntity.Action.MUTE);
 
-        if (lastMute == null || (lastMute.getExpiresAt() != null && lastMute.getExpiresAt().isBefore(Instant.now()))) {
+        if (lastMute == null || lastMute.isRevoked()) {
             throw new IllegalStateException("User is not muted.");
         }
 
         lastMute.setExpiresAt(Instant.now());
+        lastMute.setRevoked(true);
         this.dataSuit.getPunishmentRepository().save(lastMute);
 
         String messageBody = String.format("You've been unmuted on %s. You may chat again. Please " +
@@ -217,11 +218,12 @@ public class DiscordUser extends UserAbstract {
                 .findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(this.getId(),
                         server.getId(), PunishmentEntity.Action.BAN);
 
-        if (lastBan == null || (lastBan.getExpiresAt() != null && lastBan.getExpiresAt().isBefore(Instant.now()))) {
+        if (lastBan == null || lastBan.isRevoked()) {
             throw new IllegalStateException("User is not banned.");
         }
 
         lastBan.setExpiresAt(Instant.now());
+        lastBan.setRevoked(true);
         this.dataSuit.getPunishmentRepository().save(lastBan);
     }
 

@@ -48,6 +48,9 @@ public class PunishmentEntity {
     @Column(name = "reason")
     private String reason;
 
+    @Column(name = "revoked", columnDefinition = "boolean default false")
+    private Boolean revoked = false;
+
     protected PunishmentEntity() {
 
     }
@@ -106,6 +109,14 @@ public class PunishmentEntity {
         return this.expiresAt;
     }
 
+    public boolean isRevoked() {
+        return this.revoked;
+    }
+
+    public void setRevoked(boolean revoked) {
+        this.revoked = revoked;
+    }
+
     public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
     }
@@ -115,7 +126,8 @@ public class PunishmentEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PunishmentEntity that = (PunishmentEntity) o;
-        return Objects.equals(id, that.id) &&
+        return revoked == that.revoked &&
+                Objects.equals(id, that.id) &&
                 Objects.equals(userId, that.userId) &&
                 Objects.equals(serverId, that.serverId) &&
                 Objects.equals(user, that.user) &&
@@ -130,7 +142,7 @@ public class PunishmentEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, serverId, user, server, action, givenById, givenBy, givenAt, expiresAt, reason);
+        return Objects.hash(id, userId, serverId, user, server, action, givenById, givenBy, givenAt, expiresAt, reason, revoked);
     }
 
     public enum Action {
