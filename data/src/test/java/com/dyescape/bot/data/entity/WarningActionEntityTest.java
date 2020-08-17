@@ -14,25 +14,30 @@ public class WarningActionEntityTest {
     @DisplayName("Object creation")
     public void objectCreation() {
         ServerEntity server = new ServerEntity("id", "!");
-        WarningActionEntity warningAction = new WarningActionEntity(server, 10, WarningActionEntity.Action.KICK, "1h30m");
-        assertEquals(warningAction.getServer(), server, "Server value was not passed or returned correctly");
-        assertEquals(warningAction.getServer().getId(), warningAction.getServerId(), "Server ID value was not passed or returned correctly");
-        assertEquals(warningAction.getPoints(), 10, "Points value was not passed or returned correctly");
-        assertEquals(warningAction.getAction(), WarningActionEntity.Action.KICK, "Action value was not passed or returned correctly");
-        assertEquals(warningAction.getTimeFrame(), "1h30m", "TimeFrame value was not passed or returned correctly");
+        WarningActionEntity warningAction = new WarningActionEntity(server, 10, WarningActionEntity.Type.DIRECT,
+                WarningActionEntity.Action.KICK, "1h30m");
+        assertEquals(server, warningAction.getServer(), "Server value was not passed or returned correctly");
+        assertEquals(warningAction.getServerId(), warningAction.getServer().getId(), "Server ID value was not passed or returned correctly");
+        assertEquals(10, warningAction.getPoints(), "Points value was not passed or returned correctly");
+        assertEquals(WarningActionEntity.Type.DIRECT, warningAction.getType(), "Type value was not passed or returned correctly");
+        assertEquals(WarningActionEntity.Action.KICK, warningAction.getAction(), "Action value was not passed or returned correctly");
+        assertEquals("1h30m", warningAction.getTimeFrame(), "TimeFrame value was not passed or returned correctly");
     }
 
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
         ServerEntity serverOne = new ServerEntity("id", "!");
-        WarningActionEntity warningActionOne = new WarningActionEntity(serverOne, 10, WarningActionEntity.Action.KICK, null);
+        WarningActionEntity warningActionOne = new WarningActionEntity(serverOne, 10, WarningActionEntity.Type.DIRECT,
+                WarningActionEntity.Action.KICK, null);
 
         ServerEntity serverOneCopy = new ServerEntity("id", "!");
-        WarningActionEntity warningActionOneCopy = new WarningActionEntity(serverOneCopy, 10, WarningActionEntity.Action.KICK, null);
+        WarningActionEntity warningActionOneCopy = new WarningActionEntity(serverOneCopy, 10, WarningActionEntity.Type.DIRECT,
+                WarningActionEntity.Action.KICK, null);
 
         ServerEntity serverTwo = new ServerEntity("id", "!");
-        WarningActionEntity warningActionTwo = new WarningActionEntity(serverTwo, 20, WarningActionEntity.Action.KICK, null);
+        WarningActionEntity warningActionTwo = new WarningActionEntity(serverTwo, 20, WarningActionEntity.Type.DIRECT,
+                WarningActionEntity.Action.KICK, null);
 
         assertEquals(warningActionOne, warningActionOneCopy, "Equal objects were not seen as equal");
         assertEquals(warningActionOne.hashCode(), warningActionOneCopy.hashCode(), "Hashcode of equal objects were not seen as equal");

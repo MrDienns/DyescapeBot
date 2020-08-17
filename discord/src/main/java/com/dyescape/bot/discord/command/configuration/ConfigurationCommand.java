@@ -38,14 +38,14 @@ public class ConfigurationCommand extends BotCommand {
 
     @Subcommand("setwarningaction")
     @CommandPermission(CommandPermissions.CONFIGURE_WARNING_ACTION)
-    @Syntax("<points> <action> [timeframe]")
+    @Syntax("<points> <type> <action> [timeframe]")
     @Description("Configure automated actions for specific warning points")
-    public void setWarningAction(JDACommandEvent e, int points, WarningActionEntity.Action action,
-                                 @Optional TimeFrame timeFrame) {
+    public void setWarningAction(JDACommandEvent e, int points, WarningActionEntity.Type type,
+                                 WarningActionEntity.Action action, @Optional TimeFrame timeFrame) {
 
         ServerEntity serverEntity = this.getDataSuit().getOrCreateServerById(e.getIssuer().getGuild().getId());
-        WarningActionEntity warningAction = new WarningActionEntity(serverEntity, points, action,
-                timeFrameAsString(timeFrame));
+        WarningActionEntity warningAction = new WarningActionEntity(serverEntity, points, type,
+                action, timeFrameAsString(timeFrame));
 
         this.getDataSuit().getWarningActionRepository().save(warningAction);
         this.sendMessage(e.getIssuer().getChannel(), null, "Action set.");

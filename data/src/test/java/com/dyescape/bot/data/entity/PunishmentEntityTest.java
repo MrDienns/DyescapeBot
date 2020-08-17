@@ -18,9 +18,10 @@ public class PunishmentEntityTest {
         UserEntity userTwo = new UserEntity("userTwo");
         PunishmentEntity.Action action = PunishmentEntity.Action.WARN;
         Instant givenAt = Instant.now();
-        Instant expiresAt = givenAt.plusSeconds(300);
 
-        PunishmentEntity punishment = new PunishmentEntity(userOne, server, action, userTwo, givenAt, expiresAt, "test");
+        PunishmentEntity punishment = new PunishmentEntity(userOne, server, action, userTwo, givenAt, null, "test");
+        Instant expiresAt = givenAt.plusSeconds(300);
+        punishment.setExpiresAt(expiresAt);
 
         assertNull(punishment.getId(), "Punishment ID should be null before saved");
         assertEquals(userOne, punishment.getUser(), "Punishment ID value was not passed or returned correctly");

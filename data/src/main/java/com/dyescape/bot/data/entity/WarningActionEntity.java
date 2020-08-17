@@ -1,13 +1,13 @@
 package com.dyescape.bot.data.entity;
 
-import com.dyescape.bot.data.id.ServerPointsID;
+import com.dyescape.bot.data.id.ServerPointsTypeID;
 
 import javax.persistence.*;
 
 import java.util.Objects;
 
 @Entity
-@IdClass(ServerPointsID.class)
+@IdClass(ServerPointsTypeID.class)
 @Table(name = "discord_warning_action")
 public class WarningActionEntity {
 
@@ -23,21 +23,27 @@ public class WarningActionEntity {
     @Column(name = "points")
     private int points;
 
+    @Id
+    @Column(name = "type", nullable = false, columnDefinition = "enum('DIRECT', 'FILLER')")
+    @Enumerated(value = EnumType.STRING)
+    private Type type;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "action", nullable = false, columnDefinition = "enum('KICK', 'MUTE', 'BAN')")
     private Action action;
 
-    @Column(name = "time_frame", insertable = false)
+    @Column(name = "time_frame")
     private String timeFrame;
 
     protected WarningActionEntity() {
 
     }
 
-    public WarningActionEntity(ServerEntity serverEntity, int points, Action action, String timeFrame) {
+    public WarningActionEntity(ServerEntity serverEntity, int points, Type type, Action action, String timeFrame) {
         this.serverId = serverEntity.getId();
         this.server = serverEntity;
         this.points = points;
+        this.type = type;
         this.action = action;
         this.timeFrame = timeFrame;
     }
@@ -52,6 +58,10 @@ public class WarningActionEntity {
 
     public int getPoints() {
         return this.points;
+    }
+
+    public Type getType() {
+        return this.type;
     }
 
     public Action getAction() {
@@ -70,13 +80,14 @@ public class WarningActionEntity {
         return points == that.points &&
                 Objects.equals(serverId, that.serverId) &&
                 Objects.equals(server, that.server) &&
+                type == that.type &&
                 action == that.action &&
                 Objects.equals(timeFrame, that.timeFrame);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serverId, server, points, action, timeFrame);
+        return Objects.hash(serverId, server, points, type, action, timeFrame);
     }
 
     public enum Action {
@@ -96,5 +107,13 @@ public class WarningActionEntity {
         public boolean supportsTimeFrame() {
             return this.supportsTimeFrame;
         }
+    }
+
+    public enum Type {
+
+        DIRECT,
+        FILLER,
+
+        ;
     }
 }

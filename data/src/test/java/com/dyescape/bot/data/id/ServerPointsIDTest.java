@@ -1,5 +1,7 @@
 package com.dyescape.bot.data.id;
 
+import com.dyescape.bot.data.entity.WarningActionEntity;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,17 +15,18 @@ public class ServerPointsIDTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerPointsID id = new ServerPointsID("server", 10);
+        ServerPointsTypeID id = new ServerPointsTypeID("server", 10, WarningActionEntity.Type.DIRECT);
         assertEquals("server", id.getServerId(), "Server ID value was not passed or returned correctly");
         assertEquals(10, id.getPoints(), "Points value was not passed or returned correctly");
+        assertEquals(WarningActionEntity.Type.DIRECT, id.getType(), "Type value was not passed or returned correctly");
     }
 
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
-        ServerPointsID id = new ServerPointsID("server", 10);
-        ServerPointsID idOneCopy = new ServerPointsID("server", 10);
-        ServerPointsID idTwo = new ServerPointsID("server", 15);
+        ServerPointsTypeID id = new ServerPointsTypeID("server", 10, WarningActionEntity.Type.DIRECT);
+        ServerPointsTypeID idOneCopy = new ServerPointsTypeID("server", 10, WarningActionEntity.Type.DIRECT);
+        ServerPointsTypeID idTwo = new ServerPointsTypeID("server", 15, WarningActionEntity.Type.DIRECT);
 
         assertEquals(id, idOneCopy, "Equal objects were not seen as equal");
         assertEquals(id.hashCode(), idOneCopy.hashCode(), "Hashcode of equal objects were not seen as equal");
@@ -37,7 +40,7 @@ public class ServerPointsIDTest {
     @DisplayName("Serialization constructor")
     public void serializationConstructor() {
         try {
-            Constructor<ServerPointsID> constructor = ServerPointsID.class.getDeclaredConstructor();
+            Constructor<ServerPointsTypeID> constructor = ServerPointsTypeID.class.getDeclaredConstructor();
             constructor.newInstance();
         } catch (Exception ignored) {
             fail("ServerPointsID class has no empty public/protected constructor");

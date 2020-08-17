@@ -68,17 +68,29 @@ public class DiscordUser extends UserAbstract {
         this.dataSuit.getWarningRepository().save(warning);
 
         int totalPoints = this.getActiveWarningPoints(server);
-        WarningActionEntity applicableAction = this.dataSuit.getWarningActionRepository()
-                .findFirstByServerIdAndPointsIsLessThanEqualOrderByPointsDesc(server.getId(), totalPoints);
+        WarningActionEntity applicableDirectAction = this.dataSuit.getWarningActionRepository()
+                .findFirstByServerIdAndTypeAndPointsIsLessThanEqualOrderByPointsDesc(server.getId(),
+                        WarningActionEntity.Type.DIRECT, totalPoints);
 
-        if (applicableAction != null) {
-            this.applyWarningAction(server, reason, applicableAction, givenBy);
+        if (applicableDirectAction != null && applicableDirectAction.getPoints() <= totalPoints - points) {
+            applicableDirectAction = null;
+        }
+
+        if (applicableDirectAction == null) {
+            applicableDirectAction = this.dataSuit.getWarningActionRepository()
+                    .findFirstByServerIdAndTypeAndPointsIsLessThanEqualOrderByPointsDesc(server.getId(),
+                            WarningActionEntity.Type.FILLER, totalPoints);
+        }
+
+        if (applicableDirectAction != null) {
+            this.applyWarningAction(server, reason, applicableDirectAction, givenBy);
         } else {
             Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
             if (guild == null) return;
             String unit = points == 1 ? "point" : "points";
-            String messageBody = String.format("You've been warned on from %s for %s %s. You can still rejoin the server. Please " +
-                    "respect the rules and guidelines.", guild.getName(), points, unit);
+            String messageBody = String.format("You've been warned on %s for %s %s. Automated " +
+                    "punishments may be applied if you reach a certain threshold. " +
+                    "Please respect the rules and guidelines.", guild.getName(), points, unit);
             if (reason != null && !reason.isEmpty()) {
                 messageBody = messageBody + "\n\nReason: " + reason;
             }
