@@ -40,6 +40,8 @@ public class ModerationCommand extends BotCommand {
     @Description("Warn a user")
     public void warn(JDACommandEvent e, User user, Integer points, @Optional String reason) {
 
+        if (e.getIssuer().getMember().getUser().isBot()) return;
+
         try {
             MessageChannel channel = e.getIssuer().getChannel();
             this.markProcessing(channel);
@@ -71,6 +73,9 @@ public class ModerationCommand extends BotCommand {
     @Syntax("<User> [reason]")
     @Description("Kick a user")
     public void kick(JDACommandEvent e, User user, @Optional String reason) {
+
+        if (e.getIssuer().getMember().getUser().isBot()) return;
+
         try {
             this.markProcessing(e.getIssuer().getChannel());
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
@@ -99,6 +104,8 @@ public class ModerationCommand extends BotCommand {
     @Syntax("<User> [reason/timeframe]")
     @Description("Mute a user (permanently or temporarily)")
     public void mute(JDACommandEvent e, User user, @Optional String reasonOrTimeFrame) {
+
+        if (e.getIssuer().getMember().getUser().isBot()) return;
 
         try {
 
@@ -133,6 +140,9 @@ public class ModerationCommand extends BotCommand {
     @Syntax("<User>")
     @Description("Unmute a user")
     public void unmute(JDACommandEvent e, User user) {
+
+        if (e.getIssuer().getMember().getUser().isBot()) return;
+
         try {
             this.markProcessing(e.getIssuer().getChannel());
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
@@ -158,6 +168,8 @@ public class ModerationCommand extends BotCommand {
     @Syntax("<User> [reason/timeframe]")
     @Description("Ban a user (permanently or temporarily)")
     public void ban(JDACommandEvent e, User user, @Optional String reasonOrTimeFrame) {
+
+        if (e.getIssuer().getMember().getUser().isBot()) return;
 
         try {
 
@@ -195,6 +207,9 @@ public class ModerationCommand extends BotCommand {
     @Syntax("<User>")
     @Description("Unban a user")
     public void unban(JDACommandEvent e, User user) {
+
+        if (e.getIssuer().getMember().getUser().isBot()) return;
+
         try {
             this.markProcessing(e.getIssuer().getChannel());
             Server server = this.getServerFromJDA(e.getIssuer().getGuild());
