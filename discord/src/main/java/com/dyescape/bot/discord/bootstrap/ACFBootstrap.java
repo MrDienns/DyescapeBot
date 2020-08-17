@@ -5,6 +5,7 @@ import com.dyescape.bot.discord.command.ServerConfigProvider;
 import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.discord.command.configuration.ConfigurationCommand;
 import com.dyescape.bot.discord.command.moderation.ModerationCommand;
+import com.dyescape.bot.discord.command.resolver.PermissionResolver;
 import com.dyescape.bot.discord.command.resolver.TimeFrameResolver;
 import com.dyescape.bot.discord.command.resolver.UserResolver;
 import com.dyescape.bot.domain.model.TimeFrame;
@@ -36,7 +37,8 @@ public class ACFBootstrap {
         JDACommandManager manager = new JDACommandManager(this.jda);
         manager.setConfigProvider(new ServerConfigProvider(this.prefixProvider));
 
-        // TODO: Permission resolver
+        // Set permission resolver
+        manager.setPermissionResolver(new PermissionResolver());
 
         // Get the context
         JDACommandContexts contexts = (JDACommandContexts) manager.getCommandContexts();
