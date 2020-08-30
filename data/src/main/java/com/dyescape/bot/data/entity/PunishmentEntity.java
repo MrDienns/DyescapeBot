@@ -45,7 +45,7 @@ public class PunishmentEntity {
     @Column(name = "expires_at")
     private Instant expiresAt;
 
-    @Column(name = "reason")
+    @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
 
     @Column(name = "revoked", columnDefinition = "boolean default false")
