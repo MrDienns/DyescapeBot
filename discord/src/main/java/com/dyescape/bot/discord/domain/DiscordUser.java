@@ -166,11 +166,7 @@ public class DiscordUser extends UserAbstract {
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
 
-        Member member = guild.getMemberById(this.jdaUser.getId());
-        if (member != null) {
-            Role mutedRole = this.getOrCreateMutedRole(guild);
-            guild.addRoleToMember(member, mutedRole).queue();
-        }
+        this.effectuateMute(server);
 
         PunishmentEntity lastMute = this.dataSuit.getPunishmentRepository()
                 .findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(this.getId(),
@@ -201,6 +197,18 @@ public class DiscordUser extends UserAbstract {
                     "respect the rules and guidelines.", guild.getName());
         }
         this.trySendPrivateMessage(messageBody);
+    }
+
+    @Override
+    public void effectuateMute(Server server) {
+        Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
+        if (guild == null) return;
+
+        Member member = guild.getMemberById(this.jdaUser.getId());
+        if (member != null) {
+            Role mutedRole = this.getOrCreateMutedRole(guild);
+            guild.addRoleToMember(member, mutedRole).queue();
+        }
     }
 
     @Override

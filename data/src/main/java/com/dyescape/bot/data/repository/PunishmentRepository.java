@@ -17,4 +17,7 @@ public interface PunishmentRepository extends CrudRepository<PunishmentEntity, U
 
     List<PunishmentEntity> findByActionAndRevokedFalseAndExpiresAtBeforeOrderByGivenAtDesc(PunishmentEntity.Action action,
                                                                                            Instant expiry);
+
+    List<PunishmentEntity> findByActionAndRevokedFalseAndExpiresAtAfterOrderByGivenAtDesc(PunishmentEntity.Action action,
+                                                                                           Instant expiry);
 }

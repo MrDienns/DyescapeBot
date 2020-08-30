@@ -10,6 +10,7 @@ public interface Moderatable {
 
     void unmute(Server server);
     void mute(Server server, TimeFrame timeFrame, String reason, User givenBy);
+    void effectuateMute(Server server);
     boolean isMuted(Server server);
 
     void unban(Server server);

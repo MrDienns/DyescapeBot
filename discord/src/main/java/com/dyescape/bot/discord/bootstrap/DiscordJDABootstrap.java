@@ -1,5 +1,7 @@
 package com.dyescape.bot.discord.bootstrap;
 
+import com.dyescape.bot.data.suit.DataSuit;
+import com.dyescape.bot.discord.listener.ModerationListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -17,10 +19,12 @@ public class DiscordJDABootstrap {
     private static final String TOKEN_PREFIX = "Bot ";
 
     private final String token;
+    private final DataSuit dataSuit;
 
     @Autowired
-    public DiscordJDABootstrap(@Value("${discord.token}") String token) {
+    public DiscordJDABootstrap(@Value("${discord.token}") String token, DataSuit dataSuit) {
         this.token = stripOptionalBotPrefix(token);
+        this.dataSuit = dataSuit;
     }
 
     @Bean
@@ -32,6 +36,8 @@ public class DiscordJDABootstrap {
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_EMOJIS
         );
+
+        builder.addEventListeners(new ModerationListener(this.dataSuit));
 
         builder.disableCache(
                 CacheFlag.ACTIVITY,

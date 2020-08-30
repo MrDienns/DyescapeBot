@@ -12,7 +12,7 @@ public class WhenBootstrapingJDADiscordWithoutBotPrefixedTokenTest {
     @DisplayName("It should not strip the token")
     public void itShouldNotStripTheToken() {
         String token = "myCoolPrefixedToken";
-        String newToken = new DiscordJDABootstrap(token).stripOptionalBotPrefix(token);
+        String newToken = new DiscordJDABootstrap(token, null).stripOptionalBotPrefix(token);
         assertEquals(newToken, "myCoolPrefixedToken", "The token was unnecessarily stripped");
     }
 }
