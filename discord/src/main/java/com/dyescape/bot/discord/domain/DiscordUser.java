@@ -274,8 +274,10 @@ public class DiscordUser extends UserAbstract {
                 return;
             case MUTE:
                 this.mute(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason, givenBy);
+                return;
             case BAN:
                 this.ban(server, tryMakeTimeFrame(warningActionEntity.getTimeFrame()), reason, givenBy);
+                return;
             default:
                 break;
         }
