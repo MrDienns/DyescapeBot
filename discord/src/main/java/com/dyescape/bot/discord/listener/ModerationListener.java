@@ -24,7 +24,8 @@ public class ModerationListener extends ListenerAdapter {
 
         // Check if the user has active mutes
         if (!this.dataSuit.getPunishmentRepository()
-                .findByActionAndRevokedFalseAndExpiresAtAfterOrderByGivenAtDesc(PunishmentEntity.Action.MUTE,
+                .findByServerIdAndUserIdAndActionAndRevokedFalseAndExpiresAtAfterOrderByGivenAtDesc(
+                        event.getGuild().getId(), event.getUser().getId(), PunishmentEntity.Action.MUTE,
                         Instant.now()).isEmpty()) {
 
             // Get the user
