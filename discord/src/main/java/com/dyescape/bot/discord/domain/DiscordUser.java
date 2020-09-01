@@ -3,6 +3,7 @@ package com.dyescape.bot.discord.domain;
 import com.dyescape.bot.data.entity.*;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.util.DiscordMessage;
+import com.dyescape.bot.domain.model.Punishment;
 import com.dyescape.bot.domain.model.Server;
 import com.dyescape.bot.domain.model.TimeFrame;
 import com.dyescape.bot.domain.model.User;
@@ -18,6 +19,7 @@ import java.time.Instant;
 import java.time.Period;
 import java.util.List;
 import java.util.Spliterator;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class DiscordUser extends UserAbstract {
@@ -47,6 +49,15 @@ public class DiscordUser extends UserAbstract {
     public boolean hasPermission(String permissionId) {
         // TODO
         return false;
+    }
+
+    @Override
+    public List<Punishment> getActivePunishment(Server server) {
+        return this.dataSuit.getPunishmentRepository()
+                .findByServerIdAndUserIdAndRevokedFalseOrderByGivenAtDesc(
+                server.getId(), this.getId()).stream()
+                .map(DiscordPunishment::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -272,6 +283,10 @@ public class DiscordUser extends UserAbstract {
     @Override
     public boolean isBanned(Server server) {
         return false;
+    }
+
+    public net.dv8tion.jda.api.entities.User getJdaUser() {
+        return this.jdaUser;
     }
 
     private void applyWarningAction(Server server, String reason, WarningActionEntity warningActionEntity, User givenBy) {

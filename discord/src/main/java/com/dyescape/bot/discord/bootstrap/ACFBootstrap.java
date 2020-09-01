@@ -4,6 +4,7 @@ import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.ServerConfigProvider;
 import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.discord.command.configuration.ConfigurationCommand;
+import com.dyescape.bot.discord.command.general.InfoCommand;
 import com.dyescape.bot.discord.command.moderation.ModerationCommand;
 import com.dyescape.bot.discord.command.resolver.PermissionResolver;
 import com.dyescape.bot.discord.command.resolver.SuggestionResolver;
@@ -52,6 +53,7 @@ public class ACFBootstrap {
         contexts.registerContext(Suggestion.class, new SuggestionResolver());
 
         // Register commands
+        manager.registerCommand(new InfoCommand(this.jda, this.dataSuit));
         manager.registerCommand(new ModerationCommand(this.jda, this.dataSuit));
         manager.registerCommand(new ConfigurationCommand(this.jda, this.dataSuit));
         manager.registerCommand(new SuggestionCommand(this.jda, this.dataSuit));

@@ -20,4 +20,7 @@ public interface PunishmentRepository extends CrudRepository<PunishmentEntity, U
 
     List<PunishmentEntity> findByServerIdAndUserIdAndActionAndRevokedFalseAndExpiresAtAfterOrderByGivenAtDesc(
             String serverId, String userId, PunishmentEntity.Action action, Instant expiry);
+
+    List<PunishmentEntity> findByServerIdAndUserIdAndRevokedFalseOrderByGivenAtDesc(
+            String serverId, String userId);
 }

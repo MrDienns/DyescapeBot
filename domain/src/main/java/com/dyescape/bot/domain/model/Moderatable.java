@@ -1,6 +1,10 @@
 package com.dyescape.bot.domain.model;
 
+import java.util.List;
+
 public interface Moderatable {
+
+    List<Punishment> getActivePunishment(Server server);
 
     void unwarn(Server server);
     void warn(Server server, int points, String reason, User givenBy);
