@@ -39,6 +39,8 @@ public class PunishmentExpiryCheck {
         for (PunishmentEntity punishment : this.dataSuit.getPunishmentRepository()
                 .findByRevokedFalseAndExpiresAtBeforeOrderByGivenAtDesc(Instant.now())) {
 
+            if (punishment.getAction().equals(PunishmentEntity.Action.WARN)) continue;
+
             LOGGER.info(String.format("Found expired %s of user %s in server %s. Expiry time: %s", punishment.getAction(),
                     punishment.getUserId(), punishment.getServerId(), punishment.getExpiresAt()));
 
@@ -61,7 +63,10 @@ public class PunishmentExpiryCheck {
 
     private User getUserFromPunishment(PunishmentEntity punishment) {
         net.dv8tion.jda.api.entities.User jdaUser = this.jda.getUserById(punishment.getUserId());
-        if (jdaUser == null) return null;
+        if (jdaUser == null) {
+            jdaUser = this.jda.retrieveUserById(punishment.getUserId()).complete();
+            if (jdaUser == null) return null;
+        }
         return new DiscordUser(this.dataSuit, punishment.getUser(), jdaUser);
     }
 
