@@ -15,8 +15,7 @@ public interface PunishmentRepository extends CrudRepository<PunishmentEntity, U
     PunishmentEntity findTopByUserIdAndServerIdAndActionOrderByGivenAtDesc(String userId, String serverId,
                                                                            PunishmentEntity.Action action);
 
-    List<PunishmentEntity> findByActionAndRevokedFalseAndExpiresAtBeforeOrderByGivenAtDesc(PunishmentEntity.Action action,
-                                                                                           Instant expiry);
+    List<PunishmentEntity> findByRevokedFalseAndExpiresAtBeforeOrderByGivenAtDesc(Instant expiry);
 
     List<PunishmentEntity> findByServerIdAndUserIdAndActionAndRevokedFalseAndExpiresAtAfterOrderByGivenAtDesc(
             String serverId, String userId, PunishmentEntity.Action action, Instant expiry);
