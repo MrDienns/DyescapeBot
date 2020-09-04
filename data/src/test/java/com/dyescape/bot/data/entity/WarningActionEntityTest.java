@@ -13,7 +13,7 @@ public class WarningActionEntityTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("id", "!");
+        ServerEntity server = new ServerEntity("id", "!", null, null, null);
         WarningActionEntity warningAction = new WarningActionEntity(server, 10, WarningActionEntity.Type.DIRECT,
                 WarningActionEntity.Action.KICK, "1h30m");
         assertEquals(server, warningAction.getServer(), "Server value was not passed or returned correctly");
@@ -27,15 +27,15 @@ public class WarningActionEntityTest {
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
-        ServerEntity serverOne = new ServerEntity("id", "!");
+        ServerEntity serverOne = new ServerEntity("id", "!", null, null, null);
         WarningActionEntity warningActionOne = new WarningActionEntity(serverOne, 10, WarningActionEntity.Type.DIRECT,
                 WarningActionEntity.Action.KICK, null);
 
-        ServerEntity serverOneCopy = new ServerEntity("id", "!");
+        ServerEntity serverOneCopy = new ServerEntity("id", "!", null, null, null);
         WarningActionEntity warningActionOneCopy = new WarningActionEntity(serverOneCopy, 10, WarningActionEntity.Type.DIRECT,
                 WarningActionEntity.Action.KICK, null);
 
-        ServerEntity serverTwo = new ServerEntity("id", "!");
+        ServerEntity serverTwo = new ServerEntity("id", "!", null, null, null);
         WarningActionEntity warningActionTwo = new WarningActionEntity(serverTwo, 20, WarningActionEntity.Type.DIRECT,
                 WarningActionEntity.Action.KICK, null);
 

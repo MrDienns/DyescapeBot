@@ -14,7 +14,7 @@ public class WarningEntityTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("testId", "!");
+        ServerEntity server = new ServerEntity("testId", "!", null, null, null);
         UserEntity userOne = new UserEntity("userOne");
         UserEntity userTwo = new UserEntity("userTwo");
         PunishmentEntity.Action action = PunishmentEntity.Action.WARN;
@@ -45,7 +45,7 @@ public class WarningEntityTest {
     }
 
     private WarningEntity createTestWarning(String punishedUser, Instant time) {
-        ServerEntity server = new ServerEntity("testId", "!");
+        ServerEntity server = new ServerEntity("testId", "!", null, null, null);
         UserEntity userOne = new UserEntity(punishedUser);
         UserEntity userTwo = new UserEntity("userTwo");
         PunishmentEntity punishment = new PunishmentEntity(userOne, server, PunishmentEntity.Action.WARN, userTwo, time, null, "test");

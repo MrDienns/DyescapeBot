@@ -22,6 +22,6 @@ public class ServerPrefixProvider {
     private ServerEntity getServerEntityFromGuildID(String guildId) {
         Optional<ServerEntity> result = this.serverRepository.findById(guildId);
         // Should always be true under normal conditions
-        return result.orElseGet(() -> new ServerEntity(guildId, DEFAULT_COMMAND_PREFIX));
+        return result.orElseGet(() -> new ServerEntity(guildId, DEFAULT_COMMAND_PREFIX, null, null, null));
     }
 }

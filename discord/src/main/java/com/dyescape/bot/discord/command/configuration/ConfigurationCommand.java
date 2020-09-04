@@ -5,11 +5,13 @@ import com.dyescape.bot.data.entity.WarningActionEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;
+import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.domain.model.TimeFrame;
 
 import co.aikar.commands.JDACommandEvent;
 import co.aikar.commands.annotation.*;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("configuration")
@@ -24,13 +26,7 @@ public class ConfigurationCommand extends BotCommand {
     @Syntax("<prefix>")
     @Description("Change the bot command prefix")
     public void setPrefix(JDACommandEvent e, String prefix) {
-        java.util.Optional<ServerEntity> query = this.getDataSuit().getServerRepository().findById(e.getEvent().getGuild().getId());
-        ServerEntity serverEntity;
-        if (query.isEmpty()) {
-            serverEntity = new ServerEntity(e.getEvent().getGuild().getId(), prefix);
-        } else {
-            serverEntity = query.get();
-        }
+        ServerEntity serverEntity = this.getDataSuit().getOrCreateServerById(e.getEvent().getGuild().getId());
         serverEntity.setCommandPrefix(prefix);
         this.getDataSuit().getServerRepository().save(serverEntity);
         this.sendMessage(e.getIssuer().getChannel(), null, "Changed command prefix to " + prefix);
@@ -54,5 +50,38 @@ public class ConfigurationCommand extends BotCommand {
     private String timeFrameAsString(@Nullable TimeFrame timeFrame) {
         if (timeFrame == null) return null;
         return timeFrame.toString();
+    }
+
+    @Subcommand("setjoinleavechannel")
+    @CommandPermission(CommandPermissions.CONFIGURE_JOIN_LEAVE_CHANNEL)
+    @Syntax("<channel>")
+    @Description("Configure the join/leave channel")
+    public void setJoinLeaveChannel(JDACommandEvent e, TextChannel textChannel) {
+        ServerEntity serverEntity = this.getDataSuit().getOrCreateServerById(e.getEvent().getGuild().getId());
+        serverEntity.setJoinLeaveChannel(textChannel.getId());
+        this.getDataSuit().getServerRepository().save(serverEntity);
+        this.sendMessage(e.getIssuer().getChannel(), null, "Channel set.");
+    }
+
+    @Subcommand("setjoinmessage")
+    @CommandPermission(CommandPermissions.CONFIGURE_JOIN_MESSAGE)
+    @Syntax("<message>")
+    @Description("Configure the join message")
+    public void setJoinMessage(JDACommandEvent e, String message) {
+        ServerEntity serverEntity = this.getDataSuit().getOrCreateServerById(e.getEvent().getGuild().getId());
+        serverEntity.setJoinMessage(message);
+        this.getDataSuit().getServerRepository().save(serverEntity);
+        this.sendMessage(e.getIssuer().getChannel(), null, "Message set.");
+    }
+
+    @Subcommand("setleavemessage")
+    @CommandPermission(CommandPermissions.CONFIGURE_LEAVE_MESSASGE)
+    @Syntax("<message>")
+    @Description("Configure the leave message")
+    public void setLeaveMessage(JDACommandEvent e, String message) {
+        ServerEntity serverEntity = this.getDataSuit().getOrCreateServerById(e.getEvent().getGuild().getId());
+        serverEntity.setLeaveMessage(message);
+        this.getDataSuit().getServerRepository().save(serverEntity);
+        this.sendMessage(e.getIssuer().getChannel(), null, "Message set.");
     }
 }

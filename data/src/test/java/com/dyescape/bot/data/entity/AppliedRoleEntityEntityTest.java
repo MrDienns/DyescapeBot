@@ -13,7 +13,7 @@ public class AppliedRoleEntityEntityTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("286476446338252800", "!");
+        ServerEntity server = new ServerEntity("286476446338252800", "!", null, null, null);
         RoleEntity role = new RoleEntity("moderator", server);
         UserEntity user = new UserEntity("MrDienns");
         AppliedRoleEntity appliedRoleEntity = new AppliedRoleEntity(user, role);
@@ -29,7 +29,7 @@ public class AppliedRoleEntityEntityTest {
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
-        ServerEntity server = new ServerEntity("286476446338252800", "!");
+        ServerEntity server = new ServerEntity("286476446338252800", "!", null, null, null);
         RoleEntity role = new RoleEntity("moderator", server);
         UserEntity userOne = new UserEntity("MrDienns");
         AppliedRoleEntity appliedRoleEntityOne = new AppliedRoleEntity(userOne, role);

@@ -1,6 +1,7 @@
 package com.dyescape.bot.discord.bootstrap;
 
 import com.dyescape.bot.data.suit.DataSuit;
+import com.dyescape.bot.discord.listener.JoinLeaveAnnouncementListener;
 import com.dyescape.bot.discord.listener.ModerationListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -37,7 +38,10 @@ public class DiscordJDABootstrap {
                 GatewayIntent.GUILD_EMOJIS
         );
 
-        builder.addEventListeners(new ModerationListener(this.dataSuit));
+        builder.addEventListeners(
+                new ModerationListener(this.dataSuit),
+                new JoinLeaveAnnouncementListener(this.dataSuit)
+        );
 
         builder.disableCache(
                 CacheFlag.ACTIVITY,

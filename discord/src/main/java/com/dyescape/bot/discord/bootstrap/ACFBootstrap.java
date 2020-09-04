@@ -6,10 +6,7 @@ import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.discord.command.configuration.ConfigurationCommand;
 import com.dyescape.bot.discord.command.general.InfoCommand;
 import com.dyescape.bot.discord.command.moderation.ModerationCommand;
-import com.dyescape.bot.discord.command.resolver.PermissionResolver;
-import com.dyescape.bot.discord.command.resolver.SuggestionResolver;
-import com.dyescape.bot.discord.command.resolver.TimeFrameResolver;
-import com.dyescape.bot.discord.command.resolver.UserResolver;
+import com.dyescape.bot.discord.command.resolver.*;
 import com.dyescape.bot.discord.command.suggest.SuggestionCommand;
 import com.dyescape.bot.discord.domain.Suggestion;
 import com.dyescape.bot.domain.model.TimeFrame;
@@ -18,6 +15,7 @@ import com.dyescape.bot.domain.model.User;
 import co.aikar.commands.JDACommandContexts;
 import co.aikar.commands.JDACommandManager;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +49,7 @@ public class ACFBootstrap {
         contexts.registerContext(User.class, new UserResolver(this.dataSuit, this.jda));
         contexts.registerContext(TimeFrame.class, new TimeFrameResolver());
         contexts.registerContext(Suggestion.class, new SuggestionResolver());
+        contexts.registerContext(TextChannel.class, new TextChannelResolver(this.jda));
 
         // Register commands
         manager.registerCommand(new InfoCommand(this.jda, this.dataSuit));

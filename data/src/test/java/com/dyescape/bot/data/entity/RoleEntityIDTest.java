@@ -12,7 +12,7 @@ public class RoleEntityIDTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("286476446338252800", "!");
+        ServerEntity server = new ServerEntity("286476446338252800", "!", null, null, null);
         RoleEntity.ID id = new RoleEntity.ID("moderator", server);
         assertEquals(id.getId(), "moderator", "ID value was not passed or returned correctly");
         assertEquals(id.getServer(), server, "Server value was not passed or returned correctly");
@@ -21,13 +21,13 @@ public class RoleEntityIDTest {
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
-        ServerEntity serverOne = new ServerEntity("Server1", "!");
+        ServerEntity serverOne = new ServerEntity("Server1", "!", null, null, null);
         RoleEntity.ID idOne = new RoleEntity.ID("moderator", serverOne);
 
-        ServerEntity serverOneCopy = new ServerEntity("Server1", "!");
+        ServerEntity serverOneCopy = new ServerEntity("Server1", "!", null, null, null);
         RoleEntity.ID idOneCopy = new RoleEntity.ID("moderator", serverOneCopy);
 
-        ServerEntity serverTwo = new ServerEntity("Server2", "!");
+        ServerEntity serverTwo = new ServerEntity("Server2", "!", null, null, null);
         RoleEntity.ID idTwo = new RoleEntity.ID("moderator", serverTwo);
 
         assertEquals(idOne, idOneCopy, "Equal objects were not seen as equal");

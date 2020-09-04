@@ -16,7 +16,7 @@ public class UserServerIDTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("286476446338252800", "!");
+        ServerEntity server = new ServerEntity("286476446338252800", "!", null, null, null);
         UserEntity user = new UserEntity("MrDienns");
         UserServerID id = new UserServerID(user.getId(), server.getId());
         assertEquals(id.getUserId(), user.getId(), "User value was not passed or returned correctly");
@@ -26,15 +26,15 @@ public class UserServerIDTest {
     @Test
     @DisplayName("Object comparison")
     public void objectComparison() {
-        ServerEntity serverOne = new ServerEntity("Server1", "!");
+        ServerEntity serverOne = new ServerEntity("Server1", "!", null, null, null);
         UserEntity userOne = new UserEntity("MrDienns");
         UserServerID id = new UserServerID(userOne.getId(), serverOne.getId());
 
-        ServerEntity serverOneCopy = new ServerEntity("Server1", "!");
+        ServerEntity serverOneCopy = new ServerEntity("Server1", "!", null, null, null);
         UserEntity userOneCopy = new UserEntity("MrDienns");
         UserServerID idOneCopy = new UserServerID(userOneCopy.getId(), serverOneCopy.getId());
 
-        ServerEntity serverTwo = new ServerEntity("Server2", "!");
+        ServerEntity serverTwo = new ServerEntity("Server2", "!", null, null, null);
         UserEntity userTwo = new UserEntity("MrDienns");
         UserServerID idTwo = new UserServerID(serverTwo.getId(), userTwo.getId());
 

@@ -18,7 +18,7 @@ public class WhenLoadingTheCommandPrefixFromTheDatabaseTest {
     @Test
     @DisplayName("It should return the configured prefix")
     public void itShouldReturnTheConfiguredPrefix() {
-        ServerEntity mockedQueryResult = new ServerEntity("286476446338252800", "?");
+        ServerEntity mockedQueryResult = new ServerEntity("286476446338252800", "?", null, null, null);
         ServerRepository repository = Mockito.mock(ServerRepository.class);
         Mockito.when(repository.findById(Mockito.anyString())).thenReturn(Optional.of(mockedQueryResult));
 

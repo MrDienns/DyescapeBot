@@ -13,15 +13,14 @@ public class PunishmentEntityTest {
     @Test
     @DisplayName("Object creation")
     public void objectCreation() {
-        ServerEntity server = new ServerEntity("testId", "!");
+        ServerEntity server = new ServerEntity("testId", "!", null, null, null);
         UserEntity userOne = new UserEntity("userOne");
         UserEntity userTwo = new UserEntity("userTwo");
         PunishmentEntity.Action action = PunishmentEntity.Action.WARN;
         Instant givenAt = Instant.now();
-
-        PunishmentEntity punishment = new PunishmentEntity(userOne, server, action, userTwo, givenAt, null, "test");
         Instant expiresAt = givenAt.plusSeconds(300);
-        punishment.setExpiresAt(expiresAt);
+        PunishmentEntity punishment = new PunishmentEntity(userOne, server, action, userTwo, givenAt, expiresAt, "test");
+
 
         assertNull(punishment.getId(), "Punishment ID should be null before saved");
         assertEquals(userOne, punishment.getUser(), "Punishment ID value was not passed or returned correctly");
@@ -33,6 +32,34 @@ public class PunishmentEntityTest {
         assertEquals(expiresAt, punishment.getExpiresAt(), "Punishment ID value was not passed or returned correctly");
         assertEquals(userTwo, punishment.getGivenBy(), "Punishment ID value was not passed or returned correctly");
         assertEquals(userTwo.getId(), punishment.getGivenById(), "Punishment ID value was not passed or returned correctly");
+        assertFalse(punishment.isRevoked(), "Revoke value was not passed or returned correctly.");
+    }
+
+    @Test
+    @DisplayName("Object creation")
+    public void objectUpdating() {
+        ServerEntity server = new ServerEntity("testId", "!", null, null, null);
+        UserEntity userOne = new UserEntity("userOne");
+        UserEntity userTwo = new UserEntity("userTwo");
+        PunishmentEntity.Action action = PunishmentEntity.Action.WARN;
+        Instant givenAt = Instant.now();
+
+        PunishmentEntity punishment = new PunishmentEntity(userOne, server, action, userTwo, givenAt, null, "test");
+        Instant expiresAt = givenAt.plusSeconds(300);
+        punishment.setExpiresAt(expiresAt);
+        punishment.setRevoked(true);
+
+        assertNull(punishment.getId(), "Punishment ID should be null before saved");
+        assertEquals(userOne, punishment.getUser(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(userOne.getId(), punishment.getUserId(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(server, punishment.getServer(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(server.getId(), punishment.getServerId(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(PunishmentEntity.Action.WARN, punishment.getAction(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(givenAt, punishment.getGivenAt(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(expiresAt, punishment.getExpiresAt(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(userTwo, punishment.getGivenBy(), "Punishment ID value was not passed or returned correctly");
+        assertEquals(userTwo.getId(), punishment.getGivenById(), "Punishment ID value was not passed or returned correctly");
+        assertTrue(punishment.isRevoked(), "Revoke value was not passed or returned correctly.");
     }
 
     @Test
@@ -51,7 +78,7 @@ public class PunishmentEntityTest {
     }
 
     private PunishmentEntity createTestPunishment(String punishedUser, Instant time) {
-        ServerEntity server = new ServerEntity("testId", "!");
+        ServerEntity server = new ServerEntity("testId", "!", null, null, null);
         UserEntity userOne = new UserEntity(punishedUser);
         UserEntity userTwo = new UserEntity("userTwo");
         return new PunishmentEntity(userOne, server, PunishmentEntity.Action.WARN, userTwo, time, time, "test");

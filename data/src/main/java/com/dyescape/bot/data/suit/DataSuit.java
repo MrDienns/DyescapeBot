@@ -78,7 +78,7 @@ public class DataSuit {
         if (serverEntityResult.isPresent()) {
             serverEntity = serverEntityResult.get();
         } else {
-            serverEntity = new ServerEntity(serverId, "!");
+            serverEntity = new ServerEntity(serverId, "!", null, null, null);
             this.serverRepository.save(serverEntity);
         }
 
