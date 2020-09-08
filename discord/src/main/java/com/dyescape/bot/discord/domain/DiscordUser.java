@@ -2,6 +2,7 @@ package com.dyescape.bot.discord.domain;
 
 import com.dyescape.bot.data.entity.*;
 import com.dyescape.bot.data.suit.DataSuit;
+import com.dyescape.bot.discord.cron.PunishmentExpiryCheck;
 import com.dyescape.bot.discord.util.DiscordMessage;
 import com.dyescape.bot.domain.model.Punishment;
 import com.dyescape.bot.domain.model.Server;
@@ -13,6 +14,8 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.time.Instant;
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class DiscordUser extends UserAbstract {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(DiscordUser.class);
 
     private final DataSuit dataSuit;
     private final UserEntity userEntity;
@@ -68,6 +73,8 @@ public class DiscordUser extends UserAbstract {
     @Override
     public void warn(Server server, int points, String reason, User givenBy) {
 
+        LOGGER.info(String.format("Warning user %s for %s points", this.getId(), points));
+
         ServerEntity serverEntity = this.dataSuit.getOrCreateServerById(server.getId());
         UserEntity givenByEntity = this.dataSuit.getOrCreateUserById(givenBy.getId());
 
@@ -94,6 +101,8 @@ public class DiscordUser extends UserAbstract {
         }
 
         if (applicableDirectAction != null) {
+            LOGGER.info(String.format("Found applicable punishment at %s (%s)", applicableDirectAction.getPoints(),
+                    applicableDirectAction.getAction()));
             this.applyWarningAction(server, reason, applicableDirectAction, givenBy);
         } else {
             Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
@@ -128,6 +137,8 @@ public class DiscordUser extends UserAbstract {
     @Override
     public void kick(Server server, String reason, User givenBy) {
 
+        LOGGER.info(String.format("Kicking user %s", this.getId()));
+
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
 
@@ -147,6 +158,9 @@ public class DiscordUser extends UserAbstract {
 
     @Override
     public void unmute(Server server) {
+
+        LOGGER.info(String.format("Unmuting user %s", this.getId()));
+
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
         List<Role> mutedRoles = guild.getRolesByName("muted", true);
@@ -173,6 +187,8 @@ public class DiscordUser extends UserAbstract {
 
     @Override
     public void mute(Server server, TimeFrame timeFrame, String reason, User givenBy) {
+
+        LOGGER.info(String.format("Muting user %s", this.getId()));
 
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
@@ -213,12 +229,18 @@ public class DiscordUser extends UserAbstract {
     @Override
     public void effectuateMute(Server server) {
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
-        if (guild == null) return;
+        if (guild == null) {
+            LOGGER.info(String.format("Cannot apply mute guild %s isn't found.", server.getId()));
+            return;
+        }
 
         Member member = guild.getMemberById(this.jdaUser.getId());
         if (member != null) {
             Role mutedRole = this.getOrCreateMutedRole(guild);
             guild.addRoleToMember(member, mutedRole).queue();
+        } else {
+            LOGGER.info(String.format("Cannot apply mute right away because user %s is not in server %s",
+                    this.getId(), server.getId()));
         }
     }
 
@@ -229,6 +251,9 @@ public class DiscordUser extends UserAbstract {
 
     @Override
     public void unban(Server server) {
+
+        LOGGER.info(String.format("Unbanning user %s", this.getId()));
+
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
         guild.unban(this.jdaUser).queue();
@@ -248,6 +273,8 @@ public class DiscordUser extends UserAbstract {
 
     @Override
     public void ban(Server server, TimeFrame timeFrame, String reason, User givenBy) {
+
+        LOGGER.info(String.format("Banning user %s", this.getId()));
 
         Guild guild = this.jdaUser.getJDA().getGuildById(server.getId());
         if (guild == null) return;
