@@ -5,7 +5,6 @@ import com.dyescape.bot.data.entity.WarningActionEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;
-import com.dyescape.bot.discord.command.ServerPrefixProvider;
 import com.dyescape.bot.domain.model.TimeFrame;
 
 import co.aikar.commands.JDACommandEvent;
