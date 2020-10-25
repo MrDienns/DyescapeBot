@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.cron;
 
-import com.dyescape.bot.data.entity.PunishmentEntity;
+import com.dyescape.bot.data.entity.data.PunishmentEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.domain.DiscordServer;
 import com.dyescape.bot.discord.domain.DiscordUser;

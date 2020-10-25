@@ -1,6 +1,6 @@
 package com.dyescape.bot.data.repository;
 
-import com.dyescape.bot.data.entity.PunishmentEntity;
+import com.dyescape.bot.data.entity.data.PunishmentEntity;
 import com.dyescape.bot.data.id.UserServerID;
 
 import org.springframework.data.repository.CrudRepository;

@@ -1,6 +1,6 @@
 package com.dyescape.bot.data.repository;
 
-import com.dyescape.bot.data.entity.RoleEntity;
+import com.dyescape.bot.data.entity.data.RoleEntity;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

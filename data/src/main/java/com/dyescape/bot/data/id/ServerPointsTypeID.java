@@ -1,6 +1,6 @@
 package com.dyescape.bot.data.id;
 
-import com.dyescape.bot.data.entity.WarningActionEntity;
+import com.dyescape.bot.data.entity.data.WarningActionEntity;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;

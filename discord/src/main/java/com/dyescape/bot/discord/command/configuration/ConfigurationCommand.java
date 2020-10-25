@@ -1,7 +1,7 @@
 package com.dyescape.bot.discord.command.configuration;
 
-import com.dyescape.bot.data.entity.ServerEntity;
-import com.dyescape.bot.data.entity.WarningActionEntity;
+import com.dyescape.bot.data.entity.data.ServerEntity;
+import com.dyescape.bot.data.entity.data.WarningActionEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;

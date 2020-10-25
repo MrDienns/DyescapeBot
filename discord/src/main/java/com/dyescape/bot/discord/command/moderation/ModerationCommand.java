@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.command.moderation;
 
-import com.dyescape.bot.data.entity.UserEntity;
+import com.dyescape.bot.data.entity.data.UserEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.BotCommand;
 import com.dyescape.bot.discord.command.CommandPermissions;

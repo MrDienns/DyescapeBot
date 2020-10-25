@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.command.resolver;
 
-import com.dyescape.bot.data.entity.UserEntity;
+import com.dyescape.bot.data.entity.data.UserEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.command.resolver.processor.ArgumentProcessor;
 import com.dyescape.bot.discord.command.resolver.processor.UserProcessor;

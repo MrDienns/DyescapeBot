@@ -1,7 +1,7 @@
 package com.dyescape.bot.data.suit;
 
-import com.dyescape.bot.data.entity.ServerEntity;
-import com.dyescape.bot.data.entity.UserEntity;
+import com.dyescape.bot.data.entity.data.ServerEntity;
+import com.dyescape.bot.data.entity.data.UserEntity;
 import com.dyescape.bot.data.repository.*;
 
 import java.util.Objects;

@@ -1,8 +1,7 @@
-package com.dyescape.bot.data.entity;
+package com.dyescape.bot.data.entity.data;
 
 import javax.persistence.*;
 
-import java.time.Instant;
 import java.util.Objects;
 
 @Entity

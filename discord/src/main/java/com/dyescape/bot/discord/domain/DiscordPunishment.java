@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.domain;
 
-import com.dyescape.bot.data.entity.PunishmentEntity;
+import com.dyescape.bot.data.entity.data.PunishmentEntity;
 import com.dyescape.bot.domain.model.Punishment;
 
 import org.jetbrains.annotations.Nullable;

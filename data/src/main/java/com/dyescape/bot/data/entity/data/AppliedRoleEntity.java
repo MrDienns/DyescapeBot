@@ -1,4 +1,4 @@
-package com.dyescape.bot.data.entity;
+package com.dyescape.bot.data.entity.data;
 
 import com.dyescape.bot.data.id.UserServerID;
 

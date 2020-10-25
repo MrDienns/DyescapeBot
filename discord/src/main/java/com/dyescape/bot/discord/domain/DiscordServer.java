@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.domain;
 
-import com.dyescape.bot.data.entity.ServerEntity;
+import com.dyescape.bot.data.entity.data.ServerEntity;
 import com.dyescape.bot.domain.model.Server;
 
 import net.dv8tion.jda.api.entities.Guild;

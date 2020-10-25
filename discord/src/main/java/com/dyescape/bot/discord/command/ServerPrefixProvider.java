@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.command;
 
-import com.dyescape.bot.data.entity.ServerEntity;
+import com.dyescape.bot.data.entity.data.ServerEntity;
 import com.dyescape.bot.data.repository.ServerRepository;
 
 import java.util.Optional;

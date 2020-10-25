@@ -1,6 +1,6 @@
 package com.dyescape.bot.data.repository;
 
-import com.dyescape.bot.data.entity.WarningActionEntity;
+import com.dyescape.bot.data.entity.data.WarningActionEntity;
 import com.dyescape.bot.data.id.ServerPointsTypeID;
 
 import org.springframework.data.repository.CrudRepository;

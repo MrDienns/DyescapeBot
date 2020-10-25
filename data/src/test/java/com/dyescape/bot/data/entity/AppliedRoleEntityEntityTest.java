@@ -1,5 +1,10 @@
 package com.dyescape.bot.data.entity;
 
+import com.dyescape.bot.data.entity.data.AppliedRoleEntity;
+import com.dyescape.bot.data.entity.data.RoleEntity;
+import com.dyescape.bot.data.entity.data.ServerEntity;
+import com.dyescape.bot.data.entity.data.UserEntity;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

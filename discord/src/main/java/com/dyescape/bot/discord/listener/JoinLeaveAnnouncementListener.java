@@ -1,6 +1,6 @@
 package com.dyescape.bot.discord.listener;
 
-import com.dyescape.bot.data.entity.ServerEntity;
+import com.dyescape.bot.data.entity.data.ServerEntity;
 import com.dyescape.bot.data.suit.DataSuit;
 import com.dyescape.bot.discord.util.DiscordMessage;
 
