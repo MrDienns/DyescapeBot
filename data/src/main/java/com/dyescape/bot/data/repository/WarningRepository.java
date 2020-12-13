@@ -11,7 +11,7 @@ import java.time.Instant;
 @Repository
 public interface WarningRepository extends CrudRepository<WarningEntity, UserServerID> {
 
-    Iterable<WarningEntity> findAllByPunishmentUserIdAndPunishmentServerIdAndPunishmentGivenAtAfter(String userId,
+    Iterable<WarningEntity> findAllByPunishmentUserIdAndPunishmentServerIdAndPunishmentExpiresAtAfter(String userId,
                                                                                                     String serverId,
                                                                                                     Instant current);
 }

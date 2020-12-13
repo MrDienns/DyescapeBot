@@ -18,8 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.Collectors;
@@ -79,7 +81,7 @@ public class DiscordUser extends UserAbstract {
         UserEntity givenByEntity = this.dataSuit.getOrCreateUserById(givenBy.getId());
 
         PunishmentEntity punishment = new PunishmentEntity(this.userEntity,  serverEntity, PunishmentEntity.Action.WARN,
-                givenByEntity, Instant.now(), null, reason);
+                givenByEntity, Instant.now(), Instant.now().plus(Duration.ofDays(180)), reason);
         punishment = this.dataSuit.getPunishmentRepository().save(punishment);
 
         WarningEntity warning = new WarningEntity(punishment, points);
@@ -123,10 +125,10 @@ public class DiscordUser extends UserAbstract {
     public int getActiveWarningPoints(Server server) {
 
         // TODO: Configurable
-        Instant expiryTime = Instant.now().minus(Period.ofDays(180));
+        Instant expiryTime = Instant.now();
 
         Spliterator<WarningEntity> spliterator = this.dataSuit.getWarningRepository()
-                .findAllByPunishmentUserIdAndPunishmentServerIdAndPunishmentGivenAtAfter(this.getId(), server.getId(),
+                .findAllByPunishmentUserIdAndPunishmentServerIdAndPunishmentExpiresAtAfter(this.getId(), server.getId(),
                         expiryTime).spliterator();
 
         return StreamSupport.stream(spliterator, false)
